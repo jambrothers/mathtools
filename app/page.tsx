@@ -1,65 +1,88 @@
-import Image from "next/image";
+import { ToolCard } from "@/components/tool-card"
+import { Grid2x2, Calculator } from "lucide-react"
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex flex-col min-h-screen">
+      {/* Background Ambience */}
+      <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/10 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-600/10 blur-[120px]" />
+      </div>
+
+      <section className="relative px-4 sm:px-6 lg:px-8 pt-24 pb-12 md:pt-32 md:pb-20 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+
+            {/* Hero Text */}
+            <div className="flex-1 text-center lg:text-left">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-[var(--theme-main)] mb-6">
+                Bridging the gap <br className="hidden lg:block" />
+                between <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                  Math & Code
+                </span>
+              </h1>
+              <p className="text-lg md:text-xl text-[var(--theme-muted)] max-w-2xl mx-auto lg:mx-0 leading-relaxed mb-8">
+                Interactive digital manipulatives designed to make abstract mathematical concepts concrete, accessible, and engaging for every student.
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
+                <a href="#tools" className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 shadow-lg shadow-blue-600/20 transition-all duration-200">
+                  Explore Tools
+                </a>
+                <a href="/about" className="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-xl text-[var(--theme-main)] bg-[var(--theme-card)] border border-[var(--theme-border)] hover:bg-[var(--theme-border)] transition-colors">
+                  Learn More
+                </a>
+              </div>
+            </div>
+
+            {/* Hero Visual / Featured Tool Placeholder or Decoration */}
+            <div className="flex-1 w-full max-w-[600px] lg:max-w-full relative perspective-1000">
+              <div className="relative rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-purple-600 p-1 shadow-2xl transform rotate-y-[-5deg] rotate-x-[5deg] hover:rotate-0 transition-transform duration-500">
+                <div className="rounded-[2.4rem] bg-[var(--theme-card)] p-8 h-[400px] flex items-center justify-center relative overflow-hidden">
+                  <div className="text-[10rem] font-bold text-[var(--theme-muted)]/10 select-none">
+                    M
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-transparent pointer-events-none" />
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      </section>
+
+      {/* Tools Grid Section */}
+      <section id="tools" className="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--theme-page)] relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-12">
+            <h2 className="text-3xl md:text-5xl font-bold text-[var(--theme-main)] mb-4">
+              Manipulatives
+            </h2>
+            <p className="text-xl text-[var(--theme-muted)]">
+              Digital versions of essential classroom tools.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <ToolCard
+              title="Algebra Tiles"
+              description="Visualize algebraic concepts including expressions, equations, and factorisation with virtual algebraic tiles."
+              href="/manipulatives/algebra-tiles"
+              gradient="from-blue-500 to-cyan-500"
+              icon={<Grid2x2 className="w-8 h-8 text-blue-500" />}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <ToolCard
+              title="Double Sided Counters"
+              description="Explore integer operations, probability, and ratios with interactive two-colored counters."
+              href="/manipulatives/double-sided-counters"
+              gradient="from-purple-500 to-pink-500"
+              icon={<Calculator className="w-8 h-8 text-purple-500" />}
+            />
+          </div>
         </div>
-      </main>
+      </section>
     </div>
   );
 }
