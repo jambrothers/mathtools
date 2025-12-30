@@ -45,13 +45,13 @@ export function Navbar() {
                             onMouseEnter={() => setIsToolsOpen(true)}
                             onMouseLeave={() => setIsToolsOpen(false)}
                         >
-                            <button
+                            <Link
+                                href="/#tools"
                                 className="flex items-center gap-1 text-sm font-medium text-[var(--theme-muted)] group-hover:text-[var(--theme-main)] transition-colors py-2"
-                                onClick={() => setIsToolsOpen(!isToolsOpen)}
                             >
                                 Tools
                                 <ChevronDown size={16} className={`transition-transform duration-200 ${isToolsOpen ? 'rotate-180' : ''}`} />
-                            </button>
+                            </Link>
 
                             <div
                                 className={`absolute right-0 top-full mt-0 w-48 rounded-xl bg-[var(--theme-card)] border border-[var(--theme-border)] shadow-lg py-1 transition-all duration-200 origin-top-right ${isToolsOpen ? 'opacity-100 visible scale-100' : 'opacity-0 invisible scale-95'}`}
@@ -66,9 +66,6 @@ export function Navbar() {
                             </div>
                         </div>
 
-                        <Link href="/blog" className="text-sm font-medium text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
-                            Blog
-                        </Link>
 
                         {mounted && (
                             <button
@@ -102,15 +99,14 @@ export function Navbar() {
                         <Link href="/about" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-[var(--theme-muted)] hover:text-[var(--theme-main)] hover:bg-[var(--theme-card)]">
                             About
                         </Link>
-                        <div className="px-3 py-2">
-                            <div className="text-sm font-medium text-[var(--theme-muted)] mb-2">Tools</div>
-                            <Link href="/#tools" onClick={() => setIsOpen(false)} className="block pl-4 py-2 text-sm text-[var(--theme-muted)] hover:text-[var(--theme-main)]">
+                        <div className="px-3 py-2 text-base font-medium">
+                            <Link href="/#tools" onClick={() => setIsOpen(false)} className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] block mb-1">
+                                Tools
+                            </Link>
+                            <Link href="/#tools" onClick={() => setIsOpen(false)} className="block pl-4 py-1 text-sm text-[var(--theme-muted)] hover:text-[var(--theme-main)] border-l border-[var(--theme-border)] ml-1">
                                 Manipulatives
                             </Link>
                         </div>
-                        <Link href="/blog" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-[var(--theme-muted)] hover:text-[var(--theme-main)] hover:bg-[var(--theme-card)]">
-                            Blog
-                        </Link>
 
                         <div className="px-3 py-2">
                             {mounted && (

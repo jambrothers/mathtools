@@ -56,30 +56,33 @@ export default function Home() {
       {/* Tools Grid Section */}
       <section id="tools" className="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--theme-page)] relative">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-12">
+          <div className="mb-12 text-center lg:text-left">
             <h2 className="text-3xl md:text-5xl font-bold text-[var(--theme-main)] mb-4">
-              Manipulatives
+              Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Tools</span>
             </h2>
-            <p className="text-xl text-[var(--theme-muted)]">
-              Digital versions of essential classroom tools.
+            <p className="text-xl text-[var(--theme-muted)] max-w-2xl">
+              A curated collection of digital manipulatives and teaching aids designed for modern mathematics education.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <ToolCard
-              title="Algebra Tiles"
-              description="Visualize algebraic concepts including expressions, equations, and factorisation with virtual algebraic tiles."
-              href="/manipulatives/algebra-tiles"
-              gradient="from-blue-500 to-cyan-500"
-              icon={<Grid2x2 className="w-8 h-8 text-blue-500" />}
-            />
-            <ToolCard
-              title="Double Sided Counters"
-              description="Explore integer operations, probability, and ratios with interactive two-colored counters."
-              href="/manipulatives/double-sided-counters"
-              gradient="from-purple-500 to-pink-500"
-              icon={<Calculator className="w-8 h-8 text-purple-500" />}
-            />
+          <div className="mt-16">
+            <h3 className="text-2xl font-bold text-[var(--theme-main)] mb-8">Manipulatives</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <ToolCard
+                title="Algebra Tiles"
+                description="Visualize algebraic concepts including expressions, equations, and factorisation with virtual algebraic tiles."
+                href="/manipulatives/algebra-tiles"
+                gradient="from-blue-500 to-cyan-500"
+                icon={<Grid2x2 className="w-8 h-8 text-blue-500" />}
+              />
+              <ToolCard
+                title="Double Sided Counters"
+                description="Explore integer operations, probability, and ratios with interactive two-colored counters."
+                href="/manipulatives/double-sided-counters"
+                gradient="from-purple-500 to-pink-500"
+                icon={<Calculator className="w-8 h-8 text-purple-500" />}
+              />
+            </div>
           </div>
         </div>
       </section>
