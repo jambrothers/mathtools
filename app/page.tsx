@@ -65,7 +65,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="mt-16">
+          <div id="manipulatives" className="mt-16">
             <h3 className="text-2xl font-bold text-[var(--theme-main)] mb-8">Manipulatives</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <ToolCard

@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useTheme } from "next-themes"
-import { Moon, Sun, Menu, X, Code2, ChevronDown } from "lucide-react"
+import { Moon, Sun, Menu, X, Calculator, ChevronDown } from "lucide-react"
 
 export function Navbar() {
     const [isOpen, setIsOpen] = React.useState(false)
@@ -22,7 +22,7 @@ export function Navbar() {
                     <div className="flex items-center flex-shrink-0">
                         <Link href="/" className="flex items-center gap-2 group">
                             <div className="p-2 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 group-hover:opacity-90 transition-opacity">
-                                <Code2 className="w-6 h-6 text-white" />
+                                <Calculator className="w-6 h-6 text-white" />
                             </div>
                             <span className="font-bold text-xl tracking-tight text-[var(--theme-main)]">
                                 MathTools
@@ -57,7 +57,7 @@ export function Navbar() {
                                 className={`absolute right-0 top-full mt-0 w-48 rounded-xl bg-[var(--theme-card)] border border-[var(--theme-border)] shadow-lg py-1 transition-all duration-200 origin-top-right ${isToolsOpen ? 'opacity-100 visible scale-100' : 'opacity-0 invisible scale-95'}`}
                             >
                                 <Link
-                                    href="/#tools"
+                                    href="/#manipulatives"
                                     className="block px-4 py-2 text-sm text-[var(--theme-muted)] hover:bg-[var(--theme-page)] hover:text-[var(--theme-main)]"
                                     onClick={() => setIsToolsOpen(false)}
                                 >
