@@ -27,7 +27,7 @@ export function ToolCard({ title, description, href, gradient, icon }: ToolCardP
                             {icon}
                         </div>
 
-                        <h3 className="mb-2 text-2xl font-bold tracking-tight text-[var(--theme-main)] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300">
+                        <h3 className="mb-2 text-2xl font-bold tracking-tight text-[var(--theme-main)] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-600 transition-all duration-300">
                             {title}
                         </h3>
                         <p className="text-[var(--theme-muted)] leading-relaxed">

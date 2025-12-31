@@ -6,14 +6,14 @@
 
 @theme {
   --font-sans: var(--font-inter);
-  
+
   --color-theme-page: var(--theme-page);
   --color-theme-card: var(--theme-card);
   --color-theme-main: var(--theme-main);
   --color-theme-muted: var(--theme-muted);
   --color-theme-border: var(--theme-border);
-  
-  --background-image-gradient-primary: linear-gradient(to bottom right, var(--color-blue-600), var(--color-purple-600));
+
+  --background-image-gradient-primary: linear-gradient(to bottom right, var(--color-blue-400), var(--color-purple-600));
 }
 
 :root {
