@@ -20,11 +20,11 @@ export default function Home() {
                 Bridging the gap <br className="hidden lg:block" />
                 between <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                  Math & Code
+                  Exposition & Understanding
                 </span>
               </h1>
               <p className="text-lg md:text-xl text-[var(--theme-muted)] max-w-2xl mx-auto lg:mx-0 leading-relaxed mb-8">
-                Interactive digital manipulatives designed to make abstract mathematical concepts concrete, accessible, and engaging for every student.
+                Interactive digital tools designed to make abstract mathematical concepts concrete, accessible, and engaging for every student.
               </p>
 
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">

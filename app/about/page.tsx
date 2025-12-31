@@ -8,13 +8,13 @@ export default function AboutPage() {
 
                 <div className="prose prose-lg dark:prose-invert">
                     <p className="text-xl text-[var(--theme-muted)] leading-relaxed mb-6">
-                        MathTools is a collection of interactive digital manipulatives designed to bridge the gap between abstract mathematical concepts and concrete understanding.
+                        MathTools is a collection of interactive digital tools designed to bridge the gap between abstract mathematical concepts and concrete understanding.
                     </p>
 
                     <div className="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-2xl p-8 mb-8">
                         <h2 className="text-2xl font-bold text-[var(--theme-main)] mb-4">Our Mission</h2>
                         <p className="text-[var(--theme-muted)]">
-                            We believe that every student deserves access to high-quality, intuitive tools that make learning mathematics engaging and accessible. By leveraging modern web technologies, we bring traditional classroom counters, tiles, and grids into the digital age.
+                            We believe that every student deserves access to high-quality, intuitive tools that make learning mathematics engaging and accessible. By leveraging modern web technologies, we bring traditional classroom counters, tiles, and more into the digital age.
                         </p>
                     </div>
                 </div>
