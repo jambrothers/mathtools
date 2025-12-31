@@ -1,5 +1,4 @@
-import { ToolCard } from "@/components/tool-card"
-import { Grid2x2, Calculator } from "lucide-react"
+
 
 export default function Home() {
   return (
@@ -28,7 +27,7 @@ export default function Home() {
               </p>
 
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
-                <a href="#tools" className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white rounded-xl bg-gradient-to-r from-blue-400 to-purple-600 hover:opacity-90 shadow-lg shadow-blue-600/20 transition-all duration-200">
+                <a href="/tools" className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white rounded-xl bg-gradient-to-r from-blue-400 to-purple-600 hover:opacity-90 shadow-lg shadow-blue-600/20 transition-all duration-200">
                   Explore Tools
                 </a>
                 <a href="/about" className="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-xl text-[var(--theme-main)] bg-[var(--theme-card)] border border-[var(--theme-border)] hover:bg-[var(--theme-border)] transition-colors">
@@ -49,40 +48,6 @@ export default function Home() {
               </div>
             </div>
 
-          </div>
-        </div>
-      </section>
-
-      {/* Tools Grid Section */}
-      <section id="tools" className="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--theme-page)] relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-12 text-center lg:text-left">
-            <h2 className="text-3xl md:text-5xl font-bold text-[var(--theme-main)] mb-4">
-              Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">Tools</span>
-            </h2>
-            <p className="text-xl text-[var(--theme-muted)] max-w-2xl">
-              A curated collection of digital manipulatives and teaching aids designed for modern mathematics education.
-            </p>
-          </div>
-
-          <div id="manipulatives" className="mt-16">
-            <h3 className="text-2xl font-bold text-[var(--theme-main)] mb-8">Manipulatives</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <ToolCard
-                title="Algebra Tiles"
-                description="Visualize algebraic concepts including expressions, equations, and factorisation with virtual algebraic tiles."
-                href="/manipulatives/algebra-tiles"
-                gradient="from-blue-500 to-cyan-500"
-                icon={<Grid2x2 className="w-8 h-8 text-blue-500" />}
-              />
-              <ToolCard
-                title="Double Sided Counters"
-                description="Explore integer operations, probability, and ratios with interactive two-colored counters."
-                href="/manipulatives/double-sided-counters"
-                gradient="from-purple-500 to-pink-500"
-                icon={<Calculator className="w-8 h-8 text-purple-500" />}
-              />
-            </div>
           </div>
         </div>
       </section>

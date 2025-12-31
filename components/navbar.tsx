@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useTheme } from "next-themes"
+import { usePathname } from "next/navigation"
 import { Moon, Sun, Menu, X, Calculator, ChevronDown } from "lucide-react"
 
 export function Navbar() {
@@ -10,6 +11,12 @@ export function Navbar() {
     const { theme, setTheme } = useTheme()
     const [mounted, setMounted] = React.useState(false)
     const [isToolsOpen, setIsToolsOpen] = React.useState(false)
+    const pathname = usePathname()
+
+    const isActive = (path: string) => {
+        if (path === "/") return pathname === "/"
+        return pathname.startsWith(path)
+    }
 
     React.useEffect(() => {
         setMounted(true)
@@ -31,11 +38,17 @@ export function Navbar() {
                     </div>
 
                     <div className="hidden md:flex ml-auto items-center space-x-8">
-                        <Link href="/" className="text-sm font-medium text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
+                        <Link
+                            href="/"
+                            className={`text-sm font-medium transition-colors ${isActive("/") ? "text-[var(--theme-main)]" : "text-[var(--theme-muted)] hover:text-[var(--theme-main)]"}`}
+                        >
                             Home
                         </Link>
 
-                        <Link href="/about" className="text-sm font-medium text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
+                        <Link
+                            href="/about"
+                            className={`text-sm font-medium transition-colors ${isActive("/about") ? "text-[var(--theme-main)]" : "text-[var(--theme-muted)] hover:text-[var(--theme-main)]"}`}
+                        >
                             About
                         </Link>
 
@@ -46,8 +59,8 @@ export function Navbar() {
                             onMouseLeave={() => setIsToolsOpen(false)}
                         >
                             <Link
-                                href="/#tools"
-                                className="flex items-center gap-1 text-sm font-medium text-[var(--theme-muted)] group-hover:text-[var(--theme-main)] transition-colors py-2"
+                                href="/tools"
+                                className={`flex items-center gap-1 text-sm font-medium transition-colors py-2 ${isActive("/tools") ? "text-[var(--theme-main)]" : "text-[var(--theme-muted)] group-hover:text-[var(--theme-main)]"}`}
                             >
                                 Tools
                                 <ChevronDown size={16} className={`transition-transform duration-200 ${isToolsOpen ? 'rotate-180' : ''}`} />
@@ -57,7 +70,7 @@ export function Navbar() {
                                 className={`absolute right-0 top-full mt-0 w-48 rounded-xl bg-[var(--theme-card)] border border-[var(--theme-border)] shadow-lg py-1 transition-all duration-200 origin-top-right ${isToolsOpen ? 'opacity-100 visible scale-100' : 'opacity-0 invisible scale-95'}`}
                             >
                                 <Link
-                                    href="/#manipulatives"
+                                    href="/tools#manipulatives"
                                     className="block px-4 py-2 text-sm text-[var(--theme-muted)] hover:bg-[var(--theme-page)] hover:text-[var(--theme-main)]"
                                     onClick={() => setIsToolsOpen(false)}
                                 >
@@ -100,10 +113,14 @@ export function Navbar() {
                             About
                         </Link>
                         <div className="px-3 py-2 text-base font-medium">
-                            <Link href="/#tools" onClick={() => setIsOpen(false)} className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] block mb-1">
+                            <Link
+                                href="/tools"
+                                onClick={() => setIsOpen(false)}
+                                className={`block mb-1 ${isActive("/tools") ? "text-[var(--theme-main)]" : "text-[var(--theme-muted)] hover:text-[var(--theme-main)]"}`}
+                            >
                                 Tools
                             </Link>
-                            <Link href="/#tools" onClick={() => setIsOpen(false)} className="block pl-4 py-1 text-sm text-[var(--theme-muted)] hover:text-[var(--theme-main)] border-l border-[var(--theme-border)] ml-1">
+                            <Link href="/tools" onClick={() => setIsOpen(false)} className="block pl-4 py-1 text-sm text-[var(--theme-muted)] hover:text-[var(--theme-main)] border-l border-[var(--theme-border)] ml-1">
                                 Manipulatives
                             </Link>
                         </div>
