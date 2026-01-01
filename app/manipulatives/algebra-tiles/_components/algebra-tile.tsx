@@ -8,21 +8,36 @@ import { TILE_TYPES } from "../constants"
 import { cn } from "@/lib/utils"
 import { Position } from "@/types/manipulatives"
 
+/**
+ * Props for the AlgebraTile component.
+ */
 interface AlgebraTileProps {
     id: string
+    /** The type of tile (e.g., '1', 'x', 'x2', 'y', etc.) */
     type: string
+    /** The numerical value of the tile (e.g., 1, -1). Negative values have different colors. */
     value: number
+    /** X position on the canvas. */
     x: number
+    /** Y position on the canvas. */
     y: number
     isSelected?: boolean
+    /** Whether to show text labels on the tile. */
     showLabels?: boolean
+    // Drag handlers
     onDragStart?: (id: string, initialPos: Position) => void
     onDragMove?: (id: string, newPos: Position, delta: Position) => void
     onDragEnd?: (id: string, finalPos: Position) => void
+    // Interaction handlers
     onSelect?: (id: string, multi: boolean) => void
     onFlip?: (id: string) => void
     onRotate?: (id: string) => void
 }
+
+/**
+ * A specific implementation of a tile for Algebra Tiles.
+ * Handles drag interactions, multi-click events (flip/rotate), and responsive styling.
+ */
 
 export const AlgebraTile = React.memo(function AlgebraTile({
     id,
@@ -59,13 +74,15 @@ export const AlgebraTile = React.memo(function AlgebraTile({
     const borderClasses = `${borderColor} dark:${borderColor}`;
 
     const handleMouseDown = (e: React.MouseEvent) => {
-        // Stop bubbling so canvas doesn't clear selection
+        // Stop bubbling so canvas doesn't clear selection when clicking a tile
         e.stopPropagation();
         onSelect?.(id, e.shiftKey || e.metaKey);
         handleDragStart(e);
     };
 
-    // Event Priority Stack
+    // Event Priority Stack: Handles distinguishing between double and triple clicks.
+    // Double click -> Flip
+    // Triple click -> Rotate
     const { pushEvent } = useClickStack(
         { 'DOUBLE': 1, 'TRIPLE': 2 },
         {
@@ -114,7 +131,8 @@ export const AlgebraTile = React.memo(function AlgebraTile({
         </TileBase>
     )
 }, (prev, next) => {
-    // Custom comparison for performance optimization
+    // Custom comparison for performance optimization.
+    // Only re-render if props that affect visual state or position change.
     return (
         prev.id === next.id &&
         prev.type === next.type &&

@@ -4,10 +4,16 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 interface ManipulativeCanvasProps extends React.HTMLAttributes<HTMLDivElement> {
+    /** Optional grid size in pixels for the background pattern. */
     gridSize?: number
+    /** Callback triggered when a marquee selection ends. Returns the selected rectangle. */
     onSelectionEnd?: (rect: DOMRect) => void
 }
 
+/**
+ * A canvas component that supports drag-based marquee selection and grid background.
+ * ForwardRef exposes the underlying div element.
+ */
 export const ManipulativeCanvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
     ({ className, gridSize, children, onSelectionEnd, onClick, ...props }, ref) => {
         const [selectionBox, setSelectionBox] = React.useState<{ start: { x: number, y: number }, current: { x: number, y: number } } | null>(null)
@@ -29,6 +35,8 @@ export const ManipulativeCanvas = React.forwardRef<HTMLDivElement, ManipulativeC
 
             setSelectionBox({ start: { x, y }, current: { x, y } });
         };
+
+        // Track movement for marquee selection box resize
 
         const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
             if (!selectionBox) return;

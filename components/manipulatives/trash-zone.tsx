@@ -5,8 +5,14 @@ import { Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface TrashZoneProps extends React.HTMLAttributes<HTMLDivElement> {
+    /** Whether a draggable item is currently hovering over the trash zone. */
     isHovered?: boolean
 }
+
+/**
+ * A drop zone component for deleting manipulative tiles.
+ * visually reacts when an item is dragged over it (isHovered).
+ */
 
 export const TrashZone = React.forwardRef<HTMLDivElement, TrashZoneProps>(
     ({ className, isHovered, ...props }, ref) => {

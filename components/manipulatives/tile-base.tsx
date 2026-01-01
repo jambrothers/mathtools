@@ -4,13 +4,25 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Position } from "@/types/manipulatives"
 
+/**
+ * Props for the TileBase component.
+ */
 interface TileBaseProps extends React.HTMLAttributes<HTMLDivElement> {
+    /** Absolute position on the canvas. */
     position: Position
+    /** Rotation angle in degrees. */
     rotation?: number // in degrees
+    /** Whether the tile is currently being dragged (applies z-index and cursor styles). */
     isDragging?: boolean
+    /** Whether the tile is selected (applies highlight ring). */
     isSelected?: boolean
     onMouseDown?: (e: React.MouseEvent) => void
 }
+
+/**
+ * A base component for draggable manipulative tiles.
+ * Handles common styles like positioning, rotation, selection highlighting, and drag states.
+ */
 
 export function TileBase({
     position,

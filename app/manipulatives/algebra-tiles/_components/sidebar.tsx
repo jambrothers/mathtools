@@ -9,6 +9,10 @@ interface TileSidebarProps {
     showY: boolean
 }
 
+/**
+ * Sidebar component for selecting and adding new Algebra Tiles to the canvas.
+ * Also provides a legend/shortcut guide.
+ */
 export function TileSidebar({ onAddTile, showY }: TileSidebarProps) {
     const renderButton = (type: string, value: number, label: string) => {
         const def = TILE_TYPES[type];

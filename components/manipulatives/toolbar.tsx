@@ -13,6 +13,10 @@ import { cn } from "@/lib/utils"
  * </ManipulativeToolbar>
  */
 
+/**
+ * Main container for the manipulative toolbar.
+ */
+
 export function ManipulativeToolbar({ className, children }: { className?: string, children?: React.ReactNode }) {
     return (
         <div className={cn("p-2 bg-white dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800 z-10 flex flex-wrap gap-2 items-center justify-between", className)}>
@@ -21,6 +25,9 @@ export function ManipulativeToolbar({ className, children }: { className?: strin
     )
 }
 
+/**
+ * A wrapper to group related toolbar buttons together.
+ */
 export function ToolbarGroup({ className, children }: { className?: string, children?: React.ReactNode }) {
     return (
         <div className={cn("flex items-center gap-2", className)}>
@@ -29,6 +36,9 @@ export function ToolbarGroup({ className, children }: { className?: string, chil
     )
 }
 
+/**
+ * A visual separator line for toolbar groups.
+ */
 export function ToolbarSeparator() {
     return <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
 }
@@ -37,9 +47,13 @@ interface ToolbarButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
     icon?: React.ReactNode
     label?: string
     active?: boolean
+    /** Visual style variant of the button. */
     variant?: 'default' | 'danger' | 'primary' | 'success'
 }
 
+/**
+ * A standardized button component for the toolbar.
+ */
 export function ToolbarButton({ icon, label, active, variant = 'default', className, ...props }: ToolbarButtonProps) {
     const variants = {
         default: active

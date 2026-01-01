@@ -20,6 +20,11 @@ interface AlgebraToolbarProps {
     hasSelection: boolean
 }
 
+/**
+ * Toolbar specifically for the Algebra Tiles manipulative.
+ * Includes controls for labels, Y variables, grid snapping, grouping, and visualization.
+ */
+
 export function AlgebraToolbar({
     showLabels, setShowLabels,
     showY, setShowY,

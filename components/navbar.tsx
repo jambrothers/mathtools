@@ -7,6 +7,11 @@ import { usePathname } from "next/navigation"
 import { Moon, Sun, Menu, X, Calculator, ChevronDown } from "lucide-react"
 import { usePageTitle } from "./page-title-context"
 
+/**
+ * The main application navigation bar.
+ * Handles navigation links, theme toggling, and mobile menu state.
+ * Visibility is controlled via the PageTitleContext.
+ */
 export function Navbar() {
     const [isOpen, setIsOpen] = React.useState(false)
     const { theme, setTheme } = useTheme()
