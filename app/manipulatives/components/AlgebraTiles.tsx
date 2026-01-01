@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Trash2, Calculator, Eraser, Check, Grid, Undo, Magnet, Settings2, Eye, EyeOff, MousePointer2 } from 'lucide-react';
+import { Trash2, Eraser, Check, Grid, Undo, Magnet, Settings2, Eye, EyeOff, MousePointer2 } from 'lucide-react';
 
 /**
  * Algebra Tiles Tool
@@ -688,23 +688,16 @@ export default function AlgebraTiles() {
     };
 
     return (
-        <div className="flex flex-col h-full bg-slate-50 text-slate-900 font-sans overflow-hidden">
+        <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans overflow-hidden">
 
             {/* Header & Controls */}
-            <div className="p-4 bg-white shadow-sm border-b border-slate-200 z-10 flex flex-col md:flex-row gap-4 items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <div className="bg-indigo-600 p-2 rounded-lg text-white">
-                        <Calculator size={24} />
-                    </div>
-                    {/* <h1 className="text-xl font-bold text-slate-800">Algebra Tiles</h1> */}
-                </div>
-
+            <div className="p-4 bg-white dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800 z-10 flex flex-col md:flex-row gap-4 items-center justify-between">
                 {/* Input Area */}
                 <div className="flex-1 max-w-2xl w-full flex gap-2">
                     <input
                         type="text"
                         placeholder="Expression or Equation (e.g. 2x + 1 = 5, xy + y^2...)"
-                        className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                        className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-700 dark:bg-slate-950 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                         value={equationInput}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEquationInput(e.target.value)}
                         onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && visualizeEquation()}
@@ -721,7 +714,7 @@ export default function AlgebraTiles() {
                 <div className="flex gap-2 flex-wrap justify-center md:justify-end">
                     <button
                         onClick={() => setShowLabels(!showLabels)}
-                        className={`px-3 py-2 ${!showLabels ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-slate-100 text-slate-600'} hover:bg-slate-200 border border-transparent text-sm font-medium rounded-lg transition-all flex items-center gap-1`}
+                        className={`px-3 py-2 ${!showLabels ? 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/50 dark:text-indigo-200 dark:border-indigo-700' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700'} hover:bg-slate-200 dark:hover:bg-slate-700 border text-sm font-medium rounded-lg transition-all flex items-center gap-1`}
                         title="Show/Hide Labels"
                     >
                         {showLabels ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -729,14 +722,14 @@ export default function AlgebraTiles() {
                     </button>
                     <button
                         onClick={() => setShowY(!showY)}
-                        className={`px-3 py-2 ${showY ? 'bg-orange-100 text-orange-700 border-orange-200' : 'bg-slate-100 text-slate-600'} hover:bg-slate-200 border border-transparent text-sm font-medium rounded-lg transition-all flex items-center gap-1`}
+                        className={`px-3 py-2 ${showY ? 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/50 dark:text-orange-200 dark:border-orange-700' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700'} hover:bg-slate-200 dark:hover:bg-slate-700 border text-sm font-medium rounded-lg transition-all flex items-center gap-1`}
                         title="Toggle Y Variables"
                     >
                         <Settings2 size={16} /> {showY ? 'Hide Y' : 'Show Y'}
                     </button>
                     <button
                         onClick={() => setSnapToGrid(!snapToGrid)}
-                        className={`px-3 py-2 ${snapToGrid ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-slate-100 text-slate-600'} hover:bg-slate-200 border border-transparent text-sm font-medium rounded-lg transition-all flex items-center gap-1`}
+                        className={`px-3 py-2 ${snapToGrid ? 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/50 dark:text-indigo-200 dark:border-indigo-700' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700'} hover:bg-slate-200 dark:hover:bg-slate-700 border text-sm font-medium rounded-lg transition-all flex items-center gap-1`}
                         title="Toggle Snap to Grid"
                     >
                         <Magnet size={16} /> Snap
@@ -744,7 +737,7 @@ export default function AlgebraTiles() {
                     <button
                         onClick={undo}
                         disabled={history.length === 0}
-                        className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 disabled:opacity-50 text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
+                        className="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-200 border border-transparent dark:border-slate-700 disabled:opacity-50 text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
                         title="Undo last action (Ctrl+Z)"
                     >
                         <Undo size={16} /> Undo
@@ -765,7 +758,7 @@ export default function AlgebraTiles() {
                     </button>
                     <button
                         onClick={clearTiles}
-                        className="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
+                        className="px-3 py-2 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-800 text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
                         title="Clear all tiles"
                     >
                         <Eraser size={16} /> Clear
@@ -776,40 +769,40 @@ export default function AlgebraTiles() {
             <div className="flex flex-1 overflow-hidden relative">
 
                 {/* Sidebar */}
-                <div className="w-64 bg-white border-r border-slate-200 p-4 flex flex-col gap-6 shadow-sm overflow-y-auto z-10 shrink-0">
+                <div className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-6 shadow-sm overflow-y-auto z-10 shrink-0">
 
                     <div>
                         <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Add Positive</h3>
                         <div className="flex flex-col gap-3 items-start">
                             <button onClick={() => addTile('x2', 1)} className="flex items-center gap-3 hover:bg-slate-50 p-2 rounded-md w-full transition-colors group">
                                 <div className={`w-8 h-8 ${TILE_TYPES.x2.colorPos} border-2 ${TILE_TYPES.x2.borderColor} rounded-sm shadow-sm`}></div>
-                                <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-600">+x²</span>
+                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">+x²</span>
                             </button>
-                            <button onClick={() => addTile('x', 1)} className="flex items-center gap-3 hover:bg-slate-50 p-2 rounded-md w-full transition-colors group">
+                            <button onClick={() => addTile('x', 1)} className="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group">
                                 <div className={`w-3 h-8 ${TILE_TYPES.x.colorPos} border-2 ${TILE_TYPES.x.borderColor} rounded-sm shadow-sm`}></div>
-                                <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-600">+x</span>
+                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">+x</span>
                             </button>
 
                             {showY && (
                                 <>
-                                    <button onClick={() => addTile('y2', 1)} className="flex items-center gap-3 hover:bg-slate-50 p-2 rounded-md w-full transition-colors group">
+                                    <button onClick={() => addTile('y2', 1)} className="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group">
                                         <div className={`w-6 h-6 ${TILE_TYPES.y2.colorPos} border-2 ${TILE_TYPES.y2.borderColor} rounded-sm shadow-sm`}></div>
-                                        <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-600">+y²</span>
+                                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">+y²</span>
                                     </button>
-                                    <button onClick={() => addTile('y', 1)} className="flex items-center gap-3 hover:bg-slate-50 p-2 rounded-md w-full transition-colors group">
+                                    <button onClick={() => addTile('y', 1)} className="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group">
                                         <div className={`w-3 h-6 ${TILE_TYPES.y.colorPos} border-2 ${TILE_TYPES.y.borderColor} rounded-sm shadow-sm`}></div>
-                                        <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-600">+y</span>
+                                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">+y</span>
                                     </button>
-                                    <button onClick={() => addTile('xy', 1)} className="flex items-center gap-3 hover:bg-slate-50 p-2 rounded-md w-full transition-colors group">
+                                    <button onClick={() => addTile('xy', 1)} className="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group">
                                         <div className={`w-8 h-6 ${TILE_TYPES.xy.colorPos} border-2 ${TILE_TYPES.xy.borderColor} rounded-sm shadow-sm`}></div>
-                                        <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-600">+xy</span>
+                                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">+xy</span>
                                     </button>
                                 </>
                             )}
 
-                            <button onClick={() => addTile('1', 1)} className="flex items-center gap-3 hover:bg-slate-50 p-2 rounded-md w-full transition-colors group">
+                            <button onClick={() => addTile('1', 1)} className="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group">
                                 <div className={`w-4 h-4 ${TILE_TYPES[1].colorPos} border-2 ${TILE_TYPES[1].borderColor} rounded-sm shadow-sm`}></div>
-                                <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-600">+1</span>
+                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">+1</span>
                             </button>
                         </div>
                     </div>
@@ -817,35 +810,35 @@ export default function AlgebraTiles() {
                     <div className="border-t border-slate-100 pt-4">
                         <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Add Negative</h3>
                         <div className="flex flex-col gap-3 items-start">
-                            <button onClick={() => addTile('x2', -1)} className="flex items-center gap-3 hover:bg-slate-50 p-2 rounded-md w-full transition-colors group">
+                            <button onClick={() => addTile('x2', -1)} className="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group">
                                 <div className={`w-8 h-8 ${TILE_TYPES.x2.colorNeg} border-2 ${TILE_TYPES.x2.borderColorNeg} rounded-sm shadow-sm`}></div>
-                                <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-600">-x²</span>
+                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">-x²</span>
                             </button>
-                            <button onClick={() => addTile('x', -1)} className="flex items-center gap-3 hover:bg-slate-50 p-2 rounded-md w-full transition-colors group">
+                            <button onClick={() => addTile('x', -1)} className="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group">
                                 <div className={`w-3 h-8 ${TILE_TYPES.x.colorNeg} border-2 ${TILE_TYPES.x.borderColorNeg} rounded-sm shadow-sm`}></div>
-                                <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-600">-x</span>
+                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">-x</span>
                             </button>
 
                             {showY && (
                                 <>
-                                    <button onClick={() => addTile('y2', -1)} className="flex items-center gap-3 hover:bg-slate-50 p-2 rounded-md w-full transition-colors group">
+                                    <button onClick={() => addTile('y2', -1)} className="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group">
                                         <div className={`w-6 h-6 ${TILE_TYPES.y2.colorNeg} border-2 ${TILE_TYPES.y2.borderColorNeg} rounded-sm shadow-sm`}></div>
-                                        <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-600">-y²</span>
+                                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">-y²</span>
                                     </button>
-                                    <button onClick={() => addTile('y', -1)} className="flex items-center gap-3 hover:bg-slate-50 p-2 rounded-md w-full transition-colors group">
+                                    <button onClick={() => addTile('y', -1)} className="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group">
                                         <div className={`w-3 h-6 ${TILE_TYPES.y.colorNeg} border-2 ${TILE_TYPES.y.borderColorNeg} rounded-sm shadow-sm`}></div>
-                                        <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-600">-y</span>
+                                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">-y</span>
                                     </button>
-                                    <button onClick={() => addTile('xy', -1)} className="flex items-center gap-3 hover:bg-slate-50 p-2 rounded-md w-full transition-colors group">
+                                    <button onClick={() => addTile('xy', -1)} className="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group">
                                         <div className={`w-8 h-6 ${TILE_TYPES.xy.colorNeg} border-2 ${TILE_TYPES.xy.borderColorNeg} rounded-sm shadow-sm`}></div>
-                                        <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-600">-xy</span>
+                                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">-xy</span>
                                     </button>
                                 </>
                             )}
 
-                            <button onClick={() => addTile('1', -1)} className="flex items-center gap-3 hover:bg-slate-50 p-2 rounded-md w-full transition-colors group">
+                            <button onClick={() => addTile('1', -1)} className="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group">
                                 <div className={`w-4 h-4 ${TILE_TYPES[1].colorNeg} border-2 ${TILE_TYPES[1].borderColorNeg} rounded-sm shadow-sm`}></div>
-                                <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-600">-1</span>
+                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">-1</span>
                             </button>
                         </div>
                     </div>
@@ -865,7 +858,7 @@ export default function AlgebraTiles() {
                 {/* Workspace Canvas */}
                 <div
                     ref={workspaceRef}
-                    className="flex-1 bg-slate-50 relative overflow-hidden"
+                    className="flex-1 bg-slate-50 dark:bg-slate-950 relative overflow-hidden"
                     style={{ cursor: marqueeBox ? 'crosshair' : 'default' }}
                     onMouseDown={handleWorkspaceMouseDown}
                 >
@@ -879,15 +872,15 @@ export default function AlgebraTiles() {
 
                     {/* Equation Split Line */}
                     {mode === 'equation' && (
-                        <div className="absolute top-0 bottom-0 left-1/2 w-0.5 border-l-2 border-dashed border-slate-300 flex justify-center pointer-events-none">
-                            <div className="bg-white px-2 py-1 mt-4 text-slate-400 font-bold text-xl h-min rounded shadow-sm border border-slate-200">=</div>
+                        <div className="absolute top-0 bottom-0 left-1/2 w-0.5 border-l-2 border-dashed border-slate-300 dark:border-slate-700 flex justify-center pointer-events-none">
+                            <div className="bg-white dark:bg-slate-900 px-2 py-1 mt-4 text-slate-400 font-bold text-xl h-min rounded shadow-sm border border-slate-200 dark:border-slate-800">=</div>
                         </div>
                     )}
 
                     {/* Expression Mode Center Guide */}
                     {mode === 'expression' && tiles.length === 0 && (
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div className="text-slate-300 font-medium text-lg">Workspace Empty</div>
+                            <div className="text-slate-300 dark:text-slate-800 font-medium text-lg">Workspace Empty</div>
                         </div>
                     )}
 
@@ -952,7 +945,7 @@ export default function AlgebraTiles() {
                             className={`
                     w-16 h-16 rounded-full flex items-center justify-center 
                     transition-all duration-200 border-2
-                    ${dragInfo ? 'bg-red-50 border-red-200 text-red-500 scale-110 shadow-lg' : 'bg-white border-slate-200 text-slate-300 shadow-sm'}
+                    ${dragInfo ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 scale-110 shadow-lg' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-400 shadow-sm'}
                 `}
                         >
                             <Trash2 size={24} />

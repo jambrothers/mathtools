@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navbar";
+import { MainContentWrapper } from "@/components/main-content-wrapper";
 import { Footer } from "@/components/footer";
 import { PageTitleProvider } from "@/components/page-title-context";
 
@@ -32,9 +33,9 @@ export default function RootLayout({
         >
           <PageTitleProvider>
             <Navbar />
-            <main className="flex-grow pt-16">
+            <MainContentWrapper>
               {children}
-            </main>
+            </MainContentWrapper>
             <Footer />
           </PageTitleProvider>
         </ThemeProvider>
