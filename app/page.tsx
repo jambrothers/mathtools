@@ -1,4 +1,4 @@
-
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -39,9 +39,24 @@ export default function Home() {
             {/* Hero Visual / Featured Tool Placeholder or Decoration */}
             <div className="flex-1 w-full max-w-[600px] lg:max-w-full relative perspective-1000">
               <div className="relative rounded-[2.5rem] bg-gradient-to-br from-blue-400 to-purple-600 p-1 shadow-2xl transform rotate-y-[-5deg] rotate-x-[5deg] hover:rotate-0 transition-transform duration-500">
-                <div className="rounded-[2.4rem] bg-[var(--theme-card)] p-8 h-[400px] flex items-center justify-center relative overflow-hidden">
-                  <div className="text-[10rem] font-bold text-[var(--theme-muted)]/10 select-none">
-                    M
+                <div className="rounded-[2.4rem] bg-[var(--theme-card)] h-[400px] flex items-center justify-center relative overflow-hidden">
+                  <div className="relative w-full h-full flex items-center justify-center opacity-80">
+                    <Image
+                      src="/assets/tools.svg"
+                      alt="Mathematical Tools Illustration"
+                      fill
+                      className="object-cover dark:hidden"
+                      priority
+                      unoptimized
+                    />
+                    <Image
+                      src="/assets/tools-dark.svg"
+                      alt="Mathematical Tools Illustration"
+                      fill
+                      className="object-cover hidden dark:block"
+                      priority
+                      unoptimized
+                    />
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-transparent pointer-events-none" />
                 </div>
