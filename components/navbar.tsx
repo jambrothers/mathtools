@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useTheme } from "next-themes"
 import { usePathname } from "next/navigation"
 import { Moon, Sun, Menu, X, Calculator, ChevronDown } from "lucide-react"
+import { usePageTitle } from "./page-title-context"
 
 export function Navbar() {
     const [isOpen, setIsOpen] = React.useState(false)
@@ -12,6 +13,7 @@ export function Navbar() {
     const [mounted, setMounted] = React.useState(false)
     const [isToolsOpen, setIsToolsOpen] = React.useState(false)
     const pathname = usePathname()
+    const { title } = usePageTitle()
 
     const isActive = (path: string) => {
         if (path === "/") return pathname === "/"
@@ -25,8 +27,8 @@ export function Navbar() {
     return (
         <nav className="fixed top-0 w-full z-50 border-b border-[var(--theme-border)] bg-[var(--theme-page)]/80 backdrop-blur-md transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-[81px]">
-                    <div className="flex items-center flex-shrink-0">
+                <div className="flex items-center justify-between h-[81px] relative">
+                    <div className="flex items-center flex-shrink-0 z-10 bg-[var(--theme-page)]/0">
                         <Link href="/" className="flex items-center gap-2 group">
                             <div className="p-2 rounded-lg bg-gradient-to-br from-blue-400 to-purple-600 group-hover:opacity-90 transition-opacity">
                                 <Calculator className="w-6 h-6 text-white" />
@@ -37,7 +39,16 @@ export function Navbar() {
                         </Link>
                     </div>
 
-                    <div className="hidden md:flex ml-auto items-center space-x-8">
+                    {/* Centered Title */}
+                    <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+                        {title && (
+                            <h1 className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 animate-in fade-in zoom-in duration-300 fill-mode-forwards" style={{ opacity: 1 }}>
+                                {title}
+                            </h1>
+                        )}
+                    </div>
+
+                    <div className="hidden md:flex ml-auto items-center space-x-8 z-10 bg-[var(--theme-page)]/0">
                         <Link
                             href="/"
                             className={`text-sm font-medium transition-colors ${isActive("/") ? "text-[var(--theme-main)]" : "text-[var(--theme-muted)] hover:text-[var(--theme-main)]"}`}

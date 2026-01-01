@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { PageTitleProvider } from "@/components/page-title-context";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,11 +30,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
-          <main className="flex-grow pt-16">
-            {children}
-          </main>
-          <Footer />
+          <PageTitleProvider>
+            <Navbar />
+            <main className="flex-grow pt-16">
+              {children}
+            </main>
+            <Footer />
+          </PageTitleProvider>
         </ThemeProvider>
       </body>
     </html>

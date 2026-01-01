@@ -688,7 +688,7 @@ export default function AlgebraTiles() {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-slate-50 text-slate-900 font-sans overflow-hidden">
+        <div className="flex flex-col h-full bg-slate-50 text-slate-900 font-sans overflow-hidden">
 
             {/* Header & Controls */}
             <div className="p-4 bg-white shadow-sm border-b border-slate-200 z-10 flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -696,7 +696,7 @@ export default function AlgebraTiles() {
                     <div className="bg-indigo-600 p-2 rounded-lg text-white">
                         <Calculator size={24} />
                     </div>
-                    <h1 className="text-xl font-bold text-slate-800">Algebra Tiles</h1>
+                    {/* <h1 className="text-xl font-bold text-slate-800">Algebra Tiles</h1> */}
                 </div>
 
                 {/* Input Area */}

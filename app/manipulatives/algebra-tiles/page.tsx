@@ -1,12 +1,11 @@
 import AlgebraTiles from "../components/AlgebraTiles";
+import { SetPageTitle } from "@/components/set-page-title";
 
 export default function AlgebraTilesPage() {
     return (
-        <div className="min-h-[80vh] flex items-center justify-center p-4">
-            <div className="max-w-2xl text-center">
-                <h1 className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-6">
-                    Algebra Tiles
-                </h1>
+        <div className="flex flex-col h-full w-full">
+            <SetPageTitle title="Algebra Tiles" />
+            <div className="flex-1 w-full overflow-hidden">
                 <AlgebraTiles />
             </div>
         </div>
