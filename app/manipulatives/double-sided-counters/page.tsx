@@ -12,8 +12,10 @@ import {
     Timer,
     Rabbit,
     Turtle,
-    X
+    X,
+    Grid
 } from 'lucide-react';
+import { SetPageTitle } from '@/components/set-page-title';
 
 interface Counter {
     id: number;
@@ -23,16 +25,7 @@ interface Counter {
 }
 
 export default function CountersPage() {
-    return (
-        <div className="min-h-[80vh] flex items-center justify-center p-4">
-            <div className="max-w-2xl text-center">
-                <h1 className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-6">
-                    Double Sided Counters
-                </h1>
-                <DoubleSidedCounters />
-            </div>
-        </div>
-    )
+    return <DoubleSidedCounters />;
 }
 
 function DoubleSidedCounters() {
@@ -309,87 +302,88 @@ function DoubleSidedCounters() {
     const renderNumberLine = () => {
         const clampedSum = Math.max(-21, Math.min(21, totalSum));
         return (
-            <div className="absolute bottom-0 left-0 right-0 h-28 bg-white/95 border-t border-slate-200 backdrop-blur-sm z-30 overflow-hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] animate-in slide-in-from-bottom duration-300">
+            <div className="absolute bottom-0 left-0 right-0 h-28 bg-white/95 dark:bg-slate-900/95 border-t border-slate-200 dark:border-slate-800 backdrop-blur-sm z-30 overflow-hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] animate-in slide-in-from-bottom duration-300">
                 <div className="w-full h-full flex items-center justify-center relative select-none">
                     <div className="relative h-16 w-full max-w-4xl mx-auto flex items-center overflow-x-auto no-scrollbar">
                         <div className="min-w-[1000px] w-full h-full relative">
-                            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-300"></div>
+                            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-300 dark:bg-slate-700"></div>
                             {Array.from({ length: 41 }, (_, i) => {
                                 const val = i - 20;
                                 const isMajor = val % 5 === 0;
                                 const leftPos = `${(i / 40) * 100}%`;
                                 return (
                                     <div key={val} className="absolute top-0 bottom-0 flex flex-col items-center justify-center" style={{ left: leftPos, transform: 'translateX(-50%)' }}>
-                                        <div className={`w-px rounded-full transition-all duration-300 ${val === 0 ? 'h-5 bg-slate-800 w-0.5' : isMajor ? 'h-4 bg-slate-400' : 'h-2.5 bg-slate-300'}`}></div>
+                                        <div className={`w-px rounded-full transition-all duration-300 ${val === 0 ? 'h-5 bg-slate-800 dark:bg-slate-200 w-0.5' : isMajor ? 'h-4 bg-slate-400 dark:bg-slate-500' : 'h-2.5 bg-slate-300 dark:bg-slate-600'}`}></div>
                                         {(isMajor || Math.abs(val) === Math.abs(totalSum)) && (
-                                            <span className={`text-[10px] mt-2 font-medium transition-all duration-300 ${val === totalSum ? 'text-blue-600 font-bold scale-150 -translate-y-0.5' : 'text-slate-400'}`}>{val}</span>
+                                            <span className={`text-[10px] mt-2 font-medium transition-all duration-300 ${val === totalSum ? 'text-blue-600 dark:text-blue-400 font-bold scale-150 -translate-y-0.5' : 'text-slate-400 dark:text-slate-500'}`}>{val}</span>
                                         )}
                                     </div>
                                 );
                             })}
                             <div className="absolute top-1/2 -mt-4 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20 flex flex-col items-center" style={{ left: `${((clampedSum + 20) / 40) * 100}%`, transform: 'translate(-50%, -50%)' }}>
-                                <div className="w-5 h-5 bg-blue-600 rounded-full border-2 border-white shadow-lg relative z-10 flex items-center justify-center">
+                                <div className="w-5 h-5 bg-blue-600 dark:bg-blue-500 rounded-full border-2 border-white dark:border-slate-800 shadow-lg relative z-10 flex items-center justify-center">
                                     {totalSum > 20 && <div className="text-[9px] text-white font-bold ml-0.5">›</div>}
                                     {totalSum < -20 && <div className="text-[9px] text-white font-bold mr-0.5">‹</div>}
                                 </div>
-                                <div className="w-0.5 h-6 bg-blue-600/50 -mt-2 rounded-b-full"></div>
+                                <div className="w-0.5 h-6 bg-blue-600/50 dark:bg-blue-500/50 -mt-2 rounded-b-full"></div>
                             </div>
                         </div>
                     </div>
-                    {(totalSum > 20 || totalSum < -20) && <div className="absolute top-2 right-4 bg-blue-50 text-blue-600 border border-blue-100 text-xs px-2 py-1 rounded-full font-bold shadow-sm">Off Chart: {totalSum}</div>}
+                    {(totalSum > 20 || totalSum < -20) && <div className="absolute top-2 right-4 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800 text-xs px-2 py-1 rounded-full font-bold shadow-sm">Off Chart: {totalSum}</div>}
                 </div>
             </div>
         );
     };
 
     return (
-        <div className="flex flex-col h-screen bg-slate-50 text-slate-800 font-sans selection:bg-blue-100 overflow-hidden">
+        <div className="flex flex-col h-[calc(100vh-81px)] w-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans selection:bg-blue-100 dark:selection:bg-blue-900 overflow-hidden">
+            <SetPageTitle title="Double Sided Counters" />
 
-            {/* --- Header --- */}
-            <header className="bg-white border-b border-slate-200 px-4 py-3 md:px-6 shadow-sm z-20 shrink-0 relative">
+            {/* --- Toolbar --- */}
+            <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 md:px-6 shadow-sm z-20 shrink-0 relative">
                 <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-3">
-                            <div className="flex -space-x-2 filter drop-shadow-sm">
-                                <div className="w-6 h-6 rounded-full bg-yellow-400 border-2 border-yellow-500"></div>
-                                <div className="w-6 h-6 rounded-full bg-red-500 border-2 border-red-600"></div>
-                            </div>
-                            <span>Double Sided Counters</span>
-                        </h1>
-                    </div>
-
-                    <div className="flex items-center gap-3 md:gap-6 w-full md:w-auto justify-between md:justify-end">
+                    {/* Left Side: Controls that were previously header-like or title-adjacent could go here, but for now we keep the layout similar but remove title */}
+                    <div className="flex items-center gap-3">
+                        {/* We can put the View Toggle here similar to Algebra Toolbar */}
                         <button
                             onClick={() => setShowNumberLine(!showNumberLine)}
-                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border ${showNumberLine ? 'bg-blue-50 text-blue-700 border-blue-200 shadow-inner' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 shadow-sm'}`}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border ${showNumberLine ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 shadow-inner' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm'}`}
                         >
                             {showNumberLine ? <Eye size={16} /> : <EyeOff size={16} />}
                             <span className="hidden sm:inline">Number Line</span>
                         </button>
+                    </div>
 
-                        <div className="flex items-center gap-4 bg-slate-100 px-5 py-2 rounded-xl border border-slate-200 shadow-inner">
+                    <div className="flex items-center gap-3 md:gap-6 w-full md:w-auto justify-between md:justify-end">
+                        <div className="flex items-center gap-4 bg-slate-100 dark:bg-slate-800 px-5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 shadow-inner">
                             <div className="text-center">
-                                <span className="block text-[10px] uppercase tracking-wider text-slate-500 font-bold">Pos</span>
-                                <span className="text-lg font-bold text-yellow-600 tabular-nums">+{positiveCount}</span>
+                                <span className="block text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">Pos</span>
+                                <span className="text-lg font-bold text-yellow-600 dark:text-yellow-500 tabular-nums">+{positiveCount}</span>
                             </div>
-                            <div className="h-8 w-px bg-slate-300/50"></div>
+                            <div className="h-8 w-px bg-slate-300/50 dark:bg-slate-600/50"></div>
                             <div className="text-center">
-                                <span className="block text-[10px] uppercase tracking-wider text-slate-500 font-bold">Neg</span>
-                                <span className="text-lg font-bold text-red-600 tabular-nums">-{negativeCount}</span>
+                                <span className="block text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">Neg</span>
+                                <span className="text-lg font-bold text-red-600 dark:text-red-500 tabular-nums">-{negativeCount}</span>
                             </div>
-                            <div className="h-8 w-px bg-slate-300/50"></div>
+                            <div className="h-8 w-px bg-slate-300/50 dark:bg-slate-600/50"></div>
                             <div className="text-center min-w-[2.5rem]">
-                                <span className="block text-[10px] uppercase tracking-wider text-slate-500 font-bold">Sum</span>
-                                <span className={`text-xl font-bold tabular-nums ${totalSum > 0 ? 'text-green-600' : totalSum < 0 ? 'text-red-600' : 'text-slate-700'}`}>{totalSum > 0 ? '+' : ''}{totalSum}</span>
+                                <span className="block text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">Sum</span>
+                                <span className={`text-xl font-bold tabular-nums ${totalSum > 0 ? 'text-green-600 dark:text-green-400' : totalSum < 0 ? 'text-red-600 dark:text-red-400' : 'text-slate-700 dark:text-slate-300'}`}>{totalSum > 0 ? '+' : ''}{totalSum}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </header>
+            </div>
 
             {/* --- Main Workspace --- */}
-            <main className="flex-1 overflow-hidden relative bg-slate-50 flex flex-col">
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+            {/* --- Main Workspace --- */}
+            <main className="flex-1 overflow-hidden relative bg-slate-50 dark:bg-slate-950 flex flex-col">
+                <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+                {/* Dark mode grid overlay for better visibility if needed, or rely on opacity adjustment. 
+                    Actually, black lines on dark background are hard to see. 
+                    Let's use a white grid for dark mode.
+                */}
+                <div className="absolute inset-0 opacity-0 dark:opacity-[0.05] pointer-events-none mix-blend-screen" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
 
                 <div ref={scrollRef} className={`flex-1 overflow-y-auto p-4 md:p-8 transition-all duration-300 scroll-smooth ${showNumberLine ? 'pb-40' : 'pb-24'}`}>
                     <div className="max-w-5xl mx-auto min-h-full flex flex-col justify-center">
@@ -443,11 +437,11 @@ function DoubleSidedCounters() {
             </main>
 
             {/* --- Controls Footer --- */}
-            <footer className="bg-white border-t border-slate-200 shadow-[0_-8px_30px_rgba(0,0,0,0.05)] z-40 shrink-0 relative">
+            <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shadow-[0_-8px_30px_rgba(0,0,0,0.05)] z-40 shrink-0 relative">
 
                 {/* Sequential Animation Settings Panel (Pops up when mode is active) */}
                 {isSequentialMode && (
-                    <div className="absolute -top-14 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-2 rounded-full shadow-xl flex items-center gap-4 animate-in slide-in-from-bottom-2 fade-in z-50 whitespace-nowrap">
+                    <div className="absolute -top-14 left-1/2 -translate-x-1/2 bg-slate-800 dark:bg-slate-700 text-white px-6 py-2 rounded-full shadow-xl flex items-center gap-4 animate-in slide-in-from-bottom-2 fade-in z-50 whitespace-nowrap">
                         <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Speed</span>
                         <div className="flex items-center gap-3">
                             <Turtle size={16} className="text-slate-400" />
@@ -489,8 +483,8 @@ function DoubleSidedCounters() {
                                         onChange={(e) => setExpression(e.target.value)}
                                         placeholder="Calculate (e.g. 5 + -3 or 4 - 2)..."
                                         disabled={isAnimating}
-                                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm 
-                        focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 
+                                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-sm 
+                        focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-900 dark:text-slate-100
                         transition-all shadow-sm placeholder:text-slate-400 disabled:opacity-60"
                                     />
                                 </div>
@@ -516,8 +510,8 @@ function DoubleSidedCounters() {
                                 <button
                                     onClick={() => addCounter(POSITIVE)}
                                     disabled={isAnimating}
-                                    className="flex items-center gap-2 px-5 py-3 bg-yellow-50 hover:bg-yellow-100 text-yellow-800 
-                    rounded-xl font-bold transition-all border-2 border-yellow-300 shadow-sm active:scale-95 hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none"
+                                    className="flex items-center gap-2 px-5 py-3 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400
+                    rounded-xl font-bold transition-all border-2 border-yellow-300 dark:border-yellow-800 shadow-sm active:scale-95 hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none"
                                 >
                                     <div className="w-5 h-5 rounded-full bg-yellow-400 border border-yellow-600 flex items-center justify-center text-[10px] text-yellow-900 shadow-sm">+</div>
                                     Add +1
@@ -526,8 +520,8 @@ function DoubleSidedCounters() {
                                 <button
                                     onClick={() => addCounter(NEGATIVE)}
                                     disabled={isAnimating}
-                                    className="flex items-center gap-2 px-5 py-3 bg-red-50 hover:bg-red-100 text-red-800 
-                    rounded-xl font-bold transition-all border-2 border-red-300 shadow-sm active:scale-95 hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none"
+                                    className="flex items-center gap-2 px-5 py-3 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-800 dark:text-red-400
+                    rounded-xl font-bold transition-all border-2 border-red-300 dark:border-red-800 shadow-sm active:scale-95 hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none"
                                 >
                                     <div className="w-5 h-5 rounded-full bg-red-500 border border-red-700 flex items-center justify-center text-[10px] text-white shadow-sm">-</div>
                                     Add -1
@@ -536,8 +530,8 @@ function DoubleSidedCounters() {
                                 <button
                                     onClick={addZeroPair}
                                     disabled={isAnimating}
-                                    className="flex items-center gap-2 px-4 py-3 bg-white hover:bg-slate-50 text-slate-700 
-                    rounded-xl font-semibold transition-all border-2 border-slate-200 min-w-max shadow-sm active:scale-95 hover:border-slate-300 disabled:opacity-50 disabled:transform-none"
+                                    className="flex items-center gap-2 px-4 py-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200
+                    rounded-xl font-semibold transition-all border-2 border-slate-200 dark:border-slate-700 min-w-max shadow-sm active:scale-95 hover:border-slate-300 dark:hover:border-slate-600 disabled:opacity-50 disabled:transform-none"
                                     title="Add a positive and negative counter together"
                                 >
                                     <div className="flex -space-x-1 scale-75">
@@ -548,7 +542,7 @@ function DoubleSidedCounters() {
                                 </button>
                             </div>
 
-                            <div className="hidden md:block w-px h-12 bg-slate-200"></div>
+                            <div className="hidden md:block w-px h-12 bg-slate-200 dark:bg-slate-700"></div>
 
                             {/* Tools Group */}
                             <div className="flex gap-2 w-full md:w-auto flex-wrap justify-center md:justify-end">
@@ -556,8 +550,8 @@ function DoubleSidedCounters() {
                                 <button
                                     onClick={organize}
                                     disabled={counters.length === 0 || isAnimating}
-                                    className="flex flex-col items-center justify-center w-16 h-14 bg-white hover:bg-blue-50 text-slate-600 hover:text-blue-600
-                    border border-slate-200 hover:border-blue-200 rounded-xl transition-all shadow-sm active:scale-95 
+                                    className="flex flex-col items-center justify-center w-16 h-14 bg-white dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400
+                    border border-slate-200 dark:border-slate-700 hover:border-blue-200 dark:hover:border-blue-800 rounded-xl transition-all shadow-sm active:scale-95 
                     disabled:opacity-50 disabled:cursor-not-allowed group"
                                     title={sortState === 'grouped' ? "Sort into Zero Pairs" : "Sort by Type"}
                                 >
@@ -574,8 +568,8 @@ function DoubleSidedCounters() {
                                 <button
                                     onClick={flipAll}
                                     disabled={counters.length === 0 || isAnimating}
-                                    className="flex flex-col items-center justify-center w-16 h-14 bg-white hover:bg-purple-50 text-slate-600 hover:text-purple-600
-                    border border-slate-200 hover:border-purple-200 rounded-xl transition-all shadow-sm active:scale-95 
+                                    className="flex flex-col items-center justify-center w-16 h-14 bg-white dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-purple-900/20 text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400
+                    border border-slate-200 dark:border-slate-700 hover:border-purple-200 dark:hover:border-purple-800 rounded-xl transition-all shadow-sm active:scale-95 
                     disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Flip all counters (Multiply by -1)"
                                 >
@@ -584,7 +578,7 @@ function DoubleSidedCounters() {
                                 </button>
 
                                 {/* Cancel Group with Toggle */}
-                                <div className="flex items-center gap-1 bg-white border-2 border-slate-200 rounded-xl p-1 shadow-sm">
+                                <div className="flex items-center gap-1 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl p-1 shadow-sm">
                                     <button
                                         onClick={cancelZeroPairs}
                                         disabled={counters.length === 0 || isAnimating}
@@ -592,7 +586,7 @@ function DoubleSidedCounters() {
                       flex items-center gap-2 px-4 py-2 rounded-lg font-bold transition-all active:scale-95 h-full
                       ${Math.min(positiveCount, negativeCount) > 0
                                                 ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'
-                                                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                                : 'bg-slate-100 dark:bg-slate-700/50 text-slate-400 dark:text-slate-600 cursor-not-allowed'
                                             }
                     `}
                                         title="Remove pairs of positive and negative counters"
@@ -601,14 +595,14 @@ function DoubleSidedCounters() {
                                         <span>Cancel</span>
                                     </button>
 
-                                    <div className="w-px h-8 bg-slate-200 mx-1"></div>
+                                    <div className="w-px h-8 bg-slate-200 dark:bg-slate-700 mx-1"></div>
 
                                     <button
                                         onClick={() => !isAnimating && setIsSequentialMode(!isSequentialMode)}
                                         disabled={isAnimating}
                                         className={`
                       w-10 h-full flex items-center justify-center rounded-lg transition-colors
-                      ${isSequentialMode ? 'bg-blue-100 text-blue-600' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}
+                      ${isSequentialMode ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'}
                     `}
                                         title={isSequentialMode ? "Sequential Mode On" : "Sequential Mode Off"}
                                     >
@@ -616,13 +610,13 @@ function DoubleSidedCounters() {
                                     </button>
                                 </div>
 
-                                <div className="w-px h-10 bg-slate-300 mx-2"></div>
+                                <div className="w-px h-10 bg-slate-300 dark:bg-slate-600 mx-2"></div>
 
                                 <button
                                     onClick={clearBoard}
                                     disabled={counters.length === 0}
-                                    className="flex flex-col items-center justify-center w-14 h-14 bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 
-                    border border-slate-200 hover:border-red-200 rounded-xl transition-all shadow-sm active:scale-95
+                                    className="flex flex-col items-center justify-center w-14 h-14 bg-white dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400
+                    border border-slate-200 dark:border-slate-700 hover:border-red-200 dark:hover:border-red-800 rounded-xl transition-all shadow-sm active:scale-95
                     disabled:opacity-50 disabled:cursor-not-allowed"
                                     title="Clear Board"
                                 >
