@@ -9,6 +9,22 @@ The goal of this project is to create high-quality, web-based educational tools 
 - **Visual**: Leveraging the power of digital mediums to visualize abstract concepts.
 - **Accessible**: Available on any device with a web browser.
 
+## Available Tools
+
+### 1. Algebra Tiles
+A comprehensive environment for modeling algebraic concepts such as:
+- Solving linear equations
+- Factorizing quadratics
+- Exploring integer arithmetic
+*Status: Architecture finalized (Hooks + Components).*
+
+### 2. Double Sided Counters
+A tool for teaching integer operations using positive (yellow) and negative (red) counters. Features include:
+- Zero pair cancellation animations
+- Automated number line tracking
+- Sorting and grouping animations
+*Status: Functional, but pending refactor to align with project architecture (currently monolithic).*
+
 ## Built With
 
 - **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
