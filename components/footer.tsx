@@ -1,4 +1,5 @@
-import { Github, Linkedin, Twitter, Mail } from "lucide-react"
+import { Github, Linkedin, Mail } from "lucide-react"
+import { BlueskyIcon } from "./icons/bluesky-icon"
 
 export function Footer() {
     return (
@@ -14,8 +15,8 @@ export function Footer() {
                     <a href="#" className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
                         <Linkedin size={20} />
                     </a>
-                    <a href="#" className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
-                        <Twitter size={20} />
+                    <a href="https://bsky.app" className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
+                        <BlueskyIcon size={20} />
                     </a>
                     <a href="mailto:hello@example.com" className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
                         <Mail size={20} />
