@@ -1,0 +1,101 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Home Page matches snapshot 1`] = `
+<div>
+  <div
+    class="flex flex-col min-h-screen"
+  >
+    <div
+      class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none"
+    >
+      <div
+        class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/10 blur-[120px]"
+      />
+      <div
+        class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-600/10 blur-[120px]"
+      />
+    </div>
+    <section
+      class="relative px-4 sm:px-6 lg:px-8 pt-24 pb-12 md:pt-32 md:pb-20 overflow-hidden"
+    >
+      <div
+        class="max-w-7xl mx-auto"
+      >
+        <div
+          class="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center"
+        >
+          <div
+            class="flex-1 text-center lg:text-left"
+          >
+            <h1
+              class="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-[var(--theme-main)] mb-6"
+            >
+              Bridging the gap 
+              <br
+                class="hidden lg:block"
+              />
+              between 
+              <br />
+              <span
+                class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600"
+              >
+                Exposition & Understanding
+              </span>
+            </h1>
+            <p
+              class="text-lg md:text-xl text-[var(--theme-muted)] max-w-2xl mx-auto lg:mx-0 leading-relaxed mb-8"
+            >
+              Interactive digital tools designed to make abstract mathematical concepts concrete, accessible, and engaging for every student.
+            </p>
+            <div
+              class="flex flex-wrap items-center justify-center lg:justify-start gap-4"
+            >
+              <a
+                class="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white rounded-xl bg-gradient-to-r from-blue-400 to-purple-600 hover:opacity-90 shadow-lg shadow-blue-600/20 transition-all duration-200"
+                href="/tools"
+              >
+                Explore Tools
+              </a>
+              <a
+                class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-xl text-[var(--theme-main)] bg-[var(--theme-card)] border border-[var(--theme-border)] hover:bg-[var(--theme-border)] transition-colors"
+                href="/about"
+              >
+                Learn More
+              </a>
+            </div>
+          </div>
+          <div
+            class="flex-1 w-full max-w-[600px] lg:max-w-full relative perspective-1000"
+          >
+            <div
+              class="relative rounded-[2.5rem] bg-gradient-to-br from-blue-400 to-purple-600 p-1 shadow-2xl transform rotate-y-[-5deg] rotate-x-[5deg] hover:rotate-0 transition-transform duration-500"
+            >
+              <div
+                class="rounded-[2.4rem] bg-[var(--theme-card)] h-[400px] flex items-center justify-center relative overflow-hidden"
+              >
+                <div
+                  class="relative w-full h-full flex items-center justify-center opacity-80"
+                >
+                  <img
+                    alt="Mathematical Tools Illustration"
+                    class="object-cover dark:hidden"
+                    src="/assets/tools.svg"
+                  />
+                  <img
+                    alt="Mathematical Tools Illustration"
+                    class="object-cover hidden dark:block"
+                    src="/assets/tools-dark.svg"
+                  />
+                </div>
+                <div
+                  class="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-transparent pointer-events-none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+`;

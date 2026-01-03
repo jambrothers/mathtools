@@ -93,3 +93,54 @@ To learn more about the technologies used:
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+
+## Testing
+
+We use [Jest](https://jestjs.io/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) to ensure the reliability of our application.
+
+### Running Tests
+
+To run the full test suite:
+```bash
+npm run test
+```
+
+To run tests in watch mode (re-runs on file save):
+```bash
+npm run test:watch
+```
+
+### Test Structure
+
+- **Framework**: Jest serves as the test runner and assertion library.
+- **Environment**: `jsdom` is used to simulate a browser environment.
+- **Library**: `react-testing-library` is used to render components and query the DOM in a way that resembles how users find elements.
+
+Tests are located in the `__tests__` directory at the project root, mirroring the `app/` and `components/` structure:
+- **Component Tests**: Unit tests for individual components (e.g., `__tests__/components/footer.test.tsx`).
+- **Page Tests**: Snapshot tests to ensure pages render correctly (e.g., `__tests__/app/page.test.tsx`).
+- **Logic Tests**: Integration tests for complex interactions (e.g., `__tests__/app/manipulatives/double-sided-counters/page.test.tsx`).
+
+### Adding New Tests
+
+1.  **Identify the Target**: Decide if you are testing a reusable component or a page.
+2.  **Create the File**: Create a new file in the appropriate subdirectory of `__tests__`.
+    - Naming convention: `[filename].test.tsx`
+3.  **Write the Test**:
+    - Import `render` and `screen` from `@testing-library/react`.
+    - Use `describe` to group tests and `it` for individual test cases.
+    - **Snapshots**: Use `expect(container).toMatchSnapshot()` for static pages.
+    - **Interactions**: Use `fireEvent` to simulate user actions (clicks, inputs).
+
+Example:
+```tsx
+import { render, screen } from '@testing-library/react'
+import { MyComponent } from '@/components/my-component'
+
+describe('MyComponent', () => {
+    it('renders correctly', () => {
+        render(<MyComponent />)
+        expect(screen.getByText('Expected Text')).toBeInTheDocument()
+    })
+})
+```
