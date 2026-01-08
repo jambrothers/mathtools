@@ -1,90 +1,65 @@
-import { render, screen, fireEvent, act } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import CountersPage from '@/app/manipulatives/double-sided-counters/page'
 
-// Mock components that might cause issues or aren't relevant to logic tests
+// Mock the SetPageTitle component to avoid context requirement
 jest.mock('@/components/set-page-title', () => ({
-    SetPageTitle: () => null
+    SetPageTitle: ({ title }: { title: string }) => <h1>{title}</h1>
 }))
 
-describe('Double Sided Counters Page - Logic', () => {
-
-    beforeEach(() => {
-        jest.useFakeTimers()
-    })
-
-    afterEach(() => {
-        jest.runOnlyPendingTimers()
-        jest.useRealTimers()
-    })
-
-    it('starts with an empty board', () => {
+describe('Double Sided Counters Page', () => {
+    it('renders the title and empty state', () => {
         render(<CountersPage />)
+        expect(screen.getByText('Double Sided Counters')).toBeInTheDocument()
         expect(screen.getByText('The board is empty')).toBeInTheDocument()
-        // Ensure no counter buttons exist. Counter buttons have specific name '+' or '−'
-        // We use queryAllByRole to be safe and check length
-        const plusButtons = screen.queryAllByRole('button', { name: '+' })
-        const minusButtons = screen.queryAllByRole('button', { name: '−' })
-        expect(plusButtons).toHaveLength(0)
-        expect(minusButtons).toHaveLength(0)
     })
 
-    it('adds positive counter', () => {
+    it('adds positive counters via sidebar', () => {
         render(<CountersPage />)
+        const initialCount = screen.queryAllByText('+').length
         const addPosBtn = screen.getByText('Add +1')
         fireEvent.click(addPosBtn)
 
-        act(() => {
-            jest.advanceTimersByTime(1000) // Advance for animations/timeouts
-        })
-
-        // Should find at least one "+" counter
-        const plusButtons = screen.getAllByRole('button', { name: '+' })
-        expect(plusButtons.length).toBeGreaterThan(0)
+        // Should increase by 1
+        const newCount = screen.queryAllByText('+').length
+        expect(newCount).toBe(initialCount + 1)
+        expect(screen.queryByText('The board is empty')).not.toBeInTheDocument()
     })
 
-    it('adds negative counter', () => {
+    it('adds negative counters via sidebar', () => {
         render(<CountersPage />)
-        const addNegBtn = screen.getByText('Add -1')
-        fireEvent.click(addNegBtn)
-
-        act(() => {
-            jest.advanceTimersByTime(1000)
-        })
-
-        // Look for the minus sign.
-        const minusButtons = screen.getAllByRole('button', { name: '−' })
-        expect(minusButtons.length).toBeGreaterThan(0)
+        const initialCount = screen.queryAllByText('−').length
+        fireEvent.click(screen.getByText('Add -1'))
+        expect(screen.queryAllByText('−').length).toBe(initialCount + 1)
     })
 
     it('adds zero pair', () => {
         render(<CountersPage />)
-        const zeroPairBtn = screen.getByText('Zero Pair')
-        fireEvent.click(zeroPairBtn)
+        const initialPos = screen.queryAllByText('+').length
+        const initialNeg = screen.queryAllByText('−').length
 
-        act(() => {
-            jest.advanceTimersByTime(1000)
-        })
+        fireEvent.click(screen.getByText('Zero Pair'))
 
-        const plusButtons = screen.getAllByRole('button', { name: '+' })
-        const minusButtons = screen.getAllByRole('button', { name: '−' })
-
-        expect(plusButtons.length).toBeGreaterThanOrEqual(1)
-        expect(minusButtons.length).toBeGreaterThanOrEqual(1)
+        expect(screen.queryAllByText('+').length).toBe(initialPos + 1)
+        expect(screen.queryAllByText('−').length).toBe(initialNeg + 1)
     })
 
-    it('clears board', () => {
+    it('updates stats correctly', () => {
         render(<CountersPage />)
-        const addPosBtn = screen.getByText('Add +1')
-        fireEvent.click(addPosBtn)
-        act(() => { jest.advanceTimersByTime(1000) })
+        // Add +1, +1, -1
+        fireEvent.click(screen.getByText('Zero Pair')) // +1, -1
+        fireEvent.click(screen.getByText('Add +1'))    // +1
+
+        // Check Stats
+        expect(screen.getByText('+2')).toBeInTheDocument() // Pos count
+        expect(screen.getByText('-1')).toBeInTheDocument() // Neg count
+    })
+
+    it('clears the board', () => {
+        render(<CountersPage />)
+        fireEvent.click(screen.getByText('Add +1'))
         expect(screen.queryByText('The board is empty')).not.toBeInTheDocument()
 
-        const clearBtn = screen.getByText('Clear') // Might match Title "Clear Board" or text logic
-        // Button text is "Clear" inside span
-        fireEvent.click(clearBtn)
-
-        act(() => { jest.runAllTimers() })
-
+        fireEvent.click(screen.getByText('Clear'))
         expect(screen.getByText('The board is empty')).toBeInTheDocument()
     })
 })
