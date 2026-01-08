@@ -1,6 +1,7 @@
 "use client"
 
 import React from 'react';
+import { FloatingPanel } from "@/components/manipulatives/floating-panel";
 
 interface NumberLineProps {
     val: number;
@@ -10,7 +11,7 @@ export function NumberLine({ val: currentSum }: NumberLineProps) {
     const clampedSum = Math.max(-21, Math.min(21, currentSum));
 
     return (
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-2xl bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg backdrop-blur-sm z-30 overflow-hidden animate-in slide-in-from-bottom duration-300">
+        <FloatingPanel className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-2xl overflow-hidden animate-in slide-in-from-bottom duration-300">
             <div className="h-16 w-full relative select-none flex items-center justify-center">
                 <div className="relative w-full h-full overflow-hidden">
                     {/* Horizontal Line */}
@@ -56,6 +57,6 @@ export function NumberLine({ val: currentSum }: NumberLineProps) {
                     Off Scale: {currentSum}
                 </div>
             )}
-        </div>
+        </FloatingPanel>
     );
 }

@@ -79,3 +79,53 @@ export function ToolbarButton({ icon, label, active, variant = 'default', classN
         </button>
     )
 }
+interface ToolbarInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSubmit'> {
+    value: string
+    onChange: (value: string) => void
+    onSubmit?: (value: string) => void
+    buttonLabel?: string
+    buttonIcon?: React.ReactNode
+}
+
+/**
+ * A combined Input + Button component for the toolbar (e.g. for equations or adding counts).
+ */
+export function ToolbarInput({
+    value,
+    onChange,
+    onSubmit,
+    buttonLabel = "Add",
+    buttonIcon,
+    className,
+    placeholder,
+    ...props
+}: ToolbarInputProps) {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && onSubmit) {
+            onSubmit(value);
+        }
+    };
+
+    return (
+        <div className={cn("flex items-center gap-2", className)}>
+            <input
+                type="text"
+                className="flex-1 px-3 py-1.5 text-sm border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-950 focus:ring-2 focus:ring-indigo-500 focus:outline-none min-w-[140px]"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={placeholder}
+                {...props}
+            />
+            {onSubmit && (
+                <ToolbarButton
+                    label={buttonLabel}
+                    icon={buttonIcon}
+                    variant="primary"
+                    onClick={() => onSubmit(value)}
+                    disabled={!value}
+                />
+            )}
+        </div>
+    )
+}

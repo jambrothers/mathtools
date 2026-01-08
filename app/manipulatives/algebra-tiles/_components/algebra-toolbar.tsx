@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Eye, EyeOff, Settings2, Magnet, Undo, Grid, Check, Eraser, Trash2 } from "lucide-react"
-import { ManipulativeToolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator } from "@/components/manipulatives/toolbar"
+import { ManipulativeToolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator, ToolbarInput } from "@/components/manipulatives/toolbar"
 
 interface AlgebraToolbarProps {
     showLabels: boolean
@@ -18,6 +18,7 @@ interface AlgebraToolbarProps {
     onSimplify?: () => void
     onDeleteSelected?: () => void
     hasSelection: boolean
+    onVisualize?: (eq: string) => void
 }
 
 /**
@@ -36,24 +37,20 @@ export function AlgebraToolbar({
     onDeleteSelected,
     hasSelection,
     onVisualize
-}: AlgebraToolbarProps & { onVisualize?: (eq: string) => void }) {
+}: AlgebraToolbarProps) {
     const [input, setInput] = React.useState("")
 
     return (
         <ManipulativeToolbar className="gap-4">
-            <div className="flex-1 flex gap-2 min-w-[200px]">
-                <input
-                    type="text"
-                    placeholder="e.g. 2x + 1 = 5"
-                    className="flex-1 px-3 py-1.5 text-sm border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-950 focus:ring-2 focus:ring-indigo-500"
+            <div className="flex-1 flex gap-2 min-w-[300px] max-w-4xl">
+                <ToolbarInput
+                    className="flex-1"
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && onVisualize?.(input)}
-                />
-                <ToolbarButton
-                    label="Visualize"
-                    variant="primary"
-                    onClick={() => onVisualize?.(input)}
+                    onChange={setInput}
+                    onSubmit={onVisualize}
+                    placeholder="e.g. 2x + 1 = 5"
+                    buttonLabel="Visualize"
+                    buttonIcon={<Check size={16} />}
                 />
             </div>
 

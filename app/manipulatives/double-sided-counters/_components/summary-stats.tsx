@@ -1,5 +1,7 @@
 "use client"
 
+import { FloatingPanel } from '@/components/manipulatives/floating-panel';
+
 interface SummaryStatsProps {
     pos: number
     neg: number
@@ -8,7 +10,7 @@ interface SummaryStatsProps {
 
 export function SummaryStats({ pos, neg, sum }: SummaryStatsProps) {
     return (
-        <div className="absolute top-4 right-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg p-3 z-30 animate-in fade-in slide-in-from-top-2">
+        <FloatingPanel className="absolute top-4 right-4 animate-in fade-in slide-in-from-top-2">
             <div className="flex items-center gap-4">
                 <div className="text-center">
                     <span className="block text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">Pos</span>
@@ -27,6 +29,6 @@ export function SummaryStats({ pos, neg, sum }: SummaryStatsProps) {
                     </span>
                 </div>
             </div>
-        </div>
+        </FloatingPanel>
     )
 }

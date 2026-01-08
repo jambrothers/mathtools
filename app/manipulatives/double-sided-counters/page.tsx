@@ -4,10 +4,11 @@ import React, { useState } from 'react';
 import { SetPageTitle } from '@/components/set-page-title';
 import { useCounters } from './_hooks/use-counters';
 import { CountersToolbar } from './_components/counters-toolbar';
-import { CountersSidebar } from './_components/counters-sidebar';
 import { SummaryStats } from './_components/summary-stats';
 import { NumberLine } from './_components/number-line';
-import { SpeedControl } from './_components/speed-control';
+import { ManipulativeSidebar, SidebarSection, SidebarButton } from '@/components/manipulatives/sidebar';
+import { SpeedControl } from '@/components/manipulatives/speed-control';
+import { ManipulativeCanvas } from '@/components/manipulatives/canvas';
 
 export default function CountersPage() {
     const {
@@ -81,24 +82,51 @@ export default function CountersPage() {
 
             <div className="flex flex-1 overflow-hidden relative">
                 {/* Sidebar */}
-                <CountersSidebar
-                    onAddPositive={() => addCounter(1, 1, showNumberLine)}
-                    onAddNegative={() => addCounter(-1, 1, showNumberLine)}
-                    onAddZeroPair={() => addZeroPair(showNumberLine)}
-                    disabled={isAnimating}
-                />
+                <ManipulativeSidebar>
+                    <SidebarSection title="Add Positive">
+                        <SidebarButton
+                            icon={<div className="w-4 h-4 rounded-full bg-yellow-400 border border-yellow-600 shadow-sm" />}
+                            label="Add +1"
+                            onClick={() => addCounter(1, 1, showNumberLine)}
+                            disabled={isAnimating}
+                        />
+                    </SidebarSection>
+
+                    <SidebarSection title="Add Negative">
+                        <SidebarButton
+                            icon={<div className="w-4 h-4 rounded-full bg-red-500 border border-red-700 shadow-sm" />}
+                            label="Add -1"
+                            onClick={() => addCounter(-1, 1, showNumberLine)}
+                            disabled={isAnimating}
+                        />
+                    </SidebarSection>
+
+                    <div className="mt-8">
+                        <SidebarSection title="Combinations">
+                            <SidebarButton
+                                icon={
+                                    <div className="flex -space-x-1">
+                                        <div className="w-3 h-3 rounded-full bg-yellow-400 border border-yellow-600 z-10" />
+                                        <div className="w-3 h-3 rounded-full bg-red-500 border border-red-700" />
+                                    </div>
+                                }
+                                label="Zero Pair"
+                                onClick={() => addZeroPair(showNumberLine)}
+                                disabled={isAnimating}
+                            />
+                        </SidebarSection>
+                    </div>
+
+                    <div className="mt-auto pt-6 text-slate-500 dark:text-slate-400 text-sm">
+                        <h3 className="font-semibold mb-2 text-slate-600 dark:text-slate-300">Shortcuts:</h3>
+                        <ul className="space-y-1 list-disc pl-4 text-xs">
+                            <li><span className="font-bold text-slate-700 dark:text-slate-200">Click</span> to flip sign.</li>
+                        </ul>
+                    </div>
+                </ManipulativeSidebar>
 
                 {/* Main Canvas */}
-                <main className="flex-1 relative bg-slate-50 dark:bg-slate-950 overflow-hidden">
-                    <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none"
-                        style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
-                    </div>
-
-                    {/* Dark mode grid (white lines) */}
-                    <div className="absolute inset-0 opacity-0 dark:opacity-[0.05] pointer-events-none mix-blend-screen"
-                        style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
-                    </div>
-
+                <ManipulativeCanvas gridSize={40}>
                     {/* Stats Overlay */}
                     {showStats && (
                         <SummaryStats pos={positiveCount} neg={negativeCount} sum={totalSum} />
@@ -106,7 +134,11 @@ export default function CountersPage() {
 
                     {/* Speed Control Overlay */}
                     {isSequentialMode && (
-                        <SpeedControl speed={animSpeed} onChange={setAnimSpeed} />
+                        <SpeedControl
+                            className="absolute top-4 left-4 md:left-6"
+                            speed={animSpeed}
+                            onChange={setAnimSpeed}
+                        />
                     )}
 
                     {/* Counters Area */}
@@ -157,8 +189,7 @@ export default function CountersPage() {
                     {showNumberLine && (
                         <NumberLine val={totalSum} />
                     )}
-
-                </main>
+                </ManipulativeCanvas>
             </div>
 
             <style>{`

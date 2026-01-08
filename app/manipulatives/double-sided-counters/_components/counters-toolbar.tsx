@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Eye, EyeOff, Trash2, RefreshCw, GitMerge, ArrowRightLeft, Timer } from "lucide-react"
-import { ManipulativeToolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator } from "@/components/manipulatives/toolbar"
+import { ManipulativeToolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator, ToolbarInput } from "@/components/manipulatives/toolbar"
 
 interface CountersToolbarProps {
     showNumberLine: boolean
@@ -35,33 +35,22 @@ export function CountersToolbar({
 }: CountersToolbarProps) {
     const [input, setInput] = React.useState("")
 
-    const handleSubmit = () => {
-        if (input.trim()) {
-            onAddExpression(input);
-            setInput("");
-        }
-    }
-
     return (
         <ManipulativeToolbar className="gap-4">
             {/* Search / Input */}
-            <div className="flex-1 flex gap-2 min-w-[200px] max-w-md">
-                <input
-                    type="text"
-                    placeholder="e.g. 5 + -3"
-                    className="flex-1 px-3 py-1.5 text-sm border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-950 focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+            <div className="flex-1 flex gap-2 min-w-[200px] max-w-4xl">
+                <ToolbarInput
+                    className="flex-1"
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                    onChange={setInput}
+                    onSubmit={(val) => {
+                        onAddExpression(val);
+                        setInput("");
+                    }}
+                    placeholder="e.g. 5 + -3"
+                    buttonLabel="Add"
                     disabled={isAnimating}
                 />
-                <button
-                    onClick={handleSubmit}
-                    disabled={!input || isAnimating}
-                    className="px-3 py-1.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-sm font-medium rounded-md hover:bg-slate-800 dark:hover:bg-slate-200 disabled:opacity-50 transition-colors"
-                >
-                    Add
-                </button>
             </div>
 
             <div className="flex items-center gap-2 ml-auto">

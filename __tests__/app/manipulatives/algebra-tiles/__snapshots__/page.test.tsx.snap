@@ -11,22 +11,44 @@ exports[`AlgebraTiles Page matches snapshot 1`] = `
       <div
         class="flex-1 flex gap-2 min-w-[200px]"
       >
-        <input
-          class="flex-1 px-3 py-1.5 text-sm border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-950 focus:ring-2 focus:ring-indigo-500"
-          placeholder="e.g. 2x + 1 = 5"
-          type="text"
-          value=""
-        />
-        <button
-          class="px-3 py-2 border text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700 text-white border-transparent"
-          type="button"
+        <div
+          class="flex items-center gap-2"
         >
-          <span
-            class="hidden sm:inline"
+          <input
+            class="flex-1 px-3 py-1.5 text-sm border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-950 focus:ring-2 focus:ring-indigo-500 focus:outline-none min-w-[140px]"
+            placeholder="e.g. 2x + 1 = 5"
+            type="text"
+            value=""
+          />
+          <button
+            class="px-3 py-2 border text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 hover:bg-blue-700 text-white border-transparent"
+            disabled=""
+            type="button"
           >
-            Visualize
-          </span>
-        </button>
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-check"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20 6 9 17l-5-5"
+              />
+            </svg>
+            <span
+              class="hidden sm:inline"
+            >
+              Visualize
+            </span>
+          </button>
+        </div>
       </div>
       <div
         class="flex items-center gap-2"
@@ -333,7 +355,9 @@ exports[`AlgebraTiles Page matches snapshot 1`] = `
       <div
         class="w-48 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-6 shadow-sm overflow-y-auto z-10 shrink-0 h-full"
       >
-        <div>
+        <div
+          class=""
+        >
           <h3
             class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3"
           >
@@ -343,50 +367,70 @@ exports[`AlgebraTiles Page matches snapshot 1`] = `
             class="flex flex-col gap-2"
           >
             <button
-              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left"
+              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div
-                class="bg-blue-500 border-2 border-blue-700 rounded-sm shadow-sm shrink-0"
-                style="width: 24px; height: 24px;"
-              />
-              <span
-                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+                class="shrink-0 flex items-center justify-center"
               >
-                +
-                x²
+                <div
+                  class="bg-blue-500 border-2 border-blue-700 rounded-sm shadow-sm shrink-0"
+                  style="width: 24px; height: 24px;"
+                />
+              </div>
+              <span
+                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-disabled:group-hover:text-slate-600 dark:group-disabled:group-hover:text-slate-400"
+              >
+                <span>
+                  +
+                  x²
+                </span>
               </span>
             </button>
             <button
-              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left"
+              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div
-                class="bg-green-500 border-2 border-green-700 rounded-sm shadow-sm shrink-0"
-                style="width: 10px; height: 24px;"
-              />
-              <span
-                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+                class="shrink-0 flex items-center justify-center"
               >
-                +
-                x
+                <div
+                  class="bg-green-500 border-2 border-green-700 rounded-sm shadow-sm shrink-0"
+                  style="width: 10px; height: 24px;"
+                />
+              </div>
+              <span
+                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-disabled:group-hover:text-slate-600 dark:group-disabled:group-hover:text-slate-400"
+              >
+                <span>
+                  +
+                  x
+                </span>
               </span>
             </button>
             <button
-              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left"
+              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div
-                class="bg-yellow-400 border-2 border-yellow-600 rounded-sm shadow-sm shrink-0"
-                style="width: 10px; height: 10px;"
-              />
-              <span
-                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+                class="shrink-0 flex items-center justify-center"
               >
-                +
-                1
+                <div
+                  class="bg-yellow-400 border-2 border-yellow-600 rounded-sm shadow-sm shrink-0"
+                  style="width: 10px; height: 10px;"
+                />
+              </div>
+              <span
+                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-disabled:group-hover:text-slate-600 dark:group-disabled:group-hover:text-slate-400"
+              >
+                <span>
+                  +
+                  1
+                </span>
               </span>
             </button>
           </div>
         </div>
-        <div>
+        <div
+          class=""
+        >
           <h3
             class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3"
           >
@@ -396,42 +440,60 @@ exports[`AlgebraTiles Page matches snapshot 1`] = `
             class="flex flex-col gap-2"
           >
             <button
-              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left"
+              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div
-                class="bg-red-500 border-2 border-red-700 rounded-sm shadow-sm shrink-0"
-                style="width: 24px; height: 24px;"
-              />
-              <span
-                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+                class="shrink-0 flex items-center justify-center"
               >
-                -x²
+                <div
+                  class="bg-red-500 border-2 border-red-700 rounded-sm shadow-sm shrink-0"
+                  style="width: 24px; height: 24px;"
+                />
+              </div>
+              <span
+                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-disabled:group-hover:text-slate-600 dark:group-disabled:group-hover:text-slate-400"
+              >
+                <span>
+                  -x²
+                </span>
               </span>
             </button>
             <button
-              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left"
+              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div
-                class="bg-red-500 border-2 border-red-700 rounded-sm shadow-sm shrink-0"
-                style="width: 10px; height: 24px;"
-              />
-              <span
-                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+                class="shrink-0 flex items-center justify-center"
               >
-                -x
+                <div
+                  class="bg-red-500 border-2 border-red-700 rounded-sm shadow-sm shrink-0"
+                  style="width: 10px; height: 24px;"
+                />
+              </div>
+              <span
+                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-disabled:group-hover:text-slate-600 dark:group-disabled:group-hover:text-slate-400"
+              >
+                <span>
+                  -x
+                </span>
               </span>
             </button>
             <button
-              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left"
+              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div
-                class="bg-red-500 border-2 border-red-700 rounded-sm shadow-sm shrink-0"
-                style="width: 10px; height: 10px;"
-              />
-              <span
-                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+                class="shrink-0 flex items-center justify-center"
               >
-                -1
+                <div
+                  class="bg-red-500 border-2 border-red-700 rounded-sm shadow-sm shrink-0"
+                  style="width: 10px; height: 10px;"
+                />
+              </div>
+              <span
+                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-disabled:group-hover:text-slate-600 dark:group-disabled:group-hover:text-slate-400"
+              >
+                <span>
+                  -1
+                </span>
               </span>
             </button>
           </div>
