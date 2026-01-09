@@ -11,9 +11,9 @@ export function NumberLine({ val: currentSum }: NumberLineProps) {
     const clampedSum = Math.max(-21, Math.min(21, currentSum));
 
     return (
-        <FloatingPanel className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-2xl overflow-hidden animate-in slide-in-from-bottom duration-300">
-            <div className="h-16 w-full relative select-none flex items-center justify-center">
-                <div className="relative w-full h-full overflow-hidden">
+        <FloatingPanel className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-2xl animate-in slide-in-from-bottom duration-300">
+            <div className="h-20 w-full relative select-none">
+                <div className="relative h-full mx-12">
                     {/* Horizontal Line */}
                     <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-300 dark:bg-slate-700"></div>
 
@@ -24,8 +24,6 @@ export function NumberLine({ val: currentSum }: NumberLineProps) {
                         const isMajor = val % 5 === 0;
                         const leftPos = `${(i / 20) * 100}%`;
 
-                        // We will just show -10 to 10 for simplicity in this smaller bar
-
                         return (
                             <div key={val} className="absolute top-0 bottom-0 flex flex-col items-center justify-center pointer-events-none" style={{ left: leftPos, width: 40, marginLeft: -20 }}>
                                 <div className={`w-px rounded-full transition-all ${val === 0 ? 'h-5 bg-slate-800 dark:bg-slate-200 w-0.5' : isMajor ? 'h-4 bg-slate-400 dark:bg-slate-500' : 'h-2.5 bg-slate-300 dark:bg-slate-600'}`}></div>
@@ -35,12 +33,6 @@ export function NumberLine({ val: currentSum }: NumberLineProps) {
                     })}
 
                     {/* Indicator */}
-                    {/* We need to map currentSum to the position. 
-                        Range shown: -10 to 10.
-                        Position 0% = -10
-                        Position 50% = 0
-                        Position 100% = 10
-                    */}
                     {Math.abs(currentSum) <= 10 && (
                         <div
                             className="absolute top-1/2 -mt-4 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20 flex flex-col items-center"
