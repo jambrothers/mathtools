@@ -21,7 +21,7 @@ describe('Circuit Designer Page', () => {
         expect(getByText('Generate Truth Table')).toBeInTheDocument()
     })
 
-    it('renders all component type buttons in the footer', () => {
+    it('renders all component type buttons in the sidebar', () => {
         const { getAllByText, getByText } = render(<CircuitDesignerPage />)
         expect(getByText('Switch')).toBeInTheDocument()
         expect(getByText('Bulb')).toBeInTheDocument()
