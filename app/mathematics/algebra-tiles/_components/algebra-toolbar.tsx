@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Eye, EyeOff, Settings2, Magnet, Undo, Grid, Check, Eraser, Trash2 } from "lucide-react"
-import { ManipulativeToolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator, ToolbarInput } from "@/components/manipulatives/toolbar"
+import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator, ToolbarInput } from "@/components/tool-ui/toolbar"
 
 interface AlgebraToolbarProps {
     showLabels: boolean
@@ -41,7 +41,7 @@ export function AlgebraToolbar({
     const [input, setInput] = React.useState("")
 
     return (
-        <ManipulativeToolbar className="gap-4">
+        <Toolbar className="gap-4">
             <div className="flex-1 flex gap-2 min-w-[300px] max-w-4xl">
                 <ToolbarInput
                     className="flex-1"
@@ -117,6 +117,6 @@ export function AlgebraToolbar({
                     />
                 </ToolbarGroup>
             </div>
-        </ManipulativeToolbar>
+        </Toolbar>
     )
 }

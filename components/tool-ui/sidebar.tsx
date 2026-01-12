@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils"
 
 interface ManipulativeSidebarProps extends React.HTMLAttributes<HTMLDivElement> { }
 
-export function ManipulativeSidebar({ className, children, ...props }: ManipulativeSidebarProps) {
+export function Sidebar({ className, children, ...props }: ManipulativeSidebarProps) {
     return (
         <div
             className={cn(

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Eye, EyeOff, Trash2, RefreshCw, GitMerge, ArrowRightLeft, Timer } from "lucide-react"
-import { ManipulativeToolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator, ToolbarInput } from "@/components/manipulatives/toolbar"
+import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator, ToolbarInput } from "@/components/tool-ui/toolbar"
 
 interface CountersToolbarProps {
     showNumberLine: boolean
@@ -36,7 +36,7 @@ export function CountersToolbar({
     const [input, setInput] = React.useState("")
 
     return (
-        <ManipulativeToolbar className="gap-4">
+        <Toolbar className="gap-4">
             {/* Search / Input */}
             <div className="flex-1 flex gap-2 min-w-[200px] max-w-4xl">
                 <ToolbarInput
@@ -121,6 +121,6 @@ export function CountersToolbar({
                     />
                 </ToolbarGroup>
             </div>
-        </ManipulativeToolbar>
+        </Toolbar>
     )
 }

@@ -14,7 +14,7 @@ interface ManipulativeCanvasProps extends React.HTMLAttributes<HTMLDivElement> {
  * A canvas component that supports drag-based marquee selection and grid background.
  * ForwardRef exposes the underlying div element.
  */
-export const ManipulativeCanvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
+export const Canvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
     ({ className, gridSize, children, onSelectionEnd, onClick, ...props }, ref) => {
         const [selectionBox, setSelectionBox] = React.useState<{ start: { x: number, y: number }, current: { x: number, y: number } } | null>(null)
         const internalRef = React.useRef<HTMLDivElement>(null)
@@ -119,4 +119,4 @@ export const ManipulativeCanvas = React.forwardRef<HTMLDivElement, ManipulativeC
         )
     }
 )
-ManipulativeCanvas.displayName = "ManipulativeCanvas"
+Canvas.displayName = "Canvas"

@@ -21,20 +21,20 @@ export default function ToolsPage() {
                         </p>
                     </div>
 
-                    <div id="manipulatives" className="mt-16">
-                        <h2 className="text-2xl font-bold text-[var(--theme-main)] mb-8">Manipulatives</h2>
+                    <div id="mathematics" className="mt-16">
+                        <h2 className="text-2xl font-bold text-[var(--theme-main)] mb-8">Mathematics</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             <ToolCard
                                 title="Algebra Tiles"
                                 description="Visualize algebraic concepts including expressions, equations, and factorisation with virtual algebraic tiles."
-                                href="/manipulatives/algebra-tiles"
+                                href="/mathematics/algebra-tiles"
                                 gradient="from-blue-500 to-cyan-500"
                                 icon={<Grid2x2 className="w-8 h-8 text-blue-500" />}
                             />
                             <ToolCard
                                 title="Double Sided Counters"
                                 description="Explore integer operations, probability, and ratios with interactive two-colored counters."
-                                href="/manipulatives/double-sided-counters"
+                                href="/mathematics/double-sided-counters"
                                 gradient="from-purple-500 to-pink-500"
                                 icon={<Calculator className="w-8 h-8 text-purple-500" />}
                             />

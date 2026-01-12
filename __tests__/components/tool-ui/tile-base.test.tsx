@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { TileBase } from '@/components/manipulatives/tile-base'
+import { TileBase } from '@/components/tool-ui/tile-base'
 
 describe('TileBase', () => {
     const defaultProps = {

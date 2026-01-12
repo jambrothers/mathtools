@@ -3,7 +3,7 @@
 import * as React from "react"
 import { TILE_TYPES } from "../constants"
 import { cn } from "@/lib/utils"
-import { ManipulativeSidebar, SidebarButton, SidebarSection } from "@/components/manipulatives/sidebar"
+import { Sidebar, SidebarButton, SidebarSection } from "@/components/tool-ui/sidebar"
 
 interface TileSidebarProps {
     onAddTile: (type: string, value: number) => void
@@ -47,7 +47,7 @@ export function TileSidebar({ onAddTile, showY }: TileSidebarProps) {
     };
 
     return (
-        <ManipulativeSidebar>
+        <Sidebar className="w-64">
             <SidebarSection title="Add Positive">
                 {renderButton('x2', 1, 'x²')}
                 {renderButton('x', 1, 'x')}
@@ -86,6 +86,6 @@ export function TileSidebar({ onAddTile, showY }: TileSidebarProps) {
                     <li><span className="font-bold text-slate-700 dark:text-slate-200">Triple Click</span> to rotate tile.</li>
                 </ul>
             </div>
-        </ManipulativeSidebar>
+        </Sidebar>
     )
 }

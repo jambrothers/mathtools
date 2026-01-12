@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react'
-import AlgebraTilesPage from '@/app/manipulatives/algebra-tiles/page'
+import AlgebraTilesPage from '@/app/mathematics/algebra-tiles/page'
 
 // Mock the child components to avoid testing their implementation details in the page snapshot
 // or complex interactions (like DndContext).
@@ -7,7 +7,7 @@ import AlgebraTilesPage from '@/app/manipulatives/algebra-tiles/page'
 // AlgebraTilesPage seems to import AlgebraTiles component.
 // Let's assume we want to snapshot the high level page structure.
 
-jest.mock('@/app/manipulatives/algebra-tiles/_components/algebra-tile', () => ({
+jest.mock('@/app/mathematics/algebra-tiles/_components/algebra-tile', () => ({
     AlgebraTile: () => <div data-testid="algebra-tile">Tile</div>
 }))
 

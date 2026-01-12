@@ -1,6 +1,6 @@
 "use client"
 
-import { FloatingPanel } from '@/components/manipulatives/floating-panel';
+import { FloatingPanel } from "@/components/tool-ui/floating-panel";
 
 interface SummaryStatsProps {
     pos: number

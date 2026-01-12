@@ -5,8 +5,8 @@ import { useAlgebraTiles } from "./_hooks/use-algebra-tiles"
 import { AlgebraTile } from "./_components/algebra-tile"
 import { AlgebraToolbar } from "./_components/algebra-toolbar"
 import { TileSidebar } from "./_components/sidebar"
-import { ManipulativeCanvas } from "@/components/manipulatives/canvas"
-import { TrashZone } from "@/components/manipulatives/trash-zone"
+import { Canvas } from '@/components/tool-ui/canvas';
+import { TrashZone } from '@/components/tool-ui/trash-zone';
 import { SetPageTitle } from "@/components/set-page-title"
 import { Position } from "@/types/manipulatives"
 
@@ -139,7 +139,7 @@ export default function AlgebraTilesPage() {
             <div className="flex flex-1 overflow-hidden relative">
                 <TileSidebar onAddTile={addTile} showY={showY} />
 
-                <ManipulativeCanvas
+                <Canvas
                     ref={canvasRef}
                     gridSize={snapToGrid ? 50 : undefined}
                     className="relative"
@@ -162,7 +162,7 @@ export default function AlgebraTilesPage() {
                     ))}
 
                     <TrashZone ref={trashRef} isHovered={isTrashHovered} />
-                </ManipulativeCanvas>
+                </Canvas>
             </div>
         </div>
     )

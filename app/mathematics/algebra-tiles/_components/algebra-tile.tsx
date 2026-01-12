@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useDraggable } from "@/lib/hooks/use-draggable"
 import { useClickStack } from "@/lib/hooks/use-click-stack"
-import { TileBase } from "@/components/manipulatives/tile-base"
+import { TileBase } from "@/components/tool-ui/tile-base"
 import { TILE_TYPES } from "../constants"
 import { cn } from "@/lib/utils"
 import { Position } from "@/types/manipulatives"

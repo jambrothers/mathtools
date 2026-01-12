@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import CountersPage from '@/app/manipulatives/double-sided-counters/page'
+import CountersPage from '@/app/mathematics/double-sided-counters/page'
 
 // Mock the SetPageTitle component to avoid context requirement
 jest.mock('@/components/set-page-title', () => ({

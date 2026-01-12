@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react';
-import { FloatingPanel } from "@/components/manipulatives/floating-panel";
+import { FloatingPanel } from '@/components/tool-ui/floating-panel';
 
 interface NumberLineProps {
     val: number;

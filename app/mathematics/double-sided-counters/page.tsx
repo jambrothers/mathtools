@@ -6,9 +6,12 @@ import { useCounters } from './_hooks/use-counters';
 import { CountersToolbar } from './_components/counters-toolbar';
 import { SummaryStats } from './_components/summary-stats';
 import { NumberLine } from './_components/number-line';
-import { ManipulativeSidebar, SidebarSection, SidebarButton } from '@/components/manipulatives/sidebar';
-import { SpeedControl } from '@/components/manipulatives/speed-control';
-import { ManipulativeCanvas } from '@/components/manipulatives/canvas';
+import { ToolCard } from "@/components/tool-card";
+import { Sidebar, SidebarSection, SidebarButton } from "@/components/tool-ui/sidebar";
+import { Toolbar } from "@/components/tool-ui/toolbar";
+import { TrashZone } from "@/components/tool-ui/trash-zone";
+import { SpeedControl } from '@/components/tool-ui/speed-control';
+import { Canvas } from '@/components/tool-ui/canvas';
 
 export default function CountersPage() {
     const {
@@ -82,7 +85,7 @@ export default function CountersPage() {
 
             <div className="flex flex-1 overflow-hidden relative">
                 {/* Sidebar */}
-                <ManipulativeSidebar>
+                <Sidebar>
                     <SidebarSection title="Add Positive">
                         <SidebarButton
                             icon={<div className="w-4 h-4 rounded-full bg-yellow-400 border border-yellow-600 shadow-sm" />}
@@ -123,10 +126,10 @@ export default function CountersPage() {
                             <li><span className="font-bold text-slate-700 dark:text-slate-200">Click</span> to flip sign.</li>
                         </ul>
                     </div>
-                </ManipulativeSidebar>
+                </Sidebar>
 
                 {/* Main Canvas */}
-                <ManipulativeCanvas gridSize={40}>
+                <Canvas gridSize={40}>
                     {/* Stats Overlay */}
                     {showStats && (
                         <SummaryStats pos={positiveCount} neg={negativeCount} sum={totalSum} />
@@ -189,7 +192,7 @@ export default function CountersPage() {
                     {showNumberLine && (
                         <NumberLine val={totalSum} />
                     )}
-                </ManipulativeCanvas>
+                </Canvas>
             </div>
 
             <style>{`

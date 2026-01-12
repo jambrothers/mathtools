@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils"
  * Main container for the manipulative toolbar.
  */
 
-export function ManipulativeToolbar({ className, children }: { className?: string, children?: React.ReactNode }) {
+export function Toolbar({ className, children }: { className?: string, children?: React.ReactNode }) {
     return (
         <div className={cn("p-2 bg-white dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800 z-10 flex flex-wrap gap-2 items-center justify-between", className)}>
             {children}

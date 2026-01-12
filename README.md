@@ -40,10 +40,10 @@ This project follows a standard Next.js App Router structure with a separation o
 ### Directory Overview
 
 - **`app/`**: Contains the route segments and page definitions.
-  - **`manipulatives/`**: Dedicated section for the interactive manipulative tools.
+  - **`mathematics/`**: Dedicated section for the interactive mathematics tools.
     - **`[tool-name]/`**: Each tool (e.g., `algebra-tiles`) has its own subdirectory containing its page and tool-specific local components (in `_components/`).
 - **`components/`**: Shared reusable components.
-  - **`manipulatives/`**: Components shared across multiple manipulatives (e.g., `Canvas`, `TileBase`, `Toolbar`).
+  - **`tool-ui/`**: Components shared across multiple tools (e.g., `Canvas`, `TileBase`, `Toolbar`).
   - **`ui/`**: General UI components (coming soon).
 - **`lib/`**: Utility functions and custom hooks.
 
@@ -119,7 +119,7 @@ npm run test:watch
 Tests are located in the `__tests__` directory at the project root, mirroring the `app/` and `components/` structure:
 - **Component Tests**: Unit tests for individual components (e.g., `__tests__/components/footer.test.tsx`).
 - **Page Tests**: Snapshot tests to ensure pages render correctly (e.g., `__tests__/app/page.test.tsx`).
-- **Logic Tests**: Integration tests for complex interactions (e.g., `__tests__/app/manipulatives/double-sided-counters/page.test.tsx`).
+- **Logic Tests**: Integration tests for complex interactions (e.g., `__tests__/app/mathematics/double-sided-counters/page.test.tsx`).
 
 ### Adding New Tests
 
