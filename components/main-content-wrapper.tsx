@@ -15,7 +15,7 @@ export function MainContentWrapper({ children }: { children: React.ReactNode }) 
     return (
         <main
             className={cn(
-                "flex-grow transition-[padding] duration-300 ease-in-out",
+                "flex-grow flex flex-col min-h-0 transition-[padding] duration-300 ease-in-out",
                 isNavbarVisible ? "pt-[81px]" : "pt-0"
             )}
         >

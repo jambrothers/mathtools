@@ -1,5 +1,5 @@
 import { ToolCard } from "@/components/tool-card"
-import { Grid2x2, Calculator } from "lucide-react"
+import { Grid2x2, Calculator, Cpu } from "lucide-react"
 
 export default function ToolsPage() {
     return (
@@ -17,7 +17,7 @@ export default function ToolsPage() {
                             Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">Tools</span>
                         </h1>
                         <p className="text-xl text-[var(--theme-muted)] max-w-2xl">
-                            A curated collection of digital manipulatives and teaching aids designed for modern mathematics education.
+                            A curated collection of digital manipulatives and teaching aids designed for modern education.
                         </p>
                     </div>
 
@@ -37,6 +37,19 @@ export default function ToolsPage() {
                                 href="/mathematics/double-sided-counters"
                                 gradient="from-purple-500 to-pink-500"
                                 icon={<Calculator className="w-8 h-8 text-purple-500" />}
+                            />
+                        </div>
+                    </div>
+
+                    <div id="computing" className="mt-16">
+                        <h2 className="text-2xl font-bold text-[var(--theme-main)] mb-8">Computing</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <ToolCard
+                                title="Circuit Designer"
+                                description="Build and simulate logic circuits with AND, OR, NOT, and XOR gates. Generate truth tables to verify circuit behaviour."
+                                href="/computing/circuit-designer"
+                                gradient="from-emerald-500 to-teal-500"
+                                icon={<Cpu className="w-8 h-8 text-emerald-500" />}
                             />
                         </div>
                     </div>

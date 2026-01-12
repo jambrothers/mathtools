@@ -105,6 +105,13 @@ export function Navbar() {
                                     >
                                         Mathematics
                                     </Link>
+                                    <Link
+                                        href="/tools#computing"
+                                        className="block px-4 py-2 text-sm text-[var(--theme-muted)] hover:bg-[var(--theme-page)] hover:text-[var(--theme-main)]"
+                                        onClick={() => setIsToolsOpen(false)}
+                                    >
+                                        Computing
+                                    </Link>
                                 </div>
                             </div>
 
@@ -160,8 +167,11 @@ export function Navbar() {
                                 >
                                     Tools
                                 </Link>
-                                <Link href="/tools" onClick={() => setIsOpen(false)} className="block pl-4 py-1 text-sm text-[var(--theme-muted)] hover:text-[var(--theme-main)] border-l border-[var(--theme-border)] ml-1">
+                                <Link href="/tools#mathematics" onClick={() => setIsOpen(false)} className="block pl-4 py-1 text-sm text-[var(--theme-muted)] hover:text-[var(--theme-main)] border-l border-[var(--theme-border)] ml-1">
                                     Mathematics
+                                </Link>
+                                <Link href="/tools#computing" onClick={() => setIsOpen(false)} className="block pl-4 py-1 text-sm text-[var(--theme-muted)] hover:text-[var(--theme-main)] border-l border-[var(--theme-border)] ml-1">
+                                    Computing
                                 </Link>
                             </div>
 

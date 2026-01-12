@@ -1,27 +1,84 @@
-import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { Trash2, Play, Table, Zap, RefreshCw, X } from 'lucide-react';
+"use client"
+
+import React, { useState, useRef, useEffect, useCallback, MouseEvent } from 'react';
+import { Trash2, Table, Zap, RefreshCw, X } from 'lucide-react';
+import { SetPageTitle } from "@/components/set-page-title";
 
 /**
  * LOGIC CIRCUIT DESIGNER
  * A complete drag-and-drop logic simulator with truth table generation.
  */
 
+// --- Type Definitions ---
+
+type ComponentTypeName = 'INPUT' | 'OUTPUT' | 'AND' | 'OR' | 'NOT' | 'XOR';
+
+interface CircuitNode {
+    id: string;
+    type: ComponentTypeName;
+    x: number;
+    y: number;
+    label: string;
+    state?: boolean;
+}
+
+interface Connection {
+    id: string;
+    from: string;
+    to: string;
+    inputIndex: number;
+}
+
+interface DragState {
+    id: string;
+    startX: number;
+    startY: number;
+    nodeStartX: number;
+    nodeStartY: number;
+}
+
+interface WiringState {
+    nodeId: string;
+    portType: 'output';
+}
+
+interface TruthTableRow {
+    inputs: number[];
+    outputs: number[];
+}
+
+interface TruthTableData {
+    inputs: CircuitNode[];
+    outputs: CircuitNode[];
+    rows: TruthTableRow[];
+}
+
+type SimulationState = Record<string, boolean>;
+
+interface ComponentDefinition {
+    type: ComponentTypeName;
+    label: string;
+    inputs: number;
+    outputs: number;
+    color: string;
+    evaluate: (inputs: boolean[], state?: boolean) => boolean;
+    render: (active: boolean) => React.ReactNode;
+}
+
 // --- Constants & Config ---
 
-const GATE_SIZE = 60;
-const PORT_RADIUS = 6;
 const SNAP_GRID = 20;
 
 // Gate Definitions (Shapes & Logic)
-const COMPONENT_TYPES = {
+const COMPONENT_TYPES: Record<ComponentTypeName, ComponentDefinition> = {
     INPUT: {
         type: 'INPUT',
         label: 'Switch',
         inputs: 0,
         outputs: 1,
         color: 'bg-yellow-500',
-        evaluate: (inputs, state) => state, // State holds the boolean value
-        render: (active) => (
+        evaluate: (_inputs: boolean[], state?: boolean) => state ?? false,
+        render: (active: boolean) => (
             <div className={`w-12 h-12 rounded border-2 flex items-center justify-center cursor-pointer transition-colors ${active ? 'bg-green-500 border-green-300 shadow-[0_0_15px_rgba(34,197,94,0.6)]' : 'bg-slate-700 border-slate-500'}`}>
                 <div className={`w-4 h-8 rounded-sm border ${active ? 'bg-white border-green-200 translate-y-[-2px]' : 'bg-slate-800 border-slate-600 translate-y-[2px]'} transition-transform`}></div>
             </div>
@@ -33,8 +90,8 @@ const COMPONENT_TYPES = {
         inputs: 1,
         outputs: 0,
         color: 'bg-blue-500',
-        evaluate: (inputs) => inputs[0] || false,
-        render: (active) => (
+        evaluate: (inputs: boolean[]) => inputs[0] || false,
+        render: (active: boolean) => (
             <div className={`w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${active ? 'bg-yellow-300 border-yellow-500 shadow-[0_0_30px_rgba(253,224,71,0.8)] scale-110' : 'bg-slate-800 border-slate-600'}`}>
                 <Zap size={20} className={active ? 'text-yellow-600' : 'text-slate-600'} fill={active ? "currentColor" : "none"} />
             </div>
@@ -46,7 +103,7 @@ const COMPONENT_TYPES = {
         inputs: 2,
         outputs: 1,
         color: 'bg-indigo-600',
-        evaluate: (inputs) => inputs[0] && inputs[1],
+        evaluate: (inputs: boolean[]) => inputs[0] && inputs[1],
         render: () => (
             <svg width="50" height="50" viewBox="0 0 50 50" className="fill-slate-800 stroke-indigo-400 stroke-2">
                 <path d="M 10 5 L 25 5 C 38 5 38 45 25 45 L 10 45 Z" />
@@ -59,7 +116,7 @@ const COMPONENT_TYPES = {
         inputs: 2,
         outputs: 1,
         color: 'bg-purple-600',
-        evaluate: (inputs) => inputs[0] || inputs[1],
+        evaluate: (inputs: boolean[]) => inputs[0] || inputs[1],
         render: () => (
             <svg width="50" height="50" viewBox="0 0 50 50" className="fill-slate-800 stroke-purple-400 stroke-2">
                 <path d="M 5 5 C 5 5 15 5 20 5 C 35 5 42 25 42 25 C 42 25 35 45 20 45 C 15 45 5 45 5 45 C 15 25 15 25 5 5 Z" />
@@ -72,7 +129,7 @@ const COMPONENT_TYPES = {
         inputs: 1,
         outputs: 1,
         color: 'bg-rose-600',
-        evaluate: (inputs) => !inputs[0],
+        evaluate: (inputs: boolean[]) => !inputs[0],
         render: () => (
             <svg width="50" height="50" viewBox="0 0 50 50" className="fill-slate-800 stroke-rose-400 stroke-2">
                 <path d="M 10 5 L 40 25 L 10 45 Z" />
@@ -86,7 +143,7 @@ const COMPONENT_TYPES = {
         inputs: 2,
         outputs: 1,
         color: 'bg-cyan-600',
-        evaluate: (inputs) => (inputs[0] || inputs[1]) && !(inputs[0] && inputs[1]),
+        evaluate: (inputs: boolean[]) => (inputs[0] || inputs[1]) && !(inputs[0] && inputs[1]),
         render: () => (
             <svg width="50" height="50" viewBox="0 0 50 50" className="fill-slate-800 stroke-cyan-400 stroke-2">
                 <path d="M 10 5 C 10 5 20 5 25 5 C 40 5 47 25 47 25 C 47 25 40 45 25 45 C 20 45 10 45 10 45 C 20 25 20 25 10 5 Z" />
@@ -98,10 +155,10 @@ const COMPONENT_TYPES = {
 
 // --- Helper Functions ---
 
-const generateId = () => Math.random().toString(36).substr(2, 9);
+const generateId = (): string => Math.random().toString(36).substr(2, 9);
 
 // Calculate port position relative to node center
-const getPortPosition = (nodeType, portType, index) => {
+const getPortPosition = (nodeType: ComponentTypeName, portType: 'input' | 'output', index: number): { x: number; y: number } => {
     const def = COMPONENT_TYPES[nodeType];
     const width = 60;
     const height = 60;
@@ -119,37 +176,37 @@ const getPortPosition = (nodeType, portType, index) => {
 // --- Main Component ---
 
 export default function LogicSimulator() {
-    const [nodes, setNodes] = useState([
+    const [nodes, setNodes] = useState<CircuitNode[]>([
         { id: 'start_1', type: 'INPUT', x: 100, y: 100, label: 'A', state: false },
         { id: 'start_2', type: 'INPUT', x: 100, y: 250, label: 'B', state: false },
         { id: 'gate_1', type: 'AND', x: 300, y: 175, label: 'AND' },
         { id: 'out_1', type: 'OUTPUT', x: 500, y: 175, label: 'Out' },
     ]);
 
-    const [connections, setConnections] = useState([
+    const [connections, setConnections] = useState<Connection[]>([
         { id: 'c1', from: 'start_1', to: 'gate_1', inputIndex: 0 },
         { id: 'c2', from: 'start_2', to: 'gate_1', inputIndex: 1 },
         { id: 'c3', from: 'gate_1', to: 'out_1', inputIndex: 0 },
     ]);
 
-    const [dragging, setDragging] = useState(null); // { id, startX, startY, nodeStartX, nodeStartY }
-    const [wiring, setWiring] = useState(null); // { nodeId, portType: 'output' }
+    const [dragging, setDragging] = useState<DragState | null>(null);
+    const [wiring, setWiring] = useState<WiringState | null>(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    const [truthTable, setTruthTable] = useState(null);
-    const [activeSimulation, setActiveSimulation] = useState({}); // Map of nodeID -> outputValue (boolean)
-    const canvasRef = useRef(null);
+    const [truthTable, setTruthTable] = useState<TruthTableData | null>(null);
+    const [activeSimulation, setActiveSimulation] = useState<SimulationState>({});
+    const canvasRef = useRef<HTMLDivElement>(null);
 
     // --- Simulation Logic ---
 
     // Topological simulation
-    const simulate = useCallback((currentNodes = nodes, currentConnections = connections) => {
-        const values = {};
+    const simulate = useCallback((currentNodes: CircuitNode[] = nodes, currentConnections: Connection[] = connections): SimulationState => {
+        const values: SimulationState = {};
         let changed = true;
         let iterations = 0;
 
         // Initialize inputs
         currentNodes.filter(n => n.type === 'INPUT').forEach(n => {
-            values[n.id] = n.state;
+            values[n.id] = n.state ?? false;
         });
 
         // Propagate signals (limit iterations to prevent infinite loops in cyclic graphs)
@@ -161,7 +218,7 @@ export default function LogicSimulator() {
                 if (node.type === 'INPUT') return;
 
                 const def = COMPONENT_TYPES[node.type];
-                const nodeInputs = [];
+                const nodeInputs: boolean[] = [];
 
                 // Gather inputs for this node
                 for (let i = 0; i < def.inputs; i++) {
@@ -193,9 +250,10 @@ export default function LogicSimulator() {
 
     // --- Interaction Handlers ---
 
-    const handleMouseDownNode = (e, id) => {
+    const handleMouseDownNode = (e: MouseEvent<HTMLDivElement>, id: string) => {
         e.stopPropagation();
         const node = nodes.find(n => n.id === id);
+        if (!node) return;
         setDragging({
             id,
             startX: e.clientX,
@@ -205,8 +263,9 @@ export default function LogicSimulator() {
         });
     };
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
         // Update mouse pos for drawing temp wire
+        if (!canvasRef.current) return;
         const rect = canvasRef.current.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
@@ -232,21 +291,21 @@ export default function LogicSimulator() {
         setWiring(null);
     };
 
-    const toggleInput = (e, id) => {
+    const toggleInput = (e: MouseEvent<HTMLDivElement>, id: string) => {
         if (dragging) return; // Don't toggle if we just dragged
         e.stopPropagation();
         setNodes(prev => prev.map(n => n.id === id ? { ...n, state: !n.state } : n));
     };
 
-    const startWiring = (e, nodeId) => {
+    const startWiring = (e: MouseEvent<HTMLDivElement>, nodeId: string) => {
         e.stopPropagation();
         setWiring({ nodeId, portType: 'output' });
     };
 
-    const completeWiring = (e, targetNodeId, inputIndex) => {
+    const completeWiring = (e: MouseEvent<HTMLDivElement>, targetNodeId: string, inputIndex: number) => {
         e.stopPropagation();
         if (!wiring) return;
-        if (wiring.nodeId === targetNodeId) return; // Prevent self-loop if desired (though some flip flops need it)
+        if (wiring.nodeId === targetNodeId) return; // Prevent self-loop if desired
 
         // Remove existing connection to this specific input port if any
         const cleanConnections = connections.filter(c => !(c.to === targetNodeId && c.inputIndex === inputIndex));
@@ -263,22 +322,30 @@ export default function LogicSimulator() {
         setWiring(null);
     };
 
-    const deleteNode = (id) => {
+    const deleteNode = (id: string) => {
         setNodes(prev => prev.filter(n => n.id !== id));
         setConnections(prev => prev.filter(c => c.from !== id && c.to !== id));
     };
 
-    const addNode = (type) => {
+    const addNode = (type: ComponentTypeName) => {
         const id = generateId();
         // find a safe spot
         const offset = nodes.length * 20;
+        let label: string;
+        if (type === 'INPUT') {
+            label = `In ${nodes.filter(n => n.type === 'INPUT').length + 1}`;
+        } else if (type === 'OUTPUT') {
+            label = `Out ${nodes.filter(n => n.type === 'OUTPUT').length + 1}`;
+        } else {
+            label = type;
+        }
         setNodes([...nodes, {
             id,
             type,
             x: 100 + offset,
             y: 100 + offset,
             state: false,
-            label: type === 'INPUT' ? `In ${nodes.filter(n => n.type === 'INPUT').length + 1}` : type
+            label
         }]);
     };
 
@@ -300,7 +367,7 @@ export default function LogicSimulator() {
             return;
         }
 
-        const rows = [];
+        const rows: TruthTableRow[] = [];
         const numCombinations = Math.pow(2, inputs.length);
 
         for (let i = 0; i < numCombinations; i++) {
@@ -316,8 +383,11 @@ export default function LogicSimulator() {
             const result = simulate(tempNodes, connections);
 
             // 3. Record Row
-            const rowData = {
-                inputs: inputs.map(inp => (tempNodes.find(t => t.id === inp.id).state ? 1 : 0)),
+            const rowData: TruthTableRow = {
+                inputs: inputs.map(inp => {
+                    const tempNode = tempNodes.find(t => t.id === inp.id);
+                    return tempNode?.state ? 1 : 0;
+                }),
                 outputs: outputs.map(out => (result[out.id] ? 1 : 0))
             };
             rows.push(rowData);
@@ -329,23 +399,23 @@ export default function LogicSimulator() {
     // --- Render Helpers ---
 
     // Draw smooth Bezier curve for wires
-    const getWirePath = (x1, y1, x2, y2) => {
+    const getWirePath = (x1: number, y1: number, x2: number, y2: number): string => {
         const dist = Math.abs(x2 - x1) * 0.5;
         return `M ${x1} ${y1} C ${x1 + dist} ${y1}, ${x2 - dist} ${y2}, ${x2} ${y2}`;
     };
 
+    // Get wiring source node safely
+    const getWiringSourceNode = (): CircuitNode | undefined => {
+        if (!wiring) return undefined;
+        return nodes.find(n => n.id === wiring.nodeId);
+    };
+
     return (
-        <div className="flex flex-col h-screen bg-slate-900 text-slate-100 font-sans overflow-hidden select-none">
+        <div className="flex flex-col flex-1 min-h-0 w-full">
+            <SetPageTitle title="Circuit Designer" />
 
-            {/* Header */}
-            <header className="h-14 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-6 z-10">
-                <div className="flex items-center gap-2">
-                    <div className="bg-indigo-500 p-1.5 rounded">
-                        <Zap size={20} className="text-white" />
-                    </div>
-                    <h1 className="font-bold text-lg tracking-wide">LogicLab <span className="text-slate-500 font-normal text-sm ml-2">v1.0</span></h1>
-                </div>
-
+            {/* Toolbar */}
+            <div className="h-14 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-6 z-10">
                 <div className="flex gap-3">
                     <button onClick={clearCanvas} className="flex items-center gap-2 px-3 py-1.5 text-sm bg-slate-700 hover:bg-slate-600 rounded transition-colors text-slate-300">
                         <Trash2 size={16} /> Clear
@@ -354,7 +424,7 @@ export default function LogicSimulator() {
                         <Table size={16} /> Generate Truth Table
                     </button>
                 </div>
-            </header>
+            </div>
 
             {/* Main Workspace */}
             <div className="flex-1 flex relative overflow-hidden">
@@ -405,21 +475,26 @@ export default function LogicSimulator() {
                         })}
 
                         {/* Active Drawing Wire */}
-                        {wiring && (
-                            <path
-                                d={getWirePath(
-                                    nodes.find(n => n.id === wiring.nodeId).x + getPortPosition(nodes.find(n => n.id === wiring.nodeId).type, 'output', 0).x,
-                                    nodes.find(n => n.id === wiring.nodeId).y + getPortPosition(nodes.find(n => n.id === wiring.nodeId).type, 'output', 0).y,
-                                    mousePos.x,
-                                    mousePos.y
-                                )}
-                                stroke="#6366f1"
-                                strokeWidth="2"
-                                strokeDasharray="5,5"
-                                fill="none"
-                                className="opacity-70"
-                            />
-                        )}
+                        {wiring && (() => {
+                            const sourceNode = getWiringSourceNode();
+                            if (!sourceNode) return null;
+                            const sourcePos = getPortPosition(sourceNode.type, 'output', 0);
+                            return (
+                                <path
+                                    d={getWirePath(
+                                        sourceNode.x + sourcePos.x,
+                                        sourceNode.y + sourcePos.y,
+                                        mousePos.x,
+                                        mousePos.y
+                                    )}
+                                    stroke="#6366f1"
+                                    strokeWidth="2"
+                                    strokeDasharray="5,5"
+                                    fill="none"
+                                    className="opacity-70"
+                                />
+                            );
+                        })()}
                     </svg>
 
                     {/* Nodes Layer */}
@@ -473,9 +548,9 @@ export default function LogicSimulator() {
                                 <div
                                     className="relative cursor-move"
                                     onMouseDown={(e) => handleMouseDownNode(e, node.id)}
-                                    onClick={(e) => node.type === 'INPUT' ? toggleInput(e, node.id) : null}
+                                    onClick={(e) => node.type === 'INPUT' ? toggleInput(e, node.id) : undefined}
                                 >
-                                    {def.render(isActive)}
+                                    {def.render(isActive ?? false)}
                                 </div>
 
                                 {/* Label */}
@@ -490,7 +565,7 @@ export default function LogicSimulator() {
 
             {/* Footer Toolbar */}
             <div className="h-24 bg-slate-800 border-t border-slate-700 p-4 flex items-center justify-center gap-4 shadow-xl z-20">
-                {Object.entries(COMPONENT_TYPES).map(([key, def]) => (
+                {(Object.entries(COMPONENT_TYPES) as [ComponentTypeName, ComponentDefinition][]).map(([key, def]) => (
                     <button
                         key={key}
                         onClick={() => addNode(key)}
@@ -569,20 +644,20 @@ export default function LogicSimulator() {
 
             {/* Custom Scrollbar Styles for the Modal */}
             <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #1e293b;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #475569;
-          border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #64748b;
-        }
-      `}</style>
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 8px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: #1e293b;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: #475569;
+                    border-radius: 4px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: #64748b;
+                }
+            `}</style>
         </div>
     );
 }

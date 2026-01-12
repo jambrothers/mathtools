@@ -37,7 +37,7 @@ exports[`Tools Page matches snapshot 1`] = `
           <p
             class="text-xl text-[var(--theme-muted)] max-w-2xl"
           >
-            A curated collection of digital manipulatives and teaching aids designed for modern mathematics education.
+            A curated collection of digital manipulatives and teaching aids designed for modern education.
           </p>
         </div>
         <div
@@ -221,6 +221,143 @@ exports[`Tools Page matches snapshot 1`] = `
                       class="text-[var(--theme-muted)] leading-relaxed"
                     >
                       Explore integer operations, probability, and ratios with interactive two-colored counters.
+                    </p>
+                  </div>
+                  <div
+                    class="relative z-10 mt-8 flex items-center font-medium text-blue-600 group-hover:translate-x-1 transition-transform"
+                  >
+                    Launch Tool 
+                    <svg
+                      aria-hidden="true"
+                      class="lucide lucide-arrow-right ml-2 w-4 h-4"
+                      fill="none"
+                      height="24"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                      width="24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5 12h14"
+                      />
+                      <path
+                        d="m12 5 7 7-7 7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div
+          class="mt-16"
+          id="computing"
+        >
+          <h2
+            class="text-2xl font-bold text-[var(--theme-main)] mb-8"
+          >
+            Computing
+          </h2>
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            <a
+              class="group relative block w-full h-full"
+              href="/computing/circuit-designer"
+            >
+              <div
+                class="relative h-full rounded-[2rem] bg-gradient-to-br from-emerald-500 to-teal-500 p-[1px] shadow-lg transition-transform duration-300 hover:scale-[1.02] hover:shadow-xl"
+              >
+                <div
+                  class="relative h-full rounded-[calc(2rem-1px)] bg-[var(--theme-card)] p-8 flex flex-col justify-between overflow-hidden"
+                >
+                  <div
+                    class="absolute -right-20 -top-20 h-[300px] w-[300px] rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 opacity-10 blur-[60px] group-hover:opacity-20 transition-opacity duration-500"
+                  />
+                  <div
+                    class="relative z-10"
+                  >
+                    <div
+                      class="mb-4 inline-flex items-center justify-center rounded-xl bg-[var(--theme-page)] p-3 shadow-sm border border-[var(--theme-border)]"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="lucide lucide-cpu w-8 h-8 text-emerald-500"
+                        fill="none"
+                        height="24"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                        width="24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12 20v2"
+                        />
+                        <path
+                          d="M12 2v2"
+                        />
+                        <path
+                          d="M17 20v2"
+                        />
+                        <path
+                          d="M17 2v2"
+                        />
+                        <path
+                          d="M2 12h2"
+                        />
+                        <path
+                          d="M2 17h2"
+                        />
+                        <path
+                          d="M2 7h2"
+                        />
+                        <path
+                          d="M20 12h2"
+                        />
+                        <path
+                          d="M20 17h2"
+                        />
+                        <path
+                          d="M20 7h2"
+                        />
+                        <path
+                          d="M7 20v2"
+                        />
+                        <path
+                          d="M7 2v2"
+                        />
+                        <rect
+                          height="16"
+                          rx="2"
+                          width="16"
+                          x="4"
+                          y="4"
+                        />
+                        <rect
+                          height="8"
+                          rx="1"
+                          width="8"
+                          x="8"
+                          y="8"
+                        />
+                      </svg>
+                    </div>
+                    <h3
+                      class="mb-2 text-2xl font-bold tracking-tight text-[var(--theme-main)] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-600 transition-all duration-300"
+                    >
+                      Circuit Designer
+                    </h3>
+                    <p
+                      class="text-[var(--theme-muted)] leading-relaxed"
+                    >
+                      Build and simulate logic circuits with AND, OR, NOT, and XOR gates. Generate truth tables to verify circuit behaviour.
                     </p>
                   </div>
                   <div
