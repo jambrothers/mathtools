@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef, useEffect, useCallback, MouseEvent } from 'react';
-import { Trash2, Table, Zap, RefreshCw, X } from 'lucide-react';
+import { Trash2, Table, Zap, RefreshCw, X, AlertTriangle } from 'lucide-react';
 import { SetPageTitle } from "@/components/set-page-title";
 
 /**
@@ -350,10 +350,13 @@ export default function LogicSimulator() {
     };
 
     const clearCanvas = () => {
-        if (confirm("Clear all nodes?")) {
-            setNodes([]);
-            setConnections([]);
-        }
+        setShowClearConfirm(true);
+    };
+
+    const confirmClear = () => {
+        setNodes([]);
+        setConnections([]);
+        setShowClearConfirm(false);
     };
 
     // --- Truth Table Generator ---
@@ -395,6 +398,9 @@ export default function LogicSimulator() {
 
         setTruthTable({ inputs, outputs, rows });
     };
+
+    // State for clear confirmation modal
+    const [showClearConfirm, setShowClearConfirm] = useState(false);
 
     // --- Render Helpers ---
 
@@ -637,6 +643,37 @@ export default function LogicSimulator() {
                             <button onClick={generateTruthTable} className="flex items-center gap-1 hover:text-white transition-colors">
                                 <RefreshCw size={12} /> Refresh
                             </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Clear Confirmation Modal */}
+            {showClearConfirm && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-slate-800 rounded-xl border border-slate-700 shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+                        <div className="p-6">
+                            <div className="flex items-center gap-3 mb-4 text-amber-500">
+                                <AlertTriangle size={24} />
+                                <h3 className="text-xl font-bold text-white">Clear Circuit?</h3>
+                            </div>
+                            <p className="text-slate-300 text-sm leading-relaxed mb-6">
+                                This will remove all components and connections from the canvas. This action cannot be undone.
+                            </p>
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    onClick={() => setShowClearConfirm(false)}
+                                    className="px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={confirmClear}
+                                    className="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors shadow-lg shadow-red-900/20"
+                                >
+                                    Clear Everything
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
