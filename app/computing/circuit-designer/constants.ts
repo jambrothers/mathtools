@@ -25,6 +25,8 @@ export interface DragState {
     startY: number;
     nodeStartX: number;
     nodeStartY: number;
+    /** Start positions of all selected nodes for group drag. Key is node ID. */
+    nodeStartPositions?: Record<string, { x: number; y: number }>;
 }
 
 export interface WiringState {

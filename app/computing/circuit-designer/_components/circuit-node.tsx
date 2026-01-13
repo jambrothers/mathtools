@@ -1,16 +1,17 @@
 "use client"
 
 import * as React from "react"
-import { Trash2 } from "lucide-react"
-import { CircuitNode as CircuitNodeType, ComponentTypeName, COMPONENT_TYPES, getPortPosition } from "../constants"
+import { Monitor } from "lucide-react"
+import { CircuitNode as CircuitNodeType, COMPONENT_TYPES, getPortPosition } from "../constants"
+import { cn } from "@/lib/utils"
 
 interface CircuitNodeProps {
     node: CircuitNodeType
     isActive: boolean
     isDark: boolean
+    isSelected?: boolean
     onMouseDown: (e: React.MouseEvent<HTMLDivElement>, id: string) => void
     onClick: (e: React.MouseEvent<HTMLDivElement>, id: string) => void
-    onDelete: (id: string) => void
     onStartWiring: (e: React.MouseEvent<HTMLDivElement>, nodeId: string) => void
     onCompleteWiring: (e: React.MouseEvent<HTMLDivElement>, targetNodeId: string, inputIndex: number) => void
 }
@@ -23,9 +24,9 @@ export function CircuitNodeComponent({
     node,
     isActive,
     isDark,
+    isSelected,
     onMouseDown,
     onClick,
-    onDelete,
     onStartWiring,
     onCompleteWiring
 }: CircuitNodeProps) {
@@ -33,20 +34,20 @@ export function CircuitNodeComponent({
 
     return (
         <div
-            className="absolute flex flex-col items-center group z-10"
+            className={cn(
+                "absolute flex flex-col items-center group z-10 select-none",
+                isSelected && "z-20"
+            )}
             style={{
                 left: node.x,
                 top: node.y,
                 transform: 'translate(-50%, -50%)'
             }}
         >
-            {/* Delete Button (Visible on Hover) */}
-            <button
-                onClick={() => onDelete(node.id)}
-                className="absolute -top-8 bg-red-500/80 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 pointer-events-auto"
-            >
-                <Trash2 size={12} />
-            </button>
+            {/* Selection Ring */}
+            {isSelected && (
+                <div className="absolute inset-0 -m-3 border-2 border-indigo-400 rounded-lg animate-pulse pointer-events-none" />
+            )}
 
             {/* Input Ports */}
             {Array.from({ length: def.inputs }).map((_, i) => {

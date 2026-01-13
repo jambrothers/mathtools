@@ -3,12 +3,15 @@
 import React, { useState, useRef, useEffect, useCallback, MouseEvent } from 'react';
 import { useTheme } from 'next-themes';
 import { SetPageTitle } from "@/components/set-page-title";
+import { ConfirmationModal } from './_components/confirmation-modal';
 import { Canvas } from '@/components/tool-ui/canvas';
+import { TrashZone } from '@/components/tool-ui/trash-zone';
 import { CircuitToolbar } from './_components/circuit-toolbar';
 import { CircuitSidebar } from './_components/circuit-sidebar';
 import { CircuitNodeComponent } from './_components/circuit-node';
 import { TruthTableModal } from './_components/truth-table-modal';
-import { ConfirmationModal } from './_components/confirmation-modal';
+
+
 import {
     CircuitNode,
     Connection,
@@ -42,6 +45,12 @@ export default function LogicSimulator() {
     const [truthTable, setTruthTable] = useState<TruthTableData | null>(null);
     const [activeSimulation, setActiveSimulation] = useState<SimulationState>({});
     const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+    // New State for Multi-Select & Drag-to-Delete
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [isTrashHovered, setIsTrashHovered] = useState(false);
+    const trashRef = useRef<HTMLDivElement>(null);
+    const hasDraggedRef = useRef(false); // Track if actual dragging occurred (to prevent click actions)
 
     const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -100,48 +109,138 @@ export default function LogicSimulator() {
 
     // --- Interaction Handlers ---
 
+    // --- Interaction Handlers ---
+
     const handleMouseDownNode = (e: MouseEvent<HTMLDivElement>, id: string) => {
         e.stopPropagation();
+
+        let newSelected = new Set(selectedIds);
+
+        if (e.shiftKey) {
+            // Toggle selection
+            if (newSelected.has(id)) {
+                newSelected.delete(id);
+            } else {
+                newSelected.add(id);
+            }
+        } else {
+            // If clicking an unselected node without shift, select ONLY that node.
+            // If dragging a selected node, keep selection (to allow moving group).
+            if (!newSelected.has(id)) {
+                newSelected = new Set([id]);
+            }
+        }
+
+        setSelectedIds(newSelected);
+
         const node = nodes.find(n => n.id === id);
         if (!node) return;
+
+        // Capture start positions of ALL selected nodes for group drag
+        const nodeStartPositions: Record<string, { x: number; y: number }> = {};
+        nodes.forEach(n => {
+            if (newSelected.has(n.id)) {
+                nodeStartPositions[n.id] = { x: n.x, y: n.y };
+            }
+        });
+
         setDragging({
             id,
             startX: e.clientX,
             startY: e.clientY,
             nodeStartX: node.x,
-            nodeStartY: node.y
+            nodeStartY: node.y,
+            nodeStartPositions
         });
+        hasDraggedRef.current = false; // Reset on drag start
     };
 
-    const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-        if (!canvasRef.current) return;
-        const rect = canvasRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        setMousePos({ x, y });
+    // --- Window-level Drag Listeners ---
+    // These are attached only when dragging or wiring to avoid overriding Canvas's internal marquee handlers.
+    useEffect(() => {
+        if (!dragging && !wiring) return;
 
-        if (dragging) {
-            const dx = e.clientX - dragging.startX;
-            const dy = e.clientY - dragging.startY;
+        const handleWindowMouseMove = (e: globalThis.MouseEvent) => {
+            if (!canvasRef.current) return;
+            const rect = canvasRef.current.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            setMousePos({ x, y });
 
-            let newX = dragging.nodeStartX + dx;
-            let newY = dragging.nodeStartY + dy;
+            if (dragging && dragging.nodeStartPositions) {
+                const dx = e.clientX - dragging.startX;
+                const dy = e.clientY - dragging.startY;
 
-            // Snap to grid
-            newX = Math.round(newX / SNAP_GRID) * SNAP_GRID;
-            newY = Math.round(newY / SNAP_GRID) * SNAP_GRID;
+                // Move all nodes that have stored start positions
+                setNodes(prev => prev.map(n => {
+                    const startPos = dragging.nodeStartPositions![n.id];
+                    if (startPos) {
+                        let newX = startPos.x + dx;
+                        let newY = startPos.y + dy;
 
-            setNodes(prev => prev.map(n => n.id === dragging.id ? { ...n, x: newX, y: newY } : n));
-        }
-    };
+                        // Snap to grid
+                        newX = Math.round(newX / SNAP_GRID) * SNAP_GRID;
+                        newY = Math.round(newY / SNAP_GRID) * SNAP_GRID;
 
-    const handleMouseUp = () => {
-        setDragging(null);
-        setWiring(null);
-    };
+                        return { ...n, x: newX, y: newY };
+                    }
+                    return n;
+                }));
+
+                // Mark as actually dragged if moved more than 5px
+                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                    hasDraggedRef.current = true;
+                }
+            }
+
+            // Trash Detection
+            if (dragging && trashRef.current) {
+                const trashRect = trashRef.current.getBoundingClientRect();
+                const isOver = (
+                    e.clientX >= trashRect.left &&
+                    e.clientX <= trashRect.right &&
+                    e.clientY >= trashRect.top &&
+                    e.clientY <= trashRect.bottom
+                );
+                setIsTrashHovered(isOver);
+            }
+        };
+
+        const handleWindowMouseUp = () => {
+            // Trash Detection & Deletion
+            if (isTrashHovered && dragging) {
+                // Delete all selected nodes AND the dragged node (if not selected)
+                const idsToDelete = new Set(selectedIds);
+                idsToDelete.add(dragging.id);
+
+                setNodes(prev => prev.filter(n => !idsToDelete.has(n.id)));
+                setConnections(prev => prev.filter(c => !idsToDelete.has(c.from) && !idsToDelete.has(c.to)));
+
+                // Clear selection
+                setSelectedIds(new Set());
+                setIsTrashHovered(false);
+            }
+
+            setDragging(null);
+            setWiring(null);
+        };
+
+        window.addEventListener('mousemove', handleWindowMouseMove);
+        window.addEventListener('mouseup', handleWindowMouseUp);
+
+        return () => {
+            window.removeEventListener('mousemove', handleWindowMouseMove);
+            window.removeEventListener('mouseup', handleWindowMouseUp);
+        };
+    }, [dragging, wiring, isTrashHovered, selectedIds]);
+
 
     const toggleInput = (e: MouseEvent<HTMLDivElement>, id: string) => {
-        if (dragging) return;
+        // Don't toggle if we just finished dragging
+        if (hasDraggedRef.current) {
+            hasDraggedRef.current = false;
+            return;
+        }
         e.stopPropagation();
         setNodes(prev => prev.map(n => n.id === id ? { ...n, state: !n.state } : n));
     };
@@ -176,17 +275,36 @@ export default function LogicSimulator() {
         setConnections(prev => prev.filter(c => c.from !== id && c.to !== id));
     };
 
+    const getNextSwitchLabel = (currentNodes: CircuitNode[]): string => {
+        const switchNodes = currentNodes.filter(n => n.type === 'INPUT');
+        // Find the first missing letter or append
+        // Simple strategy: 'A', 'B', 'C'... based on index.
+        // But if I delete 'B', next one should be 'B' ideally? 
+        // Or just Count + 1?
+        // User requested: "Switches should always be named A, B, C, D etc by default"
+        // Let's use a robust approach: Find first unused letter A-Z.
+        const usedLabels = new Set(switchNodes.map(n => n.label));
+        for (let i = 0; i < 26; i++) {
+            const letter = String.fromCharCode(65 + i);
+            if (!usedLabels.has(letter)) return letter;
+        }
+        return `S${switchNodes.length + 1}`; // Fallback
+    };
+
     const addNode = (type: ComponentTypeName) => {
         const id = generateId();
-        const offset = nodes.length * 20;
+        const offset = (nodes.length % 10) * 20;
+        // Logic to stagger positions so they don't pile up exactly
+
         let label: string;
         if (type === 'INPUT') {
-            label = `In ${nodes.filter(n => n.type === 'INPUT').length + 1}`;
+            label = getNextSwitchLabel(nodes);
         } else if (type === 'OUTPUT') {
             label = `Out ${nodes.filter(n => n.type === 'OUTPUT').length + 1}`;
         } else {
             label = type;
         }
+
         setNodes([...nodes, {
             id,
             type,
@@ -204,8 +322,47 @@ export default function LogicSimulator() {
     const confirmClear = () => {
         setNodes([]);
         setConnections([]);
+        setSelectedIds(new Set());
         setShowClearConfirm(false);
     };
+
+    // Marquee Selection
+    const handleMarqueeSelect = (rect: DOMRect) => {
+        const newSelected = new Set(selectedIds);
+
+        nodes.forEach(node => {
+            // Check intersection (node is approx 60x60 centered)
+            // Canvas coords
+            if (!canvasRef.current) return;
+            // The rect comes from canvas component roughly in client coords? 
+            // Canvas.tsx sends rect relative to itself?
+            // Checking Canvas.tsx:
+            // `onSelectionEnd(new DOMRect(x, y, width, height))` where x,y are relative to canvas container.
+            // CircuitNode x,y are Center coordinates.
+
+            const nodeW = 60;
+            const nodeH = 60;
+            const nodeL = node.x - nodeW / 2;
+            const nodeR = node.x + nodeW / 2;
+            const nodeT = node.y - nodeH / 2;
+            const nodeB = node.y + nodeH / 2;
+
+            const selL = rect.x;
+            const selR = rect.x + rect.width;
+            const selT = rect.y;
+            const selB = rect.y + rect.height;
+
+            // Check overlap
+            const overlaps = !(nodeR < selL || nodeL > selR || nodeB < selT || nodeT > selB);
+
+            if (overlaps) {
+                newSelected.add(node.id);
+            }
+        });
+
+        setSelectedIds(newSelected);
+    };
+
 
     // --- Truth Table Generator ---
 
@@ -251,6 +408,51 @@ export default function LogicSimulator() {
         return nodes.find(n => n.id === wiring.nodeId);
     };
 
+    const loadDemo = (type: 'AND' | 'OR' | 'NOT' | 'XOR') => {
+        // Clear and preset
+        setNodes([]);
+        setConnections([]);
+        setSelectedIds(new Set());
+        setWiring(null);
+
+        const id1 = generateId();
+        const id2 = generateId();
+        const gateId = generateId();
+        const outId = generateId();
+
+        const newNodes: CircuitNode[] = [];
+        const newConnections: Connection[] = [];
+
+        if (type === 'NOT') {
+            // 1 Input, 1 Gate, 1 Output
+            newNodes.push(
+                { id: id1, type: 'INPUT', x: 100, y: 150, label: 'A', state: false },
+                { id: gateId, type: 'NOT', x: 300, y: 150, label: 'NOT' },
+                { id: outId, type: 'OUTPUT', x: 500, y: 150, label: 'Out' }
+            );
+            newConnections.push(
+                { id: generateId(), from: id1, to: gateId, inputIndex: 0 },
+                { id: generateId(), from: gateId, to: outId, inputIndex: 0 }
+            );
+        } else {
+            // 2 Inputs, 1 Gate, 1 Output
+            newNodes.push(
+                { id: id1, type: 'INPUT', x: 100, y: 100, label: 'A', state: false },
+                { id: id2, type: 'INPUT', x: 100, y: 200, label: 'B', state: false },
+                { id: gateId, type: type, x: 300, y: 150, label: type },
+                { id: outId, type: 'OUTPUT', x: 500, y: 150, label: 'Out' }
+            );
+            newConnections.push(
+                { id: generateId(), from: id1, to: gateId, inputIndex: 0 },
+                { id: generateId(), from: id2, to: gateId, inputIndex: 1 },
+                { id: generateId(), from: gateId, to: outId, inputIndex: 0 }
+            );
+        }
+
+        setNodes(newNodes);
+        setConnections(newConnections);
+    };
+
     return (
         <div className="flex flex-col flex-1 min-h-0 w-full">
             <SetPageTitle title="Circuit Designer" />
@@ -259,6 +461,7 @@ export default function LogicSimulator() {
             <CircuitToolbar
                 onClear={clearCanvas}
                 onGenerateTruthTable={generateTruthTable}
+                onLoadDemo={loadDemo}
             />
 
             {/* Main Workspace */}
@@ -267,12 +470,13 @@ export default function LogicSimulator() {
                 <CircuitSidebar onAddNode={addNode} />
 
                 {/* Canvas Area */}
-                <div
+                <Canvas
                     ref={canvasRef}
                     className="flex-1 relative bg-slate-50 dark:bg-slate-950 overflow-hidden cursor-crosshair"
-                    onMouseMove={handleMouseMove}
-                    onMouseUp={handleMouseUp}
+                    onClick={() => setSelectedIds(new Set())}
+                    onSelectionEnd={handleMarqueeSelect}
                 >
+
                     {/* Grid Background */}
                     <div
                         className="absolute inset-0 opacity-10 dark:opacity-20 pointer-events-none"
@@ -344,14 +548,19 @@ export default function LogicSimulator() {
                             node={node}
                             isActive={activeSimulation[node.id] ?? false}
                             isDark={isDark}
+                            isSelected={selectedIds.has(node.id)}
                             onMouseDown={handleMouseDownNode}
                             onClick={toggleInput}
-                            onDelete={deleteNode}
+                            // onDelete={deleteNode} // Removed per requirements (drag to bin only)
                             onStartWiring={startWiring}
                             onCompleteWiring={completeWiring}
                         />
                     ))}
-                </div>
+
+
+                    <TrashZone ref={trashRef} isHovered={isTrashHovered} />
+                </Canvas>
+
             </div>
 
             {/* Truth Table Modal */}

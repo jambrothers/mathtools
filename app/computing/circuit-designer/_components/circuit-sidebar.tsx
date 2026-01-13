@@ -49,7 +49,8 @@ export function CircuitSidebar({ onAddNode }: CircuitSidebarProps) {
                 <ul className="space-y-1 list-disc pl-4 text-xs">
                     <li><span className="font-bold text-slate-700 dark:text-slate-200">Click</span> switches to toggle.</li>
                     <li><span className="font-bold text-slate-700 dark:text-slate-200">Drag</span> from green port to connect.</li>
-                    <li><span className="font-bold text-slate-700 dark:text-slate-200">Hover</span> node to delete.</li>
+                    <li><span className="font-bold text-slate-700 dark:text-slate-200">Drag</span> to trash to delete.</li>
+                    <li><span className="font-bold text-slate-700 dark:text-slate-200">Marquee</span> to select multiple.</li>
                 </ul>
             </div>
         </Sidebar>

@@ -25,6 +25,16 @@ A tool for teaching integer operations using positive (yellow) and negative (red
 - Sorting and grouping animations
 *Status: Functional, but pending refactor to align with project architecture (currently monolithic).*
 
+### 3. Circuit Designer
+A logic gate simulator for Computer Science students.
+- **Components**: Switches, Bulbs, AND, OR, NOT, XOR gates.
+- **Features**:
+    - Real-time signal propagation.
+    - Truth Table generation.
+    - Group selection (Marquee) and Drag-to-Delete.
+    - Quick Demo presets.
+*Status: Active development. Recently updated with multi-select and enhanced UI.*
+
 ## Built With
 
 - **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
