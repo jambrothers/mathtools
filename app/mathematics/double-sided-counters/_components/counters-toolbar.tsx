@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Eye, EyeOff, Trash2, RefreshCw, GitMerge, ArrowRightLeft, Timer } from "lucide-react"
+import { Eye, EyeOff, Trash2, RefreshCw, GitMerge, ArrowRightLeft, Timer, Grid } from "lucide-react"
 import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator, ToolbarInput } from "@/components/tool-ui/toolbar"
 
 interface CountersToolbarProps {
@@ -20,6 +20,10 @@ interface CountersToolbarProps {
     // Animation Controls
     isSequentialMode: boolean
     setIsSequentialMode: (v: boolean) => void
+
+    // Ordered mode
+    isOrdered: boolean
+    onSnapToOrder: () => void
 }
 
 export function CountersToolbar({
@@ -31,7 +35,8 @@ export function CountersToolbar({
     isAnimating,
     onClear,
     onAddExpression,
-    isSequentialMode, setIsSequentialMode
+    isSequentialMode, setIsSequentialMode,
+    isOrdered, onSnapToOrder
 }: CountersToolbarProps) {
     const [input, setInput] = React.useState("")
 
@@ -55,6 +60,13 @@ export function CountersToolbar({
 
             <div className="flex items-center gap-2 ml-auto">
                 <ToolbarGroup>
+                    <ToolbarButton
+                        icon={<Grid size={16} />}
+                        label="Ordered"
+                        active={isOrdered}
+                        onClick={onSnapToOrder}
+                        disabled={isAnimating}
+                    />
                     <ToolbarButton
                         icon={showNumberLine ? <Eye size={16} /> : <EyeOff size={16} />}
                         label="Number Line"

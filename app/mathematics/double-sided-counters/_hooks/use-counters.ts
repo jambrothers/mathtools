@@ -3,15 +3,36 @@ import { useState, useRef, useCallback } from 'react';
 export interface Counter {
     id: number;
     value: number; // 1 or -1
+    x: number;
+    y: number;
     isNew?: boolean;
     isLeaving?: boolean;
 }
 
 export type SortState = 'none' | 'grouped' | 'paired';
 
+// Constants for counter grid layout
+const COUNTER_SIZE = 80; // px (matches w-20 h-20)
+const COUNTER_GAP = 16; // px (gap-4)
+const GRID_PADDING = 32; // px (p-8)
+const COUNTERS_PER_ROW = 8;
+
+/**
+ * Calculates grid position for a counter at a given index.
+ */
+function calculateGridPosition(index: number): { x: number; y: number } {
+    const col = index % COUNTERS_PER_ROW;
+    const row = Math.floor(index / COUNTERS_PER_ROW);
+    return {
+        x: GRID_PADDING + col * (COUNTER_SIZE + COUNTER_GAP),
+        y: GRID_PADDING + row * (COUNTER_SIZE + COUNTER_GAP)
+    };
+}
+
 export function useCounters() {
     const [counters, setCounters] = useState<Counter[]>([]);
     const [sortState, setSortState] = useState<SortState>('none');
+    const [isOrdered, setIsOrdered] = useState(true);
 
     // Animation State
     const [isAnimating, setIsAnimating] = useState(false);
@@ -44,20 +65,21 @@ export function useCounters() {
 
     const addCounter = useCallback((value: number, count = 1, showNumberLine = false) => {
         // Instant Add (if Number Line hidden or just simple add)
-        // User didn't specify distinct behavior for number line in the refactor plan besides visibility, 
-        // but the original code had distinct sequential add logic for number line. 
-        // We will keep the logic to be safe.
-
         if (!showNumberLine) {
-            const newCounters: Counter[] = [];
-            for (let i = 0; i < count; i++) {
-                newCounters.push({
-                    id: nextIdRef.current++,
-                    value: value,
-                    isNew: true,
-                });
-            }
-            setCounters(prev => [...prev, ...newCounters]);
+            setCounters(prev => {
+                const newCounters: Counter[] = [];
+                for (let i = 0; i < count; i++) {
+                    const pos = calculateGridPosition(prev.length + i);
+                    newCounters.push({
+                        id: nextIdRef.current++,
+                        value: value,
+                        x: pos.x,
+                        y: pos.y,
+                        isNew: true,
+                    });
+                }
+                return [...prev, ...newCounters];
+            });
 
             const tId = setTimeout(() => {
                 setCounters(prev => prev.map(c => ({ ...c, isNew: false })));
@@ -75,11 +97,16 @@ export function useCounters() {
 
             const tId = setTimeout(() => {
                 const newId = nextIdRef.current++;
-                setCounters(prev => [...prev, {
-                    id: newId,
-                    value: value,
-                    isNew: true
-                }]);
+                setCounters(prev => {
+                    const pos = calculateGridPosition(prev.length);
+                    return [...prev, {
+                        id: newId,
+                        value: value,
+                        x: pos.x,
+                        y: pos.y,
+                        isNew: true
+                    }];
+                });
 
                 const cleanTId = setTimeout(() => {
                     setCounters(prev => prev.map(c => c.id === newId ? { ...c, isNew: false } : c));
@@ -104,6 +131,38 @@ export function useCounters() {
         setSortState('none');
     }, [isAnimating]);
 
+    const removeCounter = useCallback((id: number) => {
+        if (isAnimating) return;
+        setCounters(prev => {
+            const filtered = prev.filter(c => c.id !== id);
+            // If ordered, recalculate positions
+            if (isOrdered) {
+                return filtered.map((c, i) => ({
+                    ...c,
+                    ...calculateGridPosition(i)
+                }));
+            }
+            return filtered;
+        });
+    }, [isAnimating, isOrdered]);
+
+    const updateCounterPosition = useCallback((id: number, x: number, y: number) => {
+        if (isAnimating) return;
+        setCounters(prev => prev.map(c =>
+            c.id === id ? { ...c, x, y } : c
+        ));
+        // Moving a counter manually disables ordered mode
+        setIsOrdered(false);
+    }, [isAnimating]);
+
+    const snapToOrder = useCallback(() => {
+        setCounters(prev => prev.map((c, i) => ({
+            ...c,
+            ...calculateGridPosition(i)
+        })));
+        setIsOrdered(true);
+    }, []);
+
     const flipAll = useCallback(() => {
         if (isAnimating) return;
         setCounters(prev => prev.map(c => ({ ...c, value: c.value * -1 })));
@@ -116,12 +175,13 @@ export function useCounters() {
             const nextMode = prev === 'grouped' ? 'paired' : 'grouped';
 
             setCounters(currentCounters => {
+                let sorted: Counter[];
                 if (nextMode === 'grouped') {
-                    return [...currentCounters].sort((a, b) => b.value - a.value);
+                    sorted = [...currentCounters].sort((a, b) => b.value - a.value);
                 } else {
                     const positives = currentCounters.filter(c => c.value === POSITIVE);
                     const negatives = currentCounters.filter(c => c.value === NEGATIVE);
-                    const sorted: Counter[] = [];
+                    sorted = [];
                     const pairCount = Math.min(positives.length, negatives.length);
 
                     for (let i = 0; i < pairCount; i++) {
@@ -131,11 +191,15 @@ export function useCounters() {
 
                     if (positives.length > pairCount) sorted.push(...positives.slice(pairCount));
                     if (negatives.length > pairCount) sorted.push(...negatives.slice(pairCount));
-
-                    return sorted;
                 }
+                // Recalculate positions after organizing
+                return sorted.map((c, i) => ({
+                    ...c,
+                    ...calculateGridPosition(i)
+                }));
             });
 
+            setIsOrdered(true);
             return nextMode;
         });
     }, [isAnimating]);
@@ -232,11 +296,15 @@ export function useCounters() {
         highlightedPair,
         isSequentialMode,
         setIsSequentialMode,
+        isOrdered,
         animSpeed,
         setAnimSpeed,
         addCounter,
         addZeroPair,
         flipCounter,
+        removeCounter,
+        updateCounterPosition,
+        snapToOrder,
         flipAll,
         organize,
         cancelZeroPairs,

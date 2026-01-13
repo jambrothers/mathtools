@@ -6,10 +6,8 @@ import { useCounters } from './_hooks/use-counters';
 import { CountersToolbar } from './_components/counters-toolbar';
 import { SummaryStats } from './_components/summary-stats';
 import { NumberLine } from './_components/number-line';
-import { ToolCard } from "@/components/tool-card";
+import { DraggableCounter } from './_components/draggable-counter';
 import { Sidebar, SidebarSection, SidebarButton } from "@/components/tool-ui/sidebar";
-import { Toolbar } from "@/components/tool-ui/toolbar";
-import { TrashZone } from "@/components/tool-ui/trash-zone";
 import { SpeedControl } from '@/components/tool-ui/speed-control';
 import { Canvas } from '@/components/tool-ui/canvas';
 
@@ -21,9 +19,13 @@ export default function CountersPage() {
         highlightedPair,
         isSequentialMode,
         setIsSequentialMode,
+        isOrdered,
         addCounter,
         addZeroPair,
         flipCounter,
+        removeCounter,
+        updateCounterPosition,
+        snapToOrder,
         flipAll,
         organize,
         cancelZeroPairs,
@@ -81,6 +83,8 @@ export default function CountersPage() {
                 onAddExpression={handleExpressionAdd}
                 isSequentialMode={isSequentialMode}
                 setIsSequentialMode={setIsSequentialMode}
+                isOrdered={isOrdered}
+                onSnapToOrder={snapToOrder}
             />
 
             <div className="flex flex-1 overflow-hidden relative">
@@ -123,7 +127,9 @@ export default function CountersPage() {
                     <div className="mt-auto pt-6 text-slate-500 dark:text-slate-400 text-sm">
                         <h3 className="font-semibold mb-2 text-slate-600 dark:text-slate-300">Shortcuts:</h3>
                         <ul className="space-y-1 list-disc pl-4 text-xs">
-                            <li><span className="font-bold text-slate-700 dark:text-slate-200">Click</span> to flip sign.</li>
+                            <li><span className="font-bold text-slate-700 dark:text-slate-200">Click</span> to remove.</li>
+                            <li><span className="font-bold text-slate-700 dark:text-slate-200">Double-click</span> to flip.</li>
+                            <li><span className="font-bold text-slate-700 dark:text-slate-200">Drag</span> to move.</li>
                         </ul>
                     </div>
                 </Sidebar>
@@ -145,47 +151,28 @@ export default function CountersPage() {
                     )}
 
                     {/* Counters Area */}
-                    <div className="w-full h-full overflow-y-auto p-8 relative">
-                        <div className="min-h-full flex flex-wrap content-center justify-center gap-4 transition-all duration-500 pb-32">
-                            {counters.length === 0 && (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 pointer-events-none">
-                                    <div className="w-24 h-24 mb-6 rounded-full bg-white dark:bg-slate-900 border-4 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center shadow-sm">
-                                        <span className="text-4xl font-light text-slate-300 dark:text-slate-600">0</span>
-                                    </div>
-                                    <h3 className="text-lg font-medium text-slate-600 dark:text-slate-400">The board is empty</h3>
-                                    <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">Add counters using the sidebar</p>
+                    <div className="w-full h-full overflow-y-auto relative">
+                        {counters.length === 0 && (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 pointer-events-none">
+                                <div className="w-24 h-24 mb-6 rounded-full bg-white dark:bg-slate-900 border-4 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center shadow-sm">
+                                    <span className="text-4xl font-light text-slate-300 dark:text-slate-600">0</span>
                                 </div>
-                            )}
+                                <h3 className="text-lg font-medium text-slate-600 dark:text-slate-400">The board is empty</h3>
+                                <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">Add counters using the sidebar</p>
+                            </div>
+                        )}
 
-                            {counters.map((counter) => {
-                                const isBreathing = highlightedPair.includes(counter.id);
-                                return (
-                                    <button
-                                        key={counter.id}
-                                        onClick={() => flipCounter(counter.id)}
-                                        disabled={isAnimating}
-                                        className={`
-                                            relative w-16 h-16 md:w-20 md:h-20 rounded-full shadow-lg border-4 
-                                            flex items-center justify-center text-3xl font-bold 
-                                            transition-all duration-500 transform
-                                            select-none group
-                                            ${counter.value > 0
-                                                ? 'bg-yellow-400 border-yellow-500 text-yellow-900 ring-yellow-200'
-                                                : 'bg-red-500 border-red-600 text-white ring-red-200'
-                                            }
-                                            ${!isAnimating ? 'hover:scale-110 hover:shadow-xl active:scale-95 cursor-pointer' : 'cursor-default'}
-                                            ${counter.isNew ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}
-                                            ${counter.isLeaving ? 'scale-0 opacity-0 rotate-180' : ''}
-                                            ${isBreathing ? 'scale-110 shadow-[0_0_20px_rgba(59,130,246,0.5)] ring-4 ring-blue-400 ring-opacity-60 z-20' : ''}
-                                        `}
-                                    >
-                                        <span className="relative z-10 drop-shadow-md">{counter.value > 0 ? '+' : '−'}</span>
-                                        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/40 via-transparent to-black/5 pointer-events-none"></div>
-                                        <div className="absolute top-2 left-2 w-1/3 h-1/3 bg-white/30 rounded-full blur-[2px] pointer-events-none"></div>
-                                    </button>
-                                );
-                            })}
-                        </div>
+                        {counters.map((counter) => (
+                            <DraggableCounter
+                                key={counter.id}
+                                counter={counter}
+                                isAnimating={isAnimating}
+                                isBreathing={highlightedPair.includes(counter.id)}
+                                onRemove={removeCounter}
+                                onFlip={flipCounter}
+                                onDragEnd={updateCounterPosition}
+                            />
+                        ))}
                     </div>
 
                     {/* Floating Number Line */}
