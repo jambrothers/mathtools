@@ -23,7 +23,8 @@ A tool for teaching integer operations using positive (yellow) and negative (red
 - Zero pair cancellation animations
 - Automated number line tracking
 - Sorting and grouping animations
-*Status: Functional, but pending refactor to align with project architecture (currently monolithic).*
+- **Shareable URLs**: Generate links to share exact counter configurations
+*Status: Architecture aligned with project standards. URL state sharing implemented.*
 
 ### 3. Circuit Designer
 A logic gate simulator for Computer Science students.
@@ -37,11 +38,12 @@ A logic gate simulator for Computer Science students.
 
 ## Built With
 
-- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **State Management**: React Context + Hooks
 - **Theme**: [next-themes](https://github.com/pacocoursey/next-themes) for Dark Mode support
+- **Testing**: [Jest](https://jestjs.io/) (unit), [Playwright](https://playwright.dev/) (E2E)
 
 ## Project Structure
 
@@ -56,6 +58,7 @@ This project follows a standard Next.js App Router structure with a separation o
   - **`tool-ui/`**: Components shared across multiple tools (e.g., `Canvas`, `TileBase`, `Toolbar`).
   - **`ui/`**: General UI components (coming soon).
 - **`lib/`**: Utility functions and custom hooks.
+  - **`url-state.ts`**: Generic URL state serialization utilities for shareable tool configurations.
 
 ### key Architectural Concepts
 
@@ -153,4 +156,34 @@ describe('MyComponent', () => {
         expect(screen.getByText('Expected Text')).toBeInTheDocument()
     })
 })
+```
+
+## End-to-End Testing
+
+We use [Playwright](https://playwright.dev/) for browser-based end-to-end testing to verify complete user workflows.
+
+### Running E2E Tests
+
+To run all E2E tests:
+```bash
+npm run test:e2e
+```
+
+### E2E Test Structure
+
+- **Location**: Tests are in the `e2e/` directory at the project root.
+- **Configuration**: `playwright.config.ts` defines browser settings and dev server startup.
+- **Browsers**: Tests run in Chromium by default.
+
+### Example E2E Test
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('should add counters and generate shareable URL', async ({ page }) => {
+    await page.goto('/mathematics/double-sided-counters');
+    await page.click('text=Add +1');
+    await page.click('button:has-text("Link")');
+    // URL is copied to clipboard
+});
 ```

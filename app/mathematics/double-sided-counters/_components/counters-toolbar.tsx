@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Eye, EyeOff, Trash2, RefreshCw, GitMerge, ArrowRightLeft, Timer, Grid } from "lucide-react"
+import { Eye, EyeOff, Trash2, RefreshCw, GitMerge, ArrowRightLeft, Timer, Grid, Link } from "lucide-react"
 import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator, ToolbarInput } from "@/components/tool-ui/toolbar"
 
 interface CountersToolbarProps {
@@ -16,6 +16,7 @@ interface CountersToolbarProps {
     isAnimating: boolean
     onClear: () => void
     onAddExpression: (expr: string) => void
+    onGenerateLink: () => void
 
     // Animation Controls
     isSequentialMode: boolean
@@ -35,6 +36,7 @@ export function CountersToolbar({
     isAnimating,
     onClear,
     onAddExpression,
+    onGenerateLink,
     isSequentialMode, setIsSequentialMode,
     isOrdered, onSnapToOrder
 }: CountersToolbarProps) {
@@ -43,7 +45,7 @@ export function CountersToolbar({
     return (
         <Toolbar className="gap-4">
             {/* Search / Input */}
-            <div className="flex-1 flex gap-2 min-w-[200px] max-w-4xl">
+            <div className="flex-1 flex gap-2 min-w-[200px] max-w-xl">
                 <ToolbarInput
                     className="flex-1"
                     value={input}
@@ -130,6 +132,16 @@ export function CountersToolbar({
                         label="Clear"
                         variant="danger"
                         onClick={onClear}
+                    />
+                </ToolbarGroup>
+
+                <ToolbarSeparator />
+
+                <ToolbarGroup>
+                    <ToolbarButton
+                        icon={<Link size={16} />}
+                        label="Link"
+                        onClick={onGenerateLink}
                     />
                 </ToolbarGroup>
             </div>

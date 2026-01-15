@@ -289,6 +289,28 @@ export function useCounters() {
     // }, []);
     // (Optional but good practice)
 
+    /**
+     * Import state from URL or external source.
+     * Used for URL state restoration.
+     */
+    const setCountersFromState = useCallback((
+        importedCounters: Counter[],
+        importedSortState: SortState,
+        importedIsOrdered: boolean,
+        importedIsSequentialMode: boolean,
+        importedAnimSpeed: number
+    ) => {
+        setCounters(importedCounters);
+        setSortState(importedSortState);
+        setIsOrdered(importedIsOrdered);
+        setIsSequentialMode(importedIsSequentialMode);
+        setAnimSpeed(importedAnimSpeed);
+        // Update next ID to avoid collisions with imported counters
+        if (importedCounters.length > 0) {
+            nextIdRef.current = Math.max(...importedCounters.map(c => c.id)) + 1;
+        }
+    }, []);
+
     return {
         counters,
         sortState,
@@ -308,6 +330,7 @@ export function useCounters() {
         flipAll,
         organize,
         cancelZeroPairs,
-        clearBoard
+        clearBoard,
+        setCountersFromState
     };
 }

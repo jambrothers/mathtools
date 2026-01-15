@@ -118,6 +118,7 @@ export function DraggableCounter({
 
     return (
         <div
+            data-testid="counter"
             onClick={handleClick}
             onDoubleClick={handleDoubleClick}
             onMouseDown={handleMouseDownWrapper}

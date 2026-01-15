@@ -6,6 +6,11 @@ jest.mock('@/components/set-page-title', () => ({
     SetPageTitle: ({ title }: { title: string }) => <h1>{title}</h1>
 }))
 
+// Mock next/navigation for useSearchParams
+jest.mock('next/navigation', () => ({
+    useSearchParams: () => new URLSearchParams()
+}))
+
 describe('Double Sided Counters Page', () => {
     it('renders the title and empty state', () => {
         render(<CountersPage />)

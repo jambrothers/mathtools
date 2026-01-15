@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { SetPageTitle } from '@/components/set-page-title';
 import { useCounters } from './_hooks/use-counters';
 import { CountersToolbar } from './_components/counters-toolbar';
@@ -10,6 +11,8 @@ import { DraggableCounter } from './_components/draggable-counter';
 import { Sidebar, SidebarSection, SidebarButton } from "@/components/tool-ui/sidebar";
 import { SpeedControl } from '@/components/tool-ui/speed-control';
 import { Canvas } from '@/components/tool-ui/canvas';
+import { counterURLSerializer, CounterURLState } from './_lib/url-state';
+import { generateShareableURL, copyURLToClipboard } from '@/lib/url-state';
 
 export default function CountersPage() {
     const {
@@ -31,11 +34,33 @@ export default function CountersPage() {
         cancelZeroPairs,
         clearBoard,
         animSpeed,
-        setAnimSpeed
+        setAnimSpeed,
+        setCountersFromState
     } = useCounters();
 
+    const searchParams = useSearchParams();
     const [showNumberLine, setShowNumberLine] = useState(false);
     const [showStats, setShowStats] = useState(true);
+    const [hasInitialized, setHasInitialized] = useState(false);
+
+    // Initialize from URL on mount
+    useEffect(() => {
+        if (hasInitialized) return;
+
+        const state = counterURLSerializer.deserialize(searchParams);
+        if (state) {
+            setCountersFromState(
+                state.counters,
+                state.sortState,
+                state.isOrdered,
+                state.isSequentialMode,
+                state.animSpeed
+            );
+            setShowNumberLine(state.showNumberLine);
+            setShowStats(state.showStats);
+        }
+        setHasInitialized(true);
+    }, [searchParams, hasInitialized, setCountersFromState]);
 
     // Derived stats
     const positiveCount = counters.filter(c => c.value > 0).length;
@@ -64,6 +89,24 @@ export default function CountersPage() {
         }
     };
 
+    /**
+     * Generate a shareable URL with the current state and copy to clipboard.
+     */
+    const handleGenerateLink = useCallback(async () => {
+        const state: CounterURLState = {
+            counters,
+            sortState,
+            isOrdered,
+            isSequentialMode,
+            animSpeed,
+            showNumberLine,
+            showStats
+        };
+        const url = generateShareableURL(counterURLSerializer, state);
+        await copyURLToClipboard(url);
+        // TODO: Could add a toast notification here to confirm copy
+    }, [counters, sortState, isOrdered, isSequentialMode, animSpeed, showNumberLine, showStats]);
+
     return (
         <div className="flex flex-col h-[calc(100vh-81px)] w-full bg-slate-50 dark:bg-slate-950 overflow-hidden">
             <SetPageTitle title="Double Sided Counters" />
@@ -85,6 +128,7 @@ export default function CountersPage() {
                 setIsSequentialMode={setIsSequentialMode}
                 isOrdered={isOrdered}
                 onSnapToOrder={snapToOrder}
+                onGenerateLink={handleGenerateLink}
             />
 
             <div className="flex flex-1 overflow-hidden relative">

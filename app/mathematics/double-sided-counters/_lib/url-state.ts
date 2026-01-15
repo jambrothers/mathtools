@@ -1,0 +1,155 @@
+/**
+ * Counter-specific URL state serialization.
+ * Implements the generic URLStateSerializer interface for the double-sided counters tool.
+ */
+
+import {
+    URLStateSerializer,
+    serializeBool,
+    deserializeBool,
+    serializeNumber,
+    deserializeNumber,
+    deserializeString,
+} from '@/lib/url-state';
+import { Counter, SortState } from '../_hooks/use-counters';
+
+/**
+ * Full state that can be serialized to/from URL
+ */
+export interface CounterURLState {
+    counters: Counter[];
+    sortState: SortState;
+    isOrdered: boolean;
+    isSequentialMode: boolean;
+    animSpeed: number;
+    showNumberLine: boolean;
+    showStats: boolean;
+}
+
+// URL Parameter Keys (kept short for compact URLs)
+const PARAM_COUNTERS = 'c';
+const PARAM_NUMBER_LINE = 'nl';
+const PARAM_STATS = 'st';
+const PARAM_SLOW_MODE = 'sl';
+const PARAM_SPEED = 'sp';
+const PARAM_SORT_STATE = 'so';
+const PARAM_ORDERED = 'or';
+
+/**
+ * Serialize counters to compact string format.
+ * Format: "p:x,y;n:x,y;p:x,y;..."
+ * Where p = positive (+1), n = negative (-1)
+ * 
+ * @example
+ * // Two positive counters and one negative
+ * serializeCounters([
+ *   { id: 0, value: 1, x: 32, y: 32 },
+ *   { id: 1, value: 1, x: 128, y: 32 },
+ *   { id: 2, value: -1, x: 224, y: 32 }
+ * ])
+ * // Returns: "p:32,32;p:128,32;n:224,32"
+ */
+export function serializeCounters(counters: Counter[]): string {
+    if (counters.length === 0) return '';
+
+    return counters.map(c => {
+        const type = c.value > 0 ? 'p' : 'n';
+        // Round positions to integers for cleaner URLs
+        return `${type}:${Math.round(c.x)},${Math.round(c.y)}`;
+    }).join(';');
+}
+
+/**
+ * Parse compact counter string back to Counter array.
+ * Creates new IDs starting from 0.
+ * 
+ * @param str - The compact counter string (e.g., "p:32,32;n:128,32")
+ * @returns Array of Counter objects with generated IDs
+ */
+export function parseCounterString(str: string): Counter[] {
+    if (!str || str.trim() === '') return [];
+
+    const counters: Counter[] = [];
+    const parts = str.split(';');
+
+    for (let i = 0; i < parts.length; i++) {
+        const part = parts[i].trim();
+        if (!part) continue;
+
+        // Parse "p:x,y" or "n:x,y" format
+        const match = part.match(/^([pn]):(-?\d+),(-?\d+)$/);
+        if (match) {
+            const [, type, xStr, yStr] = match;
+            counters.push({
+                id: i,
+                value: type === 'p' ? 1 : -1,
+                x: parseInt(xStr, 10),
+                y: parseInt(yStr, 10),
+            });
+        }
+    }
+
+    return counters;
+}
+
+/**
+ * Validate and parse sort state from URL param.
+ */
+function parseSortState(value: string | null): SortState {
+    if (value === 'grouped' || value === 'paired') {
+        return value;
+    }
+    return 'none';
+}
+
+/**
+ * Counter URL state serializer implementation.
+ * Use with generateShareableURL() to create shareable links.
+ */
+export const counterURLSerializer: URLStateSerializer<CounterURLState> = {
+    serialize(state: CounterURLState): URLSearchParams {
+        const params = new URLSearchParams();
+
+        // Only add counters param if there are counters
+        const counterStr = serializeCounters(state.counters);
+        if (counterStr) {
+            params.set(PARAM_COUNTERS, counterStr);
+        }
+
+        // Add all settings
+        params.set(PARAM_NUMBER_LINE, serializeBool(state.showNumberLine));
+        params.set(PARAM_STATS, serializeBool(state.showStats));
+        params.set(PARAM_SLOW_MODE, serializeBool(state.isSequentialMode));
+        params.set(PARAM_ORDERED, serializeBool(state.isOrdered));
+        params.set(PARAM_SORT_STATE, state.sortState);
+
+        // Only add speed if slow mode is enabled (for cleaner URLs)
+        if (state.isSequentialMode) {
+            params.set(PARAM_SPEED, serializeNumber(state.animSpeed));
+        }
+
+        return params;
+    },
+
+    deserialize(params: URLSearchParams): CounterURLState | null {
+        // Check if there are any relevant params at all
+        const hasAnyParam = [
+            PARAM_COUNTERS, PARAM_NUMBER_LINE, PARAM_STATS,
+            PARAM_SLOW_MODE, PARAM_SPEED, PARAM_SORT_STATE, PARAM_ORDERED
+        ].some(key => params.has(key));
+
+        if (!hasAnyParam) {
+            return null; // No URL state to restore
+        }
+
+        return {
+            counters: parseCounterString(params.get(PARAM_COUNTERS) ?? ''),
+            showNumberLine: deserializeBool(params.get(PARAM_NUMBER_LINE), false),
+            showStats: deserializeBool(params.get(PARAM_STATS), true),
+            isSequentialMode: deserializeBool(params.get(PARAM_SLOW_MODE), false),
+            animSpeed: deserializeNumber(params.get(PARAM_SPEED), 1000),
+            sortState: parseSortState(params.get(PARAM_SORT_STATE)),
+            isOrdered: deserializeBool(params.get(PARAM_ORDERED), true),
+        };
+    }
+};
