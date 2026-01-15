@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { SetPageTitle } from '@/components/set-page-title';
 import { useCounters } from './_hooks/use-counters';
@@ -14,7 +14,33 @@ import { Canvas } from '@/components/tool-ui/canvas';
 import { counterURLSerializer, CounterURLState } from './_lib/url-state';
 import { generateShareableURL, copyURLToClipboard } from '@/lib/url-state';
 
+/**
+ * Loading fallback component for the counters page.
+ */
+function CountersPageLoading() {
+    return (
+        <div className="flex flex-col h-[calc(100vh-81px)] w-full bg-slate-50 dark:bg-slate-950 overflow-hidden items-center justify-center">
+            <div className="animate-pulse text-slate-400 dark:text-slate-500">Loading...</div>
+        </div>
+    );
+}
+
+/**
+ * Main page component wrapped in Suspense for useSearchParams compatibility.
+ */
 export default function CountersPage() {
+    return (
+        <Suspense fallback={<CountersPageLoading />}>
+            <CountersPageContent />
+        </Suspense>
+    );
+}
+
+/**
+ * Inner content component that uses useSearchParams.
+ * This must be wrapped in Suspense at the page level for Next.js static prerendering.
+ */
+function CountersPageContent() {
     const {
         counters,
         sortState,
