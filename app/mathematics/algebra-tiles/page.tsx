@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { useAlgebraTiles } from "./_hooks/use-algebra-tiles"
 import { AlgebraTile } from "./_components/algebra-tile"
 import { AlgebraToolbar } from "./_components/algebra-toolbar"
@@ -9,8 +10,35 @@ import { Canvas } from '@/components/tool-ui/canvas';
 import { TrashZone } from '@/components/tool-ui/trash-zone';
 import { SetPageTitle } from "@/components/set-page-title"
 import { Position } from "@/types/manipulatives"
+import { algebraTilesURLSerializer, AlgebraTilesURLState } from "./_lib/url-state"
+import { generateShareableURL, copyURLToClipboard } from "@/lib/url-state"
 
+/**
+ * Loading fallback component for the algebra tiles page.
+ */
+function AlgebraTilesPageLoading() {
+    return (
+        <div className="flex flex-col flex-1 min-h-0 w-full bg-slate-50 dark:bg-slate-950 items-center justify-center">
+            <div className="animate-pulse text-slate-400 dark:text-slate-500">Loading...</div>
+        </div>
+    );
+}
+
+/**
+ * Main page component wrapped in Suspense for useSearchParams compatibility.
+ */
 export default function AlgebraTilesPage() {
+    return (
+        <Suspense fallback={<AlgebraTilesPageLoading />}>
+            <AlgebraTilesPageContent />
+        </Suspense>
+    );
+}
+
+/**
+ * Inner content component that uses useSearchParams.
+ */
+function AlgebraTilesPageContent() {
     const {
         tiles,
         selectedIds,
@@ -31,16 +59,33 @@ export default function AlgebraTilesPage() {
         rotateTiles,
         flipTiles,
         undo,
-        canUndo
+        canUndo,
+        setTilesFromState
     } = useAlgebraTiles()
 
+    const searchParams = useSearchParams()
     const [showLabels, setShowLabels] = useState(true)
     const [showY, setShowY] = useState(false)
     const [snapToGrid, setSnapToGrid] = useState(false)
     const [isTrashHovered, setIsTrashHovered] = useState(false)
+    const [hasInitialized, setHasInitialized] = useState(false)
 
     const trashRef = useRef<HTMLDivElement>(null)
     const canvasRef = useRef<HTMLDivElement>(null)
+
+    // Initialize from URL on mount
+    useEffect(() => {
+        if (hasInitialized) return;
+
+        const state = algebraTilesURLSerializer.deserialize(searchParams);
+        if (state) {
+            setTilesFromState(state.tiles);
+            setShowLabels(state.showLabels);
+            setShowY(state.showY);
+            setSnapToGrid(state.snapToGrid);
+        }
+        setHasInitialized(true);
+    }, [searchParams, hasInitialized, setTilesFromState]);
 
     // Keyboard shortcuts
     useEffect(() => {
@@ -70,30 +115,56 @@ export default function AlgebraTilesPage() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedIds, removeTiles, rotateTiles, flipTiles, undo, canUndo]);
 
+    /**
+     * Generate a shareable URL with the current state and copy to clipboard.
+     */
+    const handleGenerateLink = useCallback(async () => {
+        const state: AlgebraTilesURLState = {
+            tiles,
+            showLabels,
+            showY,
+            snapToGrid
+        };
+        const url = generateShareableURL(algebraTilesURLSerializer, state);
+        await copyURLToClipboard(url);
+        // TODO: Could add a toast notification here to confirm copy
+    }, [tiles, showLabels, showY, snapToGrid]);
+
+    /**
+     * Handle tiles dropped from the sidebar onto the canvas.
+     */
+    const handleDropOnCanvas = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const data = e.dataTransfer.getData('application/json');
+        if (!data) return;
+
+        try {
+            const { type, value } = JSON.parse(data);
+            if (!canvasRef.current) return;
+
+            const canvasRect = canvasRef.current.getBoundingClientRect();
+            let x = e.clientX - canvasRect.left;
+            let y = e.clientY - canvasRect.top;
+
+            // Snap to grid if enabled
+            if (snapToGrid) {
+                x = Math.round(x / 50) * 50;
+                y = Math.round(y / 50) * 50;
+            }
+
+            addTile(type, value, x, y);
+        } catch {
+            // Invalid JSON, ignore
+        }
+    }, [addTile, snapToGrid]);
+
+    const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+    }, []);
+
     const handleDragEnd = (id: string, pos: Position) => {
         // Check trash collision
-        if (trashRef.current) {
-            const trashRect = trashRef.current.getBoundingClientRect()
-            // We use global mouse coordinates usually, but position is relative to parent (canvas)
-            // Ideally useDraggable would give us the mouse event or global coordinates. 
-            // BUT useDraggable updates 'position' state which is relative. 
-            // Collision detection here is tricky without the event.
-            // Let's assume we can get clientX/Y from somewhere or check bounds relative to canvas if Trash is in canvas.
-
-            // Actually, let's fix this properly. 
-            // The Tile is absolutely positioned in the Canvas. 
-            // The Trash is absolutely positioned in the Canvas (bottom right).
-            // We can check intersection of the Tile Rect and Trash Rect.
-
-            // Simple approach: Check if tile position is near bottom right?
-            // Better: Get the DOM element of the tile? No, ref is hard with list.
-
-            // Alternative: useDraggable could return the LAST MOUSE EVENT.
-            // Or we check standard "drop over" logic.
-        }
-
-        // For now, let's implement basic "if y is large and x is large" loose check or relying on a layout assumption
-        // Since Trash is absolute bottom right.
         if (canvasRef.current && trashRef.current) {
             const canvasRect = canvasRef.current.getBoundingClientRect();
             const trashRect = trashRef.current.getBoundingClientRect();
@@ -103,8 +174,7 @@ export default function AlgebraTilesPage() {
             const trashT = trashRect.top - canvasRect.top;
 
             // Tile position (top-left)
-            // We should probably check if the *mouse* was over the trash, but we only have tile position here.
-            // Let's check if the tile center is inside the trash zone.
+            // Check if the tile center is inside the trash zone.
             const tileCenterX = pos.x + 25; // approx
             const tileCenterY = pos.y + 25;
 
@@ -112,7 +182,6 @@ export default function AlgebraTilesPage() {
                 const idsToDelete = selectedIds.has(id) ? Array.from(selectedIds) : [id];
                 removeTiles(idsToDelete);
                 return;
-                // Don't update position if deleted
             }
         }
 
@@ -132,8 +201,7 @@ export default function AlgebraTilesPage() {
                 onGroup={groupTiles}
                 onSimplify={simplifyTiles}
                 onVisualize={visualizeEquation}
-                hasSelection={selectedIds.size > 0}
-                onDeleteSelected={() => removeTiles(Array.from(selectedIds))}
+                onGenerateLink={handleGenerateLink}
             />
 
             <div className="flex flex-1 overflow-hidden relative">
@@ -145,6 +213,8 @@ export default function AlgebraTilesPage() {
                     className="relative"
                     onClick={clearSelection}
                     onSelectionEnd={handleMarqueeSelect}
+                    onDrop={handleDropOnCanvas}
+                    onDragOver={handleDragOver}
                 >
                     {tiles.map(tile => (
                         <AlgebraTile
@@ -152,6 +222,7 @@ export default function AlgebraTilesPage() {
                             {...tile}
                             isSelected={selectedIds.has(tile.id)}
                             showLabels={showLabels}
+                            snapGridSize={snapToGrid ? 50 : undefined}
                             onDragStart={handleDragStart}
                             onDragMove={(id, pos, delta) => handleDragMove(id, delta)}
                             onDragEnd={handleDragEnd}

@@ -16,7 +16,7 @@ exports[`AlgebraTiles Page matches snapshot 1`] = `
         >
           <input
             class="flex-1 px-3 py-1.5 text-sm border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-950 focus:ring-2 focus:ring-indigo-500 focus:outline-none min-w-[140px]"
-            placeholder="e.g. 2x + 1 = 5"
+            placeholder="e.g. 2x + 1 - y + x^2"
             type="text"
             value=""
           />
@@ -45,7 +45,7 @@ exports[`AlgebraTiles Page matches snapshot 1`] = `
             <span
               class="hidden sm:inline"
             >
-              Visualize
+              Visualise
             </span>
           </button>
         </div>
@@ -278,46 +278,6 @@ exports[`AlgebraTiles Page matches snapshot 1`] = `
         >
           <button
             class="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-800"
-            disabled=""
-            type="button"
-          >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-trash2 lucide-trash-2"
-              fill="none"
-              height="16"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="16"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10 11v6"
-              />
-              <path
-                d="M14 11v6"
-              />
-              <path
-                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
-              />
-              <path
-                d="M3 6h18"
-              />
-              <path
-                d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-              />
-            </svg>
-            <span
-              class="hidden sm:inline"
-            >
-              Delete
-            </span>
-          </button>
-          <button
-            class="px-3 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-300 border border-red-200 dark:border-red-800"
             type="button"
           >
             <svg
@@ -346,6 +306,36 @@ exports[`AlgebraTiles Page matches snapshot 1`] = `
               Clear
             </span>
           </button>
+          <button
+            class="px-3 py-2 border text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-link"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+              />
+              <path
+                d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+              />
+            </svg>
+            <span
+              class="hidden sm:inline"
+            >
+              Link
+            </span>
+          </button>
         </div>
       </div>
     </div>
@@ -367,7 +357,8 @@ exports[`AlgebraTiles Page matches snapshot 1`] = `
             class="flex flex-col gap-2"
           >
             <button
-              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left disabled:opacity-50 disabled:cursor-not-allowed"
+              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left cursor-grab active:cursor-grabbing"
+              draggable="true"
             >
               <div
                 class="shrink-0 flex items-center justify-center"
@@ -378,36 +369,45 @@ exports[`AlgebraTiles Page matches snapshot 1`] = `
                 />
               </div>
               <span
-                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-disabled:group-hover:text-slate-600 dark:group-disabled:group-hover:text-slate-400"
+                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
               >
-                <span>
-                  +
-                  x²
-                </span>
+                +
+                x²
               </span>
             </button>
-            <button
-              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left disabled:opacity-50 disabled:cursor-not-allowed"
+            <div
+              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md transition-colors group"
             >
-              <div
-                class="shrink-0 flex items-center justify-center"
+              <button
+                class="shrink-0 cursor-grab active:cursor-grabbing"
+                draggable="true"
+                title="Drag +x (vertical)"
               >
                 <div
-                  class="bg-green-500 border-2 border-green-700 rounded-sm shadow-sm shrink-0"
+                  class="bg-green-500 border-2 border-green-700 rounded-sm shadow-sm"
                   style="width: 10px; height: 24px;"
                 />
-              </div>
-              <span
-                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-disabled:group-hover:text-slate-600 dark:group-disabled:group-hover:text-slate-400"
+              </button>
+              <button
+                class="shrink-0 cursor-grab active:cursor-grabbing"
+                draggable="true"
+                title="Drag +x (horizontal)"
               >
-                <span>
-                  +
-                  x
-                </span>
+                <div
+                  class="bg-green-500 border-2 border-green-700 rounded-sm shadow-sm"
+                  style="width: 24px; height: 10px;"
+                />
+              </button>
+              <span
+                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+              >
+                +
+                x
               </span>
-            </button>
+            </div>
             <button
-              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left disabled:opacity-50 disabled:cursor-not-allowed"
+              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left cursor-grab active:cursor-grabbing"
+              draggable="true"
             >
               <div
                 class="shrink-0 flex items-center justify-center"
@@ -418,12 +418,10 @@ exports[`AlgebraTiles Page matches snapshot 1`] = `
                 />
               </div>
               <span
-                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-disabled:group-hover:text-slate-600 dark:group-disabled:group-hover:text-slate-400"
+                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
               >
-                <span>
-                  +
-                  1
-                </span>
+                +
+                1
               </span>
             </button>
           </div>
@@ -440,7 +438,8 @@ exports[`AlgebraTiles Page matches snapshot 1`] = `
             class="flex flex-col gap-2"
           >
             <button
-              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left disabled:opacity-50 disabled:cursor-not-allowed"
+              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left cursor-grab active:cursor-grabbing"
+              draggable="true"
             >
               <div
                 class="shrink-0 flex items-center justify-center"
@@ -451,34 +450,43 @@ exports[`AlgebraTiles Page matches snapshot 1`] = `
                 />
               </div>
               <span
-                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-disabled:group-hover:text-slate-600 dark:group-disabled:group-hover:text-slate-400"
+                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
               >
-                <span>
-                  -x²
-                </span>
+                x²
               </span>
             </button>
-            <button
-              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left disabled:opacity-50 disabled:cursor-not-allowed"
+            <div
+              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md transition-colors group"
             >
-              <div
-                class="shrink-0 flex items-center justify-center"
+              <button
+                class="shrink-0 cursor-grab active:cursor-grabbing"
+                draggable="true"
+                title="Drag x (vertical)"
               >
                 <div
-                  class="bg-red-500 border-2 border-red-700 rounded-sm shadow-sm shrink-0"
+                  class="bg-red-500 border-2 border-red-700 rounded-sm shadow-sm"
                   style="width: 10px; height: 24px;"
                 />
-              </div>
-              <span
-                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-disabled:group-hover:text-slate-600 dark:group-disabled:group-hover:text-slate-400"
+              </button>
+              <button
+                class="shrink-0 cursor-grab active:cursor-grabbing"
+                draggable="true"
+                title="Drag x (horizontal)"
               >
-                <span>
-                  -x
-                </span>
+                <div
+                  class="bg-red-500 border-2 border-red-700 rounded-sm shadow-sm"
+                  style="width: 24px; height: 10px;"
+                />
+              </button>
+              <span
+                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+              >
+                x
               </span>
-            </button>
+            </div>
             <button
-              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left disabled:opacity-50 disabled:cursor-not-allowed"
+              class="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left cursor-grab active:cursor-grabbing"
+              draggable="true"
             >
               <div
                 class="shrink-0 flex items-center justify-center"
@@ -489,11 +497,9 @@ exports[`AlgebraTiles Page matches snapshot 1`] = `
                 />
               </div>
               <span
-                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-disabled:group-hover:text-slate-600 dark:group-disabled:group-hover:text-slate-400"
+                class="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
               >
-                <span>
-                  -1
-                </span>
+                1
               </span>
             </button>
           </div>
@@ -509,6 +515,14 @@ exports[`AlgebraTiles Page matches snapshot 1`] = `
           <ul
             class="space-y-1 list-disc pl-4 text-xs"
           >
+            <li>
+              <span
+                class="font-bold text-slate-700 dark:text-slate-200"
+              >
+                Drag
+              </span>
+               tile from sidebar to add.
+            </li>
             <li>
               <span
                 class="font-bold text-slate-700 dark:text-slate-200"

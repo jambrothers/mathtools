@@ -24,6 +24,8 @@ interface AlgebraTileProps {
     isSelected?: boolean
     /** Whether to show text labels on the tile. */
     showLabels?: boolean
+    /** Optional grid size for snap-to-grid behavior during dragging. */
+    snapGridSize?: number
     // Drag handlers
     onDragStart?: (id: string, initialPos: Position) => void
     onDragMove?: (id: string, newPos: Position, delta: Position) => void
@@ -47,6 +49,7 @@ export const AlgebraTile = React.memo(function AlgebraTile({
     y,
     isSelected,
     showLabels,
+    snapGridSize,
     onDragStart,
     onDragMove,
     onDragEnd,
@@ -57,7 +60,8 @@ export const AlgebraTile = React.memo(function AlgebraTile({
     const { position, isDragging, handleMouseDown: handleDragStart } = useDraggable(id, { x, y }, {
         onDragStart,
         onDragMove,
-        onDragEnd
+        onDragEnd,
+        gridSize: snapGridSize
     });
 
     const def = TILE_TYPES[type] || TILE_TYPES['1'];
@@ -140,6 +144,7 @@ export const AlgebraTile = React.memo(function AlgebraTile({
         prev.x === next.x &&
         prev.y === next.y &&
         prev.isSelected === next.isSelected &&
-        prev.showLabels === next.showLabels
+        prev.showLabels === next.showLabels &&
+        prev.snapGridSize === next.snapGridSize
     );
 });

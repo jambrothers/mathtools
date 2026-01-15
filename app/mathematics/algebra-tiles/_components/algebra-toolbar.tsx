@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Eye, EyeOff, Settings2, Magnet, Undo, Grid, Check, Eraser, Trash2 } from "lucide-react"
+import { Eye, EyeOff, Settings2, Magnet, Undo, Grid, Check, Eraser, Link } from "lucide-react"
 import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator, ToolbarInput } from "@/components/tool-ui/toolbar"
 
 interface AlgebraToolbarProps {
@@ -16,9 +16,8 @@ interface AlgebraToolbarProps {
     onClear: () => void
     onGroup?: () => void
     onSimplify?: () => void
-    onDeleteSelected?: () => void
-    hasSelection: boolean
     onVisualize?: (eq: string) => void
+    onGenerateLink?: () => void
 }
 
 /**
@@ -34,9 +33,8 @@ export function AlgebraToolbar({
     onClear,
     onGroup,
     onSimplify,
-    onDeleteSelected,
-    hasSelection,
-    onVisualize
+    onVisualize,
+    onGenerateLink
 }: AlgebraToolbarProps) {
     const [input, setInput] = React.useState("")
 
@@ -48,8 +46,8 @@ export function AlgebraToolbar({
                     value={input}
                     onChange={setInput}
                     onSubmit={onVisualize}
-                    placeholder="e.g. 2x + 1 = 5"
-                    buttonLabel="Visualize"
+                    placeholder="e.g. 2x + 1 - y + x^2"
+                    buttonLabel="Visualise"
                     buttonIcon={<Check size={16} />}
                 />
             </div>
@@ -103,17 +101,15 @@ export function AlgebraToolbar({
 
                 <ToolbarGroup>
                     <ToolbarButton
-                        icon={<Trash2 size={16} />}
-                        label="Delete"
-                        variant="danger"
-                        disabled={!hasSelection}
-                        onClick={onDeleteSelected}
-                    />
-                    <ToolbarButton
                         icon={<Eraser size={16} />}
                         label="Clear"
                         variant="danger"
                         onClick={onClear}
+                    />
+                    <ToolbarButton
+                        icon={<Link size={16} />}
+                        label="Link"
+                        onClick={onGenerateLink}
                     />
                 </ToolbarGroup>
             </div>

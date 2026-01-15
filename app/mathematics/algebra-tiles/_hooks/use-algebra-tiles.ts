@@ -232,6 +232,15 @@ export function useAlgebraTiles() {
         }
     }, [canUndo, undo]);
 
+    /**
+     * Set tiles directly from external state (e.g., URL restoration).
+     * Clears any existing history.
+     */
+    const setTilesFromState = useCallback((newTiles: TileData[]) => {
+        setTiles(newTiles);
+        setSelectedIds(new Set());
+    }, [setTiles]);
+
     return {
         tiles,
         selectedIds,
@@ -254,6 +263,7 @@ export function useAlgebraTiles() {
         undo: safeUndo,
         redo,
         canUndo,
-        canRedo
+        canRedo,
+        setTilesFromState
     };
 }
