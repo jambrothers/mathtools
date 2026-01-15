@@ -42,3 +42,7 @@ next-env.d.ts
 
 # testing output
 test_output.txt
+
+# playwright
+playwright-report/
+playwright-video/

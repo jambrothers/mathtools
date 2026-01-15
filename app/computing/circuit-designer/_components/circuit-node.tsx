@@ -38,6 +38,7 @@ export function CircuitNodeComponent({
                 "absolute flex flex-col items-center group z-10 select-none",
                 isSelected && "z-20"
             )}
+            data-testid="circuit-node"
             style={{
                 left: node.x,
                 top: node.y,
@@ -83,7 +84,10 @@ export function CircuitNodeComponent({
             </div>
 
             {/* Label */}
-            <div className="mt-2 text-xs font-mono text-slate-600 dark:text-slate-400 bg-white/80 dark:bg-slate-800/80 px-1.5 py-0.5 rounded pointer-events-none shadow-sm">
+            <div
+                className="mt-2 text-xs font-mono text-slate-600 dark:text-slate-400 bg-white/80 dark:bg-slate-800/80 px-1.5 py-0.5 rounded pointer-events-none shadow-sm"
+                data-testid="node-label"
+            >
                 {node.label}
             </div>
         </div>

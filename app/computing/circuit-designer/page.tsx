@@ -12,6 +12,9 @@ import { CircuitNodeComponent } from './_components/circuit-node';
 import { TruthTableModal } from './_components/truth-table-modal';
 
 
+import { useSearchParams, useRouter } from 'next/navigation';
+import { generateShareableURL, copyURLToClipboard } from '@/lib/url-state';
+import { circuitURLSerializer } from './_lib/url-state';
 import {
     CircuitNode,
     Connection,
@@ -36,6 +39,8 @@ import {
 export default function LogicSimulator() {
     const { resolvedTheme } = useTheme();
     const isDark = resolvedTheme === 'dark';
+    const searchParams = useSearchParams();
+    const router = useRouter();
 
     const [nodes, setNodes] = useState<CircuitNode[]>(DEFAULT_NODES);
     const [connections, setConnections] = useState<Connection[]>(DEFAULT_CONNECTIONS);
@@ -45,6 +50,17 @@ export default function LogicSimulator() {
     const [truthTable, setTruthTable] = useState<TruthTableData | null>(null);
     const [activeSimulation, setActiveSimulation] = useState<SimulationState>({});
     const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+    // Load state from URL on mount
+    useEffect(() => {
+        if (!searchParams || searchParams.toString() === '') return;
+
+        const restored = circuitURLSerializer.deserialize(searchParams);
+        if (restored) {
+            setNodes(restored.nodes);
+            setConnections(restored.connections);
+        }
+    }, [searchParams]);
 
     // New State for Multi-Select & Drag-to-Delete
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -453,6 +469,14 @@ export default function LogicSimulator() {
         setConnections(newConnections);
     };
 
+    const handleCopyLink = async () => {
+        const url = generateShareableURL(
+            circuitURLSerializer,
+            { nodes, connections }
+        );
+        copyURLToClipboard(url);
+    };
+
     return (
         <div className="flex flex-col flex-1 min-h-0 w-full">
             <SetPageTitle title="Circuit Designer" />
@@ -462,6 +486,7 @@ export default function LogicSimulator() {
                 onClear={clearCanvas}
                 onGenerateTruthTable={generateTruthTable}
                 onLoadDemo={loadDemo}
+                onCopyLink={handleCopyLink}
             />
 
             {/* Main Workspace */}

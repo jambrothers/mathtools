@@ -1,13 +1,14 @@
 "use client"
 
 import * as React from "react"
-import { Eraser, Table } from "lucide-react"
+import { Eraser, Table, Link } from "lucide-react"
 import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator } from "@/components/tool-ui/toolbar"
 
 interface CircuitToolbarProps {
     onClear: () => void
     onGenerateTruthTable: () => void
     onLoadDemo: (type: 'AND' | 'OR' | 'NOT' | 'XOR') => void
+    onCopyLink: () => void
 }
 
 /**
@@ -17,8 +18,17 @@ interface CircuitToolbarProps {
 export function CircuitToolbar({
     onClear,
     onGenerateTruthTable,
-    onLoadDemo
+    onLoadDemo,
+    onCopyLink
 }: CircuitToolbarProps) {
+    const [linkCopied, setLinkCopied] = React.useState(false)
+
+    const handleLinkClick = () => {
+        onCopyLink();
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 2000);
+    };
+
     return (
         <Toolbar>
             {/* Quick Demo buttons on the left */}
@@ -71,6 +81,24 @@ export function CircuitToolbar({
                         variant="danger"
                         onClick={onClear}
                     />
+                </ToolbarGroup>
+
+                <ToolbarSeparator />
+
+                <ToolbarGroup>
+                    <div className="relative">
+                        <ToolbarButton
+                            icon={<Link size={16} />}
+                            label="Link"
+                            onClick={handleLinkClick}
+                            variant="default"
+                        />
+                        {linkCopied && (
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 whitespace-nowrap text-xs text-green-600 dark:text-green-400 bg-white dark:bg-slate-800 px-2 py-1 rounded shadow-md border border-green-200 dark:border-green-800 z-50">
+                                Link copied
+                            </div>
+                        )}
+                    </div>
                 </ToolbarGroup>
             </div>
         </Toolbar>
