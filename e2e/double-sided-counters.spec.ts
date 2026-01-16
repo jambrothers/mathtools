@@ -91,7 +91,7 @@ test.describe('Double Sided Counters - Core Functionality', () => {
         await expect(page.locator('text=Animation Speed')).toBeVisible();
     });
 
-    test('Sort button should cycle through sort states', async ({ page }) => {
+    test('Sort button should organize counters into rows', async ({ page }) => {
         // Add counters
         await page.click('text=Add +1');
         await page.click('text=Add -1');
@@ -101,8 +101,8 @@ test.describe('Double Sided Counters - Core Functionality', () => {
         await page.click('button:has-text("Sort")');
         await page.waitForTimeout(300);
 
-        // Button should now say "Pair"
-        await expect(page.getByRole('button', { name: 'Pair', exact: true })).toBeVisible();
+        // Button should still say "Sort" (no longer cycles)
+        await expect(page.getByRole('button', { name: 'Sort', exact: true })).toBeVisible();
     });
 
     test('Clear button should remove all counters', async ({ page }) => {
@@ -212,36 +212,18 @@ test.describe('Double Sided Counters - Counter Interactions', () => {
         await page.click('text=Zero Pair');
         await page.waitForTimeout(500);
 
-        // Sort to grouped
+        // Sort to organize into rows
         await page.click('button:has-text("Sort")');
         await page.waitForTimeout(300);
 
-        // Now should say "Pair"
-        await page.click('button:has-text("Pair")');
-        await page.waitForTimeout(300);
-
-        // Now should say "Cancel Pairs" (or similar)
-        const cancelButton = page.locator('button').filter({ hasText: /Cancel|Scatter/i }).first();
+        // Click Cancel Pairs to remove the zero pair
+        const cancelButton = page.locator('button').filter({ hasText: /Cancel/i }).first();
         if (await cancelButton.isVisible()) {
             await cancelButton.click();
             await page.waitForTimeout(1000);
         }
-    });
-});
 
-test.describe('Double Sided Counters - Ordered Mode', () => {
-    const BASE_URL = '/mathematics/double-sided-counters';
-
-    test('should toggle ordered mode', async ({ page }) => {
-        await page.goto(BASE_URL);
-        await page.waitForSelector('text=The board is empty');
-
-        // Look for ordered mode toggle
-        const orderedToggle = page.locator('button').filter({ hasText: /Ordered|Order/i }).first();
-
-        if (await orderedToggle.isVisible()) {
-            await orderedToggle.click();
-            await page.waitForTimeout(300);
-        }
+        // Board should be empty after canceling the zero pair
+        await expect(page.locator('text=The board is empty')).toBeVisible();
     });
 });

@@ -44,5 +44,5 @@ next-env.d.ts
 test_output.txt
 
 # playwright
-playwright-report/
-playwright-video/
+/playwright-report
+/playwright-video

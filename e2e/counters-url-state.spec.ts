@@ -143,7 +143,7 @@ test.describe('Double Sided Counters - URL State', () => {
         await page.click('text=Zero Pair');
         await page.waitForTimeout(300);
 
-        // Click Sort to group
+        // Click Sort to organize
         await page.click('button:has-text("Sort")');
         await page.waitForTimeout(300);
 
@@ -159,8 +159,8 @@ test.describe('Double Sided Counters - URL State', () => {
         await newPage.goto(clipboardText);
         await newPage.waitForLoadState('networkidle');
 
-        // The button should now say "Pair" (next action after grouped)
-        await expect(newPage.getByRole('button', { name: 'Pair', exact: true })).toBeVisible();
+        // The button should still say "Sort" (no longer cycles)
+        await expect(newPage.getByRole('button', { name: 'Sort', exact: true })).toBeVisible();
 
         await newPage.close();
     });
@@ -239,8 +239,8 @@ test.describe('Double Sided Counters - URL State', () => {
         await expect(newPage.locator('text=-10').first()).toBeVisible();
         // Slow mode visible (speed control)
         await expect(newPage.locator('text=Animation Speed')).toBeVisible();
-        // Sort state is grouped (button says "Pair")
-        await expect(newPage.getByRole('button', { name: 'Pair', exact: true })).toBeVisible();
+        // Sort button still visible (button says "Sort")
+        await expect(newPage.getByRole('button', { name: 'Sort', exact: true })).toBeVisible();
         // Counters exist
         const newCounters = newPage.locator('[data-testid="counter"]');
         await expect(newCounters).toHaveCount(2);

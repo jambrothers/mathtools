@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Eye, EyeOff, Trash2, RefreshCw, GitMerge, ArrowRightLeft, Timer, Grid } from "lucide-react"
+import { Eye, EyeOff, Trash2, RefreshCw, ArrowUpDown, Timer } from "lucide-react"
 import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator, ToolbarInput } from "@/components/tool-ui/toolbar"
 import { CopyLinkButton } from "@/components/tool-ui/copy-link-button"
 
@@ -10,8 +10,7 @@ interface CountersToolbarProps {
     setShowNumberLine: (v: boolean) => void
     showStats: boolean
     setShowStats: (v: boolean) => void
-    sortState: 'none' | 'grouped' | 'paired'
-    onOrganize: () => void
+    onSort: () => void
     onFlipAll: () => void
     onCancel: () => void
     isAnimating: boolean
@@ -22,24 +21,19 @@ interface CountersToolbarProps {
     // Animation Controls
     isSequentialMode: boolean
     setIsSequentialMode: (v: boolean) => void
-
-    // Ordered mode
-    isOrdered: boolean
-    onSnapToOrder: () => void
 }
 
 export function CountersToolbar({
     showNumberLine, setShowNumberLine,
     showStats, setShowStats,
-    sortState, onOrganize,
+    onSort,
     onFlipAll,
     onCancel,
     isAnimating,
     onClear,
     onAddExpression,
     onGenerateLink,
-    isSequentialMode, setIsSequentialMode,
-    isOrdered, onSnapToOrder
+    isSequentialMode, setIsSequentialMode
 }: CountersToolbarProps) {
     const [input, setInput] = React.useState("")
 
@@ -64,13 +58,6 @@ export function CountersToolbar({
             <div className="flex items-center gap-2 ml-auto">
                 <ToolbarGroup>
                     <ToolbarButton
-                        icon={<Grid size={16} />}
-                        label="Ordered"
-                        active={isOrdered}
-                        onClick={onSnapToOrder}
-                        disabled={isAnimating}
-                    />
-                    <ToolbarButton
                         icon={showNumberLine ? <Eye size={16} /> : <EyeOff size={16} />}
                         label="Number Line"
                         active={showNumberLine}
@@ -88,9 +75,9 @@ export function CountersToolbar({
 
                 <ToolbarGroup>
                     <ToolbarButton
-                        icon={sortState === 'grouped' ? <GitMerge size={16} /> : <ArrowRightLeft size={16} />}
-                        label={sortState === 'grouped' ? "Pair" : "Sort"}
-                        onClick={onOrganize}
+                        icon={<ArrowUpDown size={16} />}
+                        label="Sort"
+                        onClick={onSort}
                         disabled={isAnimating}
                     />
                     <ToolbarButton

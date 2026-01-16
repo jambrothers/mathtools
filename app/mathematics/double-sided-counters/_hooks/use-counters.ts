@@ -17,16 +17,28 @@ const COUNTER_GAP = 16; // px (gap-4)
 const GRID_PADDING = 32; // px (p-8)
 const COUNTERS_PER_ROW = 8;
 
+// Two-row layout: positive counters on top, negative on bottom
+const POSITIVE_ROW_Y = 32;  // Top row Y position
+const NEGATIVE_ROW_Y = 128; // Bottom row Y position
+
 /**
- * Calculates grid position for a counter at a given index.
+ * Calculates grid position for a counter based on its value type and index within that row.
+ * Positive counters go on the top row, negative on the bottom row.
  */
-function calculateGridPosition(index: number): { x: number; y: number } {
-    const col = index % COUNTERS_PER_ROW;
-    const row = Math.floor(index / COUNTERS_PER_ROW);
+function calculateGridPosition(value: number, indexInRow: number): { x: number; y: number } {
+    const col = indexInRow % COUNTERS_PER_ROW;
+    const y = value > 0 ? POSITIVE_ROW_Y : NEGATIVE_ROW_Y;
     return {
         x: GRID_PADDING + col * (COUNTER_SIZE + COUNTER_GAP),
-        y: GRID_PADDING + row * (COUNTER_SIZE + COUNTER_GAP)
+        y: y
     };
+}
+
+/**
+ * Helper to count how many counters of a given type (positive/negative) exist.
+ */
+function countByType(counters: Counter[], type: 'positive' | 'negative'): number {
+    return counters.filter(c => type === 'positive' ? c.value > 0 : c.value < 0).length;
 }
 
 export function useCounters() {
@@ -68,8 +80,11 @@ export function useCounters() {
         if (!showNumberLine) {
             setCounters(prev => {
                 const newCounters: Counter[] = [];
+                // Count existing counters of this type to determine position in row
+                const existingCount = countByType(prev, value > 0 ? 'positive' : 'negative');
+
                 for (let i = 0; i < count; i++) {
-                    const pos = calculateGridPosition(prev.length + i);
+                    const pos = calculateGridPosition(value, existingCount + i);
                     newCounters.push({
                         id: nextIdRef.current++,
                         value: value,
@@ -98,7 +113,8 @@ export function useCounters() {
             const tId = setTimeout(() => {
                 const newId = nextIdRef.current++;
                 setCounters(prev => {
-                    const pos = calculateGridPosition(prev.length);
+                    const existingCount = countByType(prev, value > 0 ? 'positive' : 'negative');
+                    const pos = calculateGridPosition(value, existingCount);
                     return [...prev, {
                         id: newId,
                         value: value,
@@ -135,16 +151,16 @@ export function useCounters() {
         if (isAnimating) return;
         setCounters(prev => {
             const filtered = prev.filter(c => c.id !== id);
-            // If ordered, recalculate positions
-            if (isOrdered) {
-                return filtered.map((c, i) => ({
-                    ...c,
-                    ...calculateGridPosition(i)
-                }));
-            }
-            return filtered;
+            // Recalculate positions to maintain two-row layout
+            const positives = filtered.filter(c => c.value > 0);
+            const negatives = filtered.filter(c => c.value < 0);
+
+            return [
+                ...positives.map((c, i) => ({ ...c, ...calculateGridPosition(1, i) })),
+                ...negatives.map((c, i) => ({ ...c, ...calculateGridPosition(-1, i) }))
+            ];
         });
-    }, [isAnimating, isOrdered]);
+    }, [isAnimating]);
 
     const updateCounterPosition = useCallback((id: number, x: number, y: number) => {
         if (isAnimating) return;
@@ -156,10 +172,15 @@ export function useCounters() {
     }, [isAnimating]);
 
     const snapToOrder = useCallback(() => {
-        setCounters(prev => prev.map((c, i) => ({
-            ...c,
-            ...calculateGridPosition(i)
-        })));
+        setCounters(prev => {
+            const positives = prev.filter(c => c.value > 0);
+            const negatives = prev.filter(c => c.value < 0);
+
+            return [
+                ...positives.map((c, i) => ({ ...c, ...calculateGridPosition(1, i) })),
+                ...negatives.map((c, i) => ({ ...c, ...calculateGridPosition(-1, i) }))
+            ];
+        });
         setIsOrdered(true);
     }, []);
 
@@ -171,37 +192,20 @@ export function useCounters() {
 
     const organize = useCallback(() => {
         if (isAnimating) return;
-        setSortState(prev => {
-            const nextMode = prev === 'grouped' ? 'paired' : 'grouped';
 
-            setCounters(currentCounters => {
-                let sorted: Counter[];
-                if (nextMode === 'grouped') {
-                    sorted = [...currentCounters].sort((a, b) => b.value - a.value);
-                } else {
-                    const positives = currentCounters.filter(c => c.value === POSITIVE);
-                    const negatives = currentCounters.filter(c => c.value === NEGATIVE);
-                    sorted = [];
-                    const pairCount = Math.min(positives.length, negatives.length);
+        // Sort into two-row layout: positives on top, negatives on bottom
+        setCounters(currentCounters => {
+            const positives = currentCounters.filter(c => c.value === POSITIVE);
+            const negatives = currentCounters.filter(c => c.value === NEGATIVE);
 
-                    for (let i = 0; i < pairCount; i++) {
-                        sorted.push(positives[i]);
-                        sorted.push(negatives[i]);
-                    }
-
-                    if (positives.length > pairCount) sorted.push(...positives.slice(pairCount));
-                    if (negatives.length > pairCount) sorted.push(...negatives.slice(pairCount));
-                }
-                // Recalculate positions after organizing
-                return sorted.map((c, i) => ({
-                    ...c,
-                    ...calculateGridPosition(i)
-                }));
-            });
-
-            setIsOrdered(true);
-            return nextMode;
+            return [
+                ...positives.map((c, i) => ({ ...c, ...calculateGridPosition(1, i) })),
+                ...negatives.map((c, i) => ({ ...c, ...calculateGridPosition(-1, i) }))
+            ];
         });
+
+        setSortState('grouped');
+        setIsOrdered(true);
     }, [isAnimating]);
 
     const cancelZeroPairs = useCallback(async () => {

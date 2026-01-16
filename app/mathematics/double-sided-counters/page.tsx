@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { SetPageTitle } from '@/components/set-page-title';
 import { useCounters } from './_hooks/use-counters';
@@ -9,6 +9,7 @@ import { SummaryStats } from './_components/summary-stats';
 import { NumberLine } from './_components/number-line';
 import { DraggableCounter } from './_components/draggable-counter';
 import { Sidebar, SidebarSection, SidebarButton } from "@/components/tool-ui/sidebar";
+import { DraggableSidebarItem } from "@/components/tool-ui/draggable-sidebar-item";
 import { SpeedControl } from '@/components/tool-ui/speed-control';
 import { Canvas } from '@/components/tool-ui/canvas';
 import { counterURLSerializer, CounterURLState } from './_lib/url-state';
@@ -68,6 +69,7 @@ function CountersPageContent() {
     const [showNumberLine, setShowNumberLine] = useState(false);
     const [showStats, setShowStats] = useState(true);
     const [hasInitialized, setHasInitialized] = useState(false);
+    const canvasRef = useRef<HTMLDivElement>(null);
 
     // Initialize from URL on mount
     useEffect(() => {
@@ -133,6 +135,29 @@ function CountersPageContent() {
         // TODO: Could add a toast notification here to confirm copy
     }, [counters, sortState, isOrdered, isSequentialMode, animSpeed, showNumberLine, showStats]);
 
+    /**
+     * Handle counters dropped from the sidebar onto the canvas.
+     */
+    const handleDropOnCanvas = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const data = e.dataTransfer.getData('application/json');
+        if (!data) return;
+
+        try {
+            const { type, value } = JSON.parse(data);
+            if (type === 'counter' && typeof value === 'number') {
+                addCounter(value, 1, showNumberLine);
+            }
+        } catch {
+            // Invalid JSON, ignore
+        }
+    }, [addCounter, showNumberLine]);
+
+    const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+    }, []);
+
     return (
         <div className="flex flex-col h-[calc(100vh-81px)] w-full bg-slate-50 dark:bg-slate-950 overflow-hidden">
             <SetPageTitle title="Double Sided Counters" />
@@ -143,8 +168,7 @@ function CountersPageContent() {
                 setShowNumberLine={setShowNumberLine}
                 showStats={showStats}
                 setShowStats={setShowStats}
-                sortState={sortState}
-                onOrganize={organize}
+                onSort={organize}
                 onFlipAll={flipAll}
                 onCancel={cancelZeroPairs}
                 isAnimating={isAnimating}
@@ -152,8 +176,6 @@ function CountersPageContent() {
                 onAddExpression={handleExpressionAdd}
                 isSequentialMode={isSequentialMode}
                 setIsSequentialMode={setIsSequentialMode}
-                isOrdered={isOrdered}
-                onSnapToOrder={snapToOrder}
                 onGenerateLink={handleGenerateLink}
             />
 
@@ -161,7 +183,8 @@ function CountersPageContent() {
                 {/* Sidebar */}
                 <Sidebar>
                     <SidebarSection title="Add Positive">
-                        <SidebarButton
+                        <DraggableSidebarItem
+                            dragData={{ type: 'counter', value: 1 }}
                             icon={<div className="w-4 h-4 rounded-full bg-yellow-400 border border-yellow-600 shadow-sm" />}
                             label="Add +1"
                             onClick={() => addCounter(1, 1, showNumberLine)}
@@ -170,7 +193,8 @@ function CountersPageContent() {
                     </SidebarSection>
 
                     <SidebarSection title="Add Negative">
-                        <SidebarButton
+                        <DraggableSidebarItem
+                            dragData={{ type: 'counter', value: -1 }}
                             icon={<div className="w-4 h-4 rounded-full bg-red-500 border border-red-700 shadow-sm" />}
                             label="Add -1"
                             onClick={() => addCounter(-1, 1, showNumberLine)}
@@ -197,24 +221,31 @@ function CountersPageContent() {
                     <div className="mt-auto pt-6 text-slate-500 dark:text-slate-400 text-sm">
                         <h3 className="font-semibold mb-2 text-slate-600 dark:text-slate-300">Shortcuts:</h3>
                         <ul className="space-y-1 list-disc pl-4 text-xs">
-                            <li><span className="font-bold text-slate-700 dark:text-slate-200">Click</span> to remove.</li>
+                            <li><span className="font-bold text-slate-700 dark:text-slate-200">Drag</span> from sidebar to add.</li>
+                            <li><span className="font-bold text-slate-700 dark:text-slate-200">Click</span> counter to remove.</li>
                             <li><span className="font-bold text-slate-700 dark:text-slate-200">Double-click</span> to flip.</li>
-                            <li><span className="font-bold text-slate-700 dark:text-slate-200">Drag</span> to move.</li>
+                            <li><span className="font-bold text-slate-700 dark:text-slate-200">Drag</span> counter to move.</li>
                         </ul>
                     </div>
                 </Sidebar>
 
                 {/* Main Canvas */}
-                <Canvas gridSize={40}>
+                <Canvas
+                    ref={canvasRef}
+                    gridSize={40}
+                    data-testid="counter-canvas"
+                    onDrop={handleDropOnCanvas}
+                    onDragOver={handleDragOver}
+                >
                     {/* Stats Overlay */}
                     {showStats && (
                         <SummaryStats pos={positiveCount} neg={negativeCount} sum={totalSum} />
                     )}
 
-                    {/* Speed Control Overlay */}
+                    {/* Speed Control Overlay - positioned below stats on the right */}
                     {isSequentialMode && (
                         <SpeedControl
-                            className="absolute top-4 left-4 md:left-6"
+                            className="absolute top-24 right-4"
                             speed={animSpeed}
                             onChange={setAnimSpeed}
                         />
