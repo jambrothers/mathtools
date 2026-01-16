@@ -180,6 +180,27 @@ export function useCounters() {
         timeoutsRef.current.push(tId);
     }, []);
 
+    /**
+     * Add a counter at a specific position (used for drag-from-sidebar).
+     */
+    const addCounterAtPosition = useCallback((value: number, x: number, y: number) => {
+        setCounters(prev => [
+            ...prev,
+            {
+                id: nextIdRef.current++,
+                value: value,
+                x: x,
+                y: y,
+                isNew: true,
+            }
+        ]);
+
+        const tId = setTimeout(() => {
+            setCounters(prev => prev.map(c => ({ ...c, isNew: false })));
+        }, 100);
+        timeoutsRef.current.push(tId);
+    }, []);
+
     const flipCounter = useCallback((id: number) => {
         if (isAnimating) return;
         setCounters(prev => prev.map(c =>
@@ -358,6 +379,7 @@ export function useCounters() {
         animSpeed,
         setAnimSpeed,
         addCounter,
+        addCounterAtPosition,
         addZeroPair,
         flipCounter,
         removeCounter,

@@ -51,6 +51,7 @@ function CountersPageContent() {
         setIsSequentialMode,
         isOrdered,
         addCounter,
+        addCounterAtPosition,
         addZeroPair,
         flipCounter,
         removeCounter,
@@ -137,6 +138,7 @@ function CountersPageContent() {
 
     /**
      * Handle counters dropped from the sidebar onto the canvas.
+     * Places the counter at the exact drop location instead of the next grid position.
      */
     const handleDropOnCanvas = useCallback((e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -146,12 +148,20 @@ function CountersPageContent() {
         try {
             const { type, value } = JSON.parse(data);
             if (type === 'counter' && typeof value === 'number') {
-                addCounter(value, 1, showNumberLine);
+                // Get the canvas element's bounding rect to calculate relative position
+                if (canvasRef.current) {
+                    const rect = canvasRef.current.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+
+                    // Place counter at the drop location
+                    addCounterAtPosition(value, x, y);
+                }
             }
         } catch {
             // Invalid JSON, ignore
         }
-    }, [addCounter, showNumberLine]);
+    }, [addCounterAtPosition]);
 
     const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
