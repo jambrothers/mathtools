@@ -147,45 +147,38 @@ export function useCounters() {
     }, []);
 
     const addZeroPair = useCallback((showNumberLine = false) => {
-        // Add both counters simultaneously, not sequentially
-        if (!showNumberLine) {
-            setCounters(prev => {
-                const posCount = countByType(prev, 'positive');
-                const negCount = countByType(prev, 'negative');
+        // ALWAYS add both counters simultaneously in a single setState
+        setCounters(prev => {
+            const posCount = countByType(prev, 'positive');
+            const negCount = countByType(prev, 'negative');
 
-                const posPos = calculateGridPosition(POSITIVE, posCount);
-                const negPos = calculateGridPosition(NEGATIVE, negCount);
+            const posPos = calculateGridPosition(POSITIVE, posCount);
+            const negPos = calculateGridPosition(NEGATIVE, negCount);
 
-                return [
-                    ...prev,
-                    {
-                        id: nextIdRef.current++,
-                        value: POSITIVE,
-                        x: posPos.x,
-                        y: posPos.y,
-                        isNew: true,
-                    },
-                    {
-                        id: nextIdRef.current++,
-                        value: NEGATIVE,
-                        x: negPos.x,
-                        y: negPos.y,
-                        isNew: true,
-                    }
-                ];
-            });
+            return [
+                ...prev,
+                {
+                    id: nextIdRef.current++,
+                    value: POSITIVE,
+                    x: posPos.x,
+                    y: posPos.y,
+                    isNew: true,
+                },
+                {
+                    id: nextIdRef.current++,
+                    value: NEGATIVE,
+                    x: negPos.x,
+                    y: negPos.y,
+                    isNew: true,
+                }
+            ];
+        });
 
-            const tId = setTimeout(() => {
-                setCounters(prev => prev.map(c => ({ ...c, isNew: false })));
-            }, 100);
-            timeoutsRef.current.push(tId);
-            return;
-        }
-
-        // With number line animation - add them sequentially for visual effect
-        addCounter(POSITIVE, 1, showNumberLine);
-        addCounter(NEGATIVE, 1, showNumberLine);
-    }, [addCounter]);
+        const tId = setTimeout(() => {
+            setCounters(prev => prev.map(c => ({ ...c, isNew: false })));
+        }, 100);
+        timeoutsRef.current.push(tId);
+    }, []);
 
     const flipCounter = useCallback((id: number) => {
         if (isAnimating) return;
