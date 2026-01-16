@@ -15,19 +15,31 @@ export type SortState = 'none' | 'grouped' | 'paired';
 const COUNTER_SIZE = 80; // px (matches w-20 h-20)
 const COUNTER_GAP = 16; // px (gap-4)
 const GRID_PADDING = 32; // px (p-8)
-const COUNTERS_PER_ROW = 8;
+const COUNTERS_PER_ROW = 10; // Updated from 8 to 10 per user request
 
-// Two-row layout: positive counters on top, negative on bottom
-const POSITIVE_ROW_Y = 32;  // Top row Y position
-const NEGATIVE_ROW_Y = 128; // Bottom row Y position
+// Row spacing - alternates between positive and negative rows
+const ROW_HEIGHT = 96; // COUNTER_SIZE (80) + COUNTER_GAP (16)
 
 /**
- * Calculates grid position for a counter based on its value type and index within that row.
- * Positive counters go on the top row, negative on the bottom row.
+ * Calculates grid position for a counter based on its value type and index within that type.
+ * Supports multiple rows alternating: positive row, negative row, positive row, negative row, ...
+ * 
+ * Row layout:
+ * Y=32:  First positive row
+ * Y=128: First negative row (32 + 96)
+ * Y=224: Second positive row (128 + 96)
+ * Y=320: Second negative row (224 + 96)
+ * etc.
  */
 function calculateGridPosition(value: number, indexInRow: number): { x: number; y: number } {
     const col = indexInRow % COUNTERS_PER_ROW;
-    const y = value > 0 ? POSITIVE_ROW_Y : NEGATIVE_ROW_Y;
+    const rowNum = Math.floor(indexInRow / COUNTERS_PER_ROW);
+
+    // First row for positives is Y=32, for negatives is Y=128
+    // Each subsequent row alternates every ROW_HEIGHT*2 (one positive, one negative)
+    const baseY = value > 0 ? 32 : 128;
+    const y = baseY + (rowNum * ROW_HEIGHT * 2);
+
     return {
         x: GRID_PADDING + col * (COUNTER_SIZE + COUNTER_GAP),
         y: y
@@ -135,6 +147,42 @@ export function useCounters() {
     }, []);
 
     const addZeroPair = useCallback((showNumberLine = false) => {
+        // Add both counters simultaneously, not sequentially
+        if (!showNumberLine) {
+            setCounters(prev => {
+                const posCount = countByType(prev, 'positive');
+                const negCount = countByType(prev, 'negative');
+
+                const posPos = calculateGridPosition(POSITIVE, posCount);
+                const negPos = calculateGridPosition(NEGATIVE, negCount);
+
+                return [
+                    ...prev,
+                    {
+                        id: nextIdRef.current++,
+                        value: POSITIVE,
+                        x: posPos.x,
+                        y: posPos.y,
+                        isNew: true,
+                    },
+                    {
+                        id: nextIdRef.current++,
+                        value: NEGATIVE,
+                        x: negPos.x,
+                        y: negPos.y,
+                        isNew: true,
+                    }
+                ];
+            });
+
+            const tId = setTimeout(() => {
+                setCounters(prev => prev.map(c => ({ ...c, isNew: false })));
+            }, 100);
+            timeoutsRef.current.push(tId);
+            return;
+        }
+
+        // With number line animation - add them sequentially for visual effect
         addCounter(POSITIVE, 1, showNumberLine);
         addCounter(NEGATIVE, 1, showNumberLine);
     }, [addCounter]);
@@ -149,17 +197,8 @@ export function useCounters() {
 
     const removeCounter = useCallback((id: number) => {
         if (isAnimating) return;
-        setCounters(prev => {
-            const filtered = prev.filter(c => c.id !== id);
-            // Recalculate positions to maintain two-row layout
-            const positives = filtered.filter(c => c.value > 0);
-            const negatives = filtered.filter(c => c.value < 0);
-
-            return [
-                ...positives.map((c, i) => ({ ...c, ...calculateGridPosition(1, i) })),
-                ...negatives.map((c, i) => ({ ...c, ...calculateGridPosition(-1, i) }))
-            ];
-        });
+        // Simply filter out the counter - do NOT recalculate positions
+        setCounters(prev => prev.filter(c => c.id !== id));
     }, [isAnimating]);
 
     const updateCounterPosition = useCallback((id: number, x: number, y: number) => {

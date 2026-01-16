@@ -256,3 +256,157 @@ describe('Counter drag functionality', () => {
         expect(result.current.counters[0].y).toBe(400);
     });
 });
+
+describe('Counter layout enhancements', () => {
+    const COUNTERS_PER_ROW = 10; // Updated from 8 to 10
+
+    describe('10 counters per row', () => {
+        it('places up to 10 positive counters on first positive row', () => {
+            const { result } = renderHook(() => useCounters());
+
+            act(() => {
+                result.current.addCounter(1, 10, false);
+            });
+
+            expect(result.current.counters).toHaveLength(10);
+
+            // All should be on first positive row with same Y
+            const firstPosY = result.current.counters[0].y;
+            result.current.counters.forEach(c => {
+                expect(c.y).toBe(firstPosY);
+            });
+        });
+
+        it('wraps to second positive row after 10 counters', () => {
+            const { result } = renderHook(() => useCounters());
+
+            act(() => {
+                result.current.addCounter(1, 12, false); // 12 positive counters
+            });
+
+            expect(result.current.counters).toHaveLength(12);
+
+            // First 10 should be on first row
+            const firstRowCounters = result.current.counters.slice(0, 10);
+            const firstRowY = firstRowCounters[0].y;
+            firstRowCounters.forEach(c => expect(c.y).toBe(firstRowY));
+
+            // Next 2 should be on second row (different Y)
+            const secondRowCounters = result.current.counters.slice(10, 12);
+            const secondRowY = secondRowCounters[0].y;
+            expect(secondRowY).not.toBe(firstRowY);
+            secondRowCounters.forEach(c => expect(c.y).toBe(secondRowY));
+        });
+
+        it('alternates positive and negative rows: +, -, +, -, ...', () => {
+            const { result } = renderHook(() => useCounters());
+
+            act(() => {
+                result.current.addCounter(1, 12, false);  // 12 positive (2 rows)
+                result.current.addCounter(-1, 12, false); // 12 negative (2 rows)
+            });
+
+            const positives = result.current.counters.filter(c => c.value > 0);
+            const negatives = result.current.counters.filter(c => c.value < 0);
+
+            // Get unique Y positions for positives and negatives
+            const posYs = [...new Set(positives.map(c => c.y))].sort((a, b) => a - b);
+            const negYs = [...new Set(negatives.map(c => c.y))].sort((a, b) => a - b);
+
+            expect(posYs).toHaveLength(2); // 2 positive rows
+            expect(negYs).toHaveLength(2); // 2 negative rows
+
+            // Positive rows should be at Y=32, Y=224 (32 + 96*2)
+            // Negative rows should be at Y=128, Y=320 (128 + 96*2)
+            expect(posYs[0]).toBeLessThan(negYs[0]); // First + row above first - row
+            expect(negYs[0]).toBeLessThan(posYs[1]); // First - row above second + row
+        });
+    });
+
+    describe('counter removal does not shift others', () => {
+        it('removes counter without shifting remaining counters', () => {
+            const { result } = renderHook(() => useCounters());
+
+            act(() => {
+                result.current.addCounter(1, 5, false);
+            });
+
+            // Store original positions
+            const originalPositions = result.current.counters.map(c => ({
+                id: c.id,
+                x: c.x,
+                y: c.y
+            }));
+
+            const middleCounterId = result.current.counters[2].id;
+
+            act(() => {
+                result.current.removeCounter(middleCounterId);
+            });
+
+            expect(result.current.counters).toHaveLength(4);
+
+            // Check that remaining counters kept their original positions
+            result.current.counters.forEach(c => {
+                const original = originalPositions.find(op => op.id === c.id);
+                expect(original).toBeDefined();
+                expect(c.x).toBe(original!.x);
+                expect(c.y).toBe(original!.y);
+            });
+        });
+
+        it('removes multiple counters without affecting others', () => {
+            const { result } = renderHook(() => useCounters());
+
+            act(() => {
+                result.current.addCounter(1, 3, false);
+                result.current.addCounter(-1, 3, false);
+            });
+
+            const originalPositions = result.current.counters.map(c => ({
+                id: c.id,
+                x: c.x,
+                y: c.y
+            }));
+
+            // Remove first positive and first negative
+            const firstPos = result.current.counters.find(c => c.value > 0)!;
+            const firstNeg = result.current.counters.find(c => c.value < 0)!;
+
+            act(() => {
+                result.current.removeCounter(firstPos.id);
+                result.current.removeCounter(firstNeg.id);
+            });
+
+            expect(result.current.counters).toHaveLength(4);
+
+            // Remaining counters should have kept their positions
+            result.current.counters.forEach(c => {
+                const original = originalPositions.find(op => op.id === c.id);
+                expect(original).toBeDefined();
+                expect(c.x).toBe(original!.x);
+                expect(c.y).toBe(original!.y);
+            });
+        });
+    });
+
+    describe('zero pair simultaneous addition', () => {
+        it('adds both counters of zero pair simultaneously', () => {
+            const { result } = renderHook(() => useCounters());
+
+
+            act(() => {
+                result.current.addZeroPair(false);
+            });
+
+            expect(result.current.counters).toHaveLength(2);
+
+            // Both should exist from the start
+            const positive = result.current.counters.find(c => c.value > 0);
+            const negative = result.current.counters.find(c => c.value < 0);
+
+            expect(positive).toBeDefined();
+            expect(negative).toBeDefined();
+        });
+    });
+});
