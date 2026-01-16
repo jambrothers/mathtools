@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils"
 interface CircuitNodeProps {
     node: CircuitNodeType
     isActive: boolean
-    isDark: boolean
     isSelected?: boolean
     onMouseDown: (e: React.MouseEvent<HTMLDivElement>, id: string) => void
     onClick: (e: React.MouseEvent<HTMLDivElement>, id: string) => void
@@ -23,7 +22,6 @@ interface CircuitNodeProps {
 export function CircuitNodeComponent({
     node,
     isActive,
-    isDark,
     isSelected,
     onMouseDown,
     onClick,
@@ -80,7 +78,7 @@ export function CircuitNodeComponent({
                 onMouseDown={(e) => onMouseDown(e, node.id)}
                 onClick={(e) => node.type === 'INPUT' ? onClick(e, node.id) : undefined}
             >
-                {def.render(isActive ?? false, isDark)}
+                {def.render(isActive ?? false)}
             </div>
 
             {/* Label */}

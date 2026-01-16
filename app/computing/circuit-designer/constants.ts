@@ -55,33 +55,32 @@ export interface ComponentDefinition {
     color: string;
     iconColor: string;
     evaluate: (inputs: boolean[], state?: boolean) => boolean;
-    render: (active: boolean, isDark: boolean) => React.ReactNode;
+    render: (active: boolean) => React.ReactNode;
 }
 
 export const SNAP_GRID = 20;
 
-const switchClasses = (active: boolean, isDark: boolean) => {
+const switchClasses = (active: boolean) => {
     if (active) return 'bg-green-500 border-green-400 shadow-[0_0_15px_rgba(34,197,94,0.6)]';
-    if (isDark) return 'bg-slate-700 border-slate-500';
-    return 'bg-slate-200 border-slate-400';
+    return 'bg-slate-200 dark:bg-slate-700 border-slate-400 dark:border-slate-500';
 };
 
-const switchLeverClasses = (active: boolean, isDark: boolean) => {
+const switchLeverClasses = (active: boolean) => {
     if (active) return 'bg-white border-green-300 -translate-y-0.5';
-    if (isDark) return 'bg-slate-800 border-slate-600 translate-y-0.5';
-    return 'bg-slate-300 border-slate-400 translate-y-0.5';
+    return 'bg-slate-300 dark:bg-slate-800 border-slate-400 dark:border-slate-600 translate-y-0.5';
 };
 
-const bulbClasses = (active: boolean, isDark: boolean) => {
+const bulbClasses = (active: boolean) => {
     if (active) return 'bg-yellow-300 border-yellow-500 shadow-[0_0_30px_rgba(253,224,71,0.8)] scale-110';
-    if (isDark) return 'bg-slate-800 border-slate-600';
-    return 'bg-slate-100 border-slate-300';
+    return 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600';
 };
 
-const gateClasses = (isDark: boolean, lightStroke: string, darkStroke: string) => {
-    const fill = isDark ? 'fill-slate-800' : 'fill-white';
-    const stroke = isDark ? darkStroke : lightStroke;
-    return `${fill} ${stroke} stroke-2`;
+const gateClasses = (lightStroke: string, darkStroke: string) => {
+    // Note: lightStroke and darkStroke are expected to be full class names like "stroke-indigo-600"
+    // We assume darkStroke is passed as the class that should apply in dark mode.
+    // However, the original usage passed just the color name e.g. 'stroke-indigo-400'.
+    // We will construct the classes.
+    return `fill-white dark:fill-slate-800 stroke-2 ${lightStroke} dark:${darkStroke.replace('stroke-', 'stroke-')}`;
 };
 
 export const COMPONENT_TYPES: Record<ComponentTypeName, ComponentDefinition> = {
@@ -93,11 +92,11 @@ export const COMPONENT_TYPES: Record<ComponentTypeName, ComponentDefinition> = {
         color: 'bg-amber-500',
         iconColor: 'text-amber-500',
         evaluate: (_inputs: boolean[], state?: boolean) => state ?? false,
-        render: (active: boolean, isDark: boolean) => {
+        render: (active: boolean) => {
             return React.createElement('div', {
-                className: `w-12 h-12 rounded border-2 flex items-center justify-center cursor-pointer transition-colors ${switchClasses(active, isDark)}`
+                className: `w-12 h-12 rounded border-2 flex items-center justify-center cursor-pointer transition-colors ${switchClasses(active)}`
             }, React.createElement('div', {
-                className: `w-4 h-8 rounded-sm border transition-transform ${switchLeverClasses(active, isDark)}`
+                className: `w-4 h-8 rounded-sm border transition-transform ${switchLeverClasses(active)}`
             }));
         }
     },
@@ -109,10 +108,10 @@ export const COMPONENT_TYPES: Record<ComponentTypeName, ComponentDefinition> = {
         color: 'bg-sky-500',
         iconColor: 'text-sky-500',
         evaluate: (inputs: boolean[]) => inputs[0] || false,
-        render: (active: boolean, isDark: boolean) => {
-            const iconClass = active ? 'text-yellow-600' : isDark ? 'text-slate-600' : 'text-slate-400';
+        render: (active: boolean) => {
+            const iconClass = active ? 'text-yellow-600' : 'text-slate-400 dark:text-slate-600';
             return React.createElement('div', {
-                className: `w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${bulbClasses(active, isDark)}`
+                className: `w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all duration-300 ${bulbClasses(active)}`
             }, React.createElement(Zap, { size: 20, className: iconClass, fill: active ? 'currentColor' : 'none' }));
         }
     },
@@ -124,10 +123,10 @@ export const COMPONENT_TYPES: Record<ComponentTypeName, ComponentDefinition> = {
         color: 'bg-indigo-600',
         iconColor: 'text-indigo-500',
         evaluate: (inputs: boolean[]) => inputs[0] && inputs[1],
-        render: (_active: boolean, isDark: boolean) => {
+        render: (_active: boolean) => {
             return React.createElement('svg', {
                 width: '50', height: '50', viewBox: '0 0 50 50',
-                className: gateClasses(isDark, 'stroke-indigo-600', 'stroke-indigo-400')
+                className: gateClasses('stroke-indigo-600', 'stroke-indigo-400')
             }, React.createElement('path', { d: 'M 10 5 L 25 5 C 38 5 38 45 25 45 L 10 45 Z' }));
         }
     },
@@ -139,10 +138,10 @@ export const COMPONENT_TYPES: Record<ComponentTypeName, ComponentDefinition> = {
         color: 'bg-purple-600',
         iconColor: 'text-purple-500',
         evaluate: (inputs: boolean[]) => inputs[0] || inputs[1],
-        render: (_active: boolean, isDark: boolean) => {
+        render: (_active: boolean) => {
             return React.createElement('svg', {
                 width: '50', height: '50', viewBox: '0 0 50 50',
-                className: gateClasses(isDark, 'stroke-purple-600', 'stroke-purple-400')
+                className: gateClasses('stroke-purple-600', 'stroke-purple-400')
             }, React.createElement('path', { d: 'M 5 5 C 5 5 15 5 20 5 C 35 5 42 25 42 25 C 42 25 35 45 20 45 C 15 45 5 45 5 45 C 15 25 15 25 5 5 Z' }));
         }
     },
@@ -154,13 +153,13 @@ export const COMPONENT_TYPES: Record<ComponentTypeName, ComponentDefinition> = {
         color: 'bg-rose-600',
         iconColor: 'text-rose-500',
         evaluate: (inputs: boolean[]) => !inputs[0],
-        render: (_active: boolean, isDark: boolean) => {
+        render: (_active: boolean) => {
             return React.createElement('svg', {
                 width: '50', height: '50', viewBox: '0 0 50 50',
-                className: gateClasses(isDark, 'stroke-rose-600', 'stroke-rose-400')
+                className: gateClasses('stroke-rose-600', 'stroke-rose-400')
             }, [
                 React.createElement('path', { key: 'tri', d: 'M 10 5 L 40 25 L 10 45 Z' }),
-                React.createElement('circle', { key: 'circ', cx: '43', cy: '25', r: '3', className: isDark ? 'fill-slate-800' : 'fill-white' })
+                React.createElement('circle', { key: 'circ', cx: '43', cy: '25', r: '3', className: 'fill-white dark:fill-slate-800' })
             ]);
         }
     },
@@ -172,10 +171,10 @@ export const COMPONENT_TYPES: Record<ComponentTypeName, ComponentDefinition> = {
         color: 'bg-cyan-600',
         iconColor: 'text-cyan-500',
         evaluate: (inputs: boolean[]) => (inputs[0] || inputs[1]) && !(inputs[0] && inputs[1]),
-        render: (_active: boolean, isDark: boolean) => {
+        render: (_active: boolean) => {
             return React.createElement('svg', {
                 width: '50', height: '50', viewBox: '0 0 50 50',
-                className: gateClasses(isDark, 'stroke-cyan-600', 'stroke-cyan-400')
+                className: gateClasses('stroke-cyan-600', 'stroke-cyan-400')
             }, [
                 React.createElement('path', { key: 'main', d: 'M 10 5 C 10 5 20 5 25 5 C 40 5 47 25 47 25 C 47 25 40 45 25 45 C 20 45 10 45 10 45 C 20 25 20 25 10 5 Z' }),
                 React.createElement('path', { key: 'curve', d: 'M 4 5 C 14 25 14 25 4 45', fill: 'none' })

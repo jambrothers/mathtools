@@ -1,7 +1,6 @@
 "use client"
 
 import React, { Suspense } from 'react';
-import { useTheme } from 'next-themes';
 import { SetPageTitle } from "@/components/set-page-title";
 import { ConfirmationModal } from './_components/confirmation-modal';
 import { Canvas } from '@/components/tool-ui/canvas';
@@ -65,8 +64,7 @@ function CircuitDesignerContent() {
         getWiringSourceNode
     } = useCircuitDesigner();
 
-    const { resolvedTheme } = useTheme();
-    const isDark = resolvedTheme === 'dark';
+
 
     return (
         <div className="flex flex-col flex-1 min-h-0 w-full">
@@ -95,11 +93,8 @@ function CircuitDesignerContent() {
 
                     {/* Grid Background */}
                     <div
-                        className="absolute inset-0 opacity-10 dark:opacity-20 pointer-events-none"
+                        className="absolute inset-0 opacity-10 dark:opacity-20 pointer-events-none bg-[radial-gradient(#94a3b8_1px,transparent_1px)] dark:bg-[radial-gradient(#6366f1_1px,transparent_1px)]"
                         style={{
-                            backgroundImage: isDark
-                                ? 'radial-gradient(#6366f1 1px, transparent 1px)'
-                                : 'radial-gradient(#94a3b8 1px, transparent 1px)',
                             backgroundSize: `${SNAP_GRID}px ${SNAP_GRID}px`
                         }}
                     />
@@ -126,10 +121,9 @@ function CircuitDesignerContent() {
                                 <path
                                     key={conn.id}
                                     d={getWirePath(x1, y1, x2, y2)}
-                                    stroke={isActive ? '#22c55e' : (isDark ? '#475569' : '#94a3b8')}
                                     strokeWidth="3"
                                     fill="none"
-                                    className="transition-colors duration-150"
+                                    className={`transition-colors duration-150 ${isActive ? 'stroke-green-500' : 'stroke-slate-400 dark:stroke-slate-600'}`}
                                 />
                             );
                         })}
@@ -147,11 +141,10 @@ function CircuitDesignerContent() {
                                         mousePos.x,
                                         mousePos.y
                                     )}
-                                    stroke="#6366f1"
                                     strokeWidth="2"
                                     strokeDasharray="5,5"
                                     fill="none"
-                                    className="opacity-70"
+                                    className="opacity-70 stroke-indigo-500"
                                 />
                             );
                         })()}
@@ -163,7 +156,6 @@ function CircuitDesignerContent() {
                             key={node.id}
                             node={node}
                             isActive={activeSimulation[node.id] ?? false}
-                            isDark={isDark}
                             isSelected={selectedIds.has(node.id)}
                             onMouseDown={handleMouseDownNode}
                             onClick={toggleInput}
