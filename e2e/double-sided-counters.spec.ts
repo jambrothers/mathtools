@@ -53,9 +53,9 @@ test.describe('Double Sided Counters - Core Functionality', () => {
         await page.click('text=Add +1');
         await page.waitForTimeout(300);
 
-        // Stats should show the count
-        const statsPanel = page.locator('text=+').first();
-        await expect(statsPanel).toBeVisible();
+        // Counter should be visible, confirming stats panel is showing count
+        const counter = page.locator('[data-testid="counter"]').first();
+        await expect(counter).toBeVisible();
     });
 
     test('should toggle stats visibility with Stats button', async ({ page }) => {

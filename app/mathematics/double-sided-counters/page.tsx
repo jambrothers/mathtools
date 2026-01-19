@@ -3,11 +3,12 @@
 import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { SetPageTitle } from '@/components/set-page-title';
-import { useCounters } from './_hooks/use-counters';
+import { useCounters, CounterType } from './_hooks/use-counters';
 import { CountersToolbar } from './_components/counters-toolbar';
 import { SummaryStats } from './_components/summary-stats';
 import { NumberLine } from './_components/number-line';
 import { DraggableCounter } from './_components/draggable-counter';
+import { getSidebarLabel, getSidebarTitle } from './_components/counter-type-select';
 import { Sidebar, SidebarSection, SidebarButton } from "@/components/tool-ui/sidebar";
 import { DraggableSidebarItem } from "@/components/tool-ui/draggable-sidebar-item";
 import { SpeedControl } from '@/components/tool-ui/speed-control';
@@ -69,6 +70,7 @@ function CountersPageContent() {
     const searchParams = useSearchParams();
     const [showNumberLine, setShowNumberLine] = useState(false);
     const [showStats, setShowStats] = useState(true);
+    const [counterType, setCounterType] = useState<CounterType>('numeric');
     const [hasInitialized, setHasInitialized] = useState(false);
     const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -87,6 +89,7 @@ function CountersPageContent() {
             );
             setShowNumberLine(state.showNumberLine);
             setShowStats(state.showStats);
+            setCounterType(state.counterType);
         }
         setHasInitialized(true);
     }, [searchParams, hasInitialized, setCountersFromState]);
@@ -129,12 +132,13 @@ function CountersPageContent() {
             isSequentialMode,
             animSpeed,
             showNumberLine,
-            showStats
+            showStats,
+            counterType
         };
         const url = generateShareableURL(counterURLSerializer, state);
         await copyURLToClipboard(url);
         // TODO: Could add a toast notification here to confirm copy
-    }, [counters, sortState, isOrdered, isSequentialMode, animSpeed, showNumberLine, showStats]);
+    }, [counters, sortState, isOrdered, isSequentialMode, animSpeed, showNumberLine, showStats, counterType]);
 
     /**
      * Handle counters dropped from the sidebar onto the canvas.
@@ -187,26 +191,28 @@ function CountersPageContent() {
                 isSequentialMode={isSequentialMode}
                 setIsSequentialMode={setIsSequentialMode}
                 onGenerateLink={handleGenerateLink}
+                counterType={counterType}
+                onCounterTypeChange={setCounterType}
             />
 
             <div className="flex flex-1 overflow-hidden relative">
                 {/* Sidebar */}
                 <Sidebar>
-                    <SidebarSection title="Add Positive">
+                    <SidebarSection title={getSidebarTitle(counterType, true)}>
                         <DraggableSidebarItem
                             dragData={{ type: 'counter', value: 1 }}
                             icon={<div className="w-4 h-4 rounded-full bg-yellow-400 border border-yellow-600 shadow-sm" />}
-                            label="Add +1"
+                            label={getSidebarLabel(counterType, true)}
                             onClick={() => addCounter(1, 1, showNumberLine)}
                             disabled={isAnimating}
                         />
                     </SidebarSection>
 
-                    <SidebarSection title="Add Negative">
+                    <SidebarSection title={getSidebarTitle(counterType, false)}>
                         <DraggableSidebarItem
                             dragData={{ type: 'counter', value: -1 }}
                             icon={<div className="w-4 h-4 rounded-full bg-red-500 border border-red-700 shadow-sm" />}
-                            label="Add -1"
+                            label={getSidebarLabel(counterType, false)}
                             onClick={() => addCounter(-1, 1, showNumberLine)}
                             disabled={isAnimating}
                         />
@@ -277,6 +283,7 @@ function CountersPageContent() {
                             <DraggableCounter
                                 key={counter.id}
                                 counter={counter}
+                                counterType={counterType}
                                 isAnimating={isAnimating}
                                 isBreathing={highlightedPair.includes(counter.id)}
                                 onRemove={removeCounter}

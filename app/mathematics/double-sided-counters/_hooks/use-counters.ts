@@ -11,6 +11,13 @@ export interface Counter {
 
 export type SortState = 'none' | 'grouped' | 'paired';
 
+/**
+ * Counter type defines what the counters represent.
+ * 'numeric' = +1/-1 (default)
+ * Other values = algebraic variables (+x/-x, +y/-y, etc.)
+ */
+export type CounterType = 'numeric' | 'x' | 'y' | 'z' | 'a' | 'b' | 'c';
+
 // Constants for counter grid layout
 const COUNTER_SIZE = 80; // px (matches w-20 h-20)
 const COUNTER_GAP = 16; // px (gap-4)

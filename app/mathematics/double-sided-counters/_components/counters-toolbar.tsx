@@ -4,6 +4,8 @@ import * as React from "react"
 import { Eye, EyeOff, Trash2, RefreshCw, ArrowUpDown, Timer } from "lucide-react"
 import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator, ToolbarInput } from "@/components/tool-ui/toolbar"
 import { CopyLinkButton } from "@/components/tool-ui/copy-link-button"
+import { CounterTypeSelect } from "./counter-type-select"
+import { CounterType } from "../_hooks/use-counters"
 
 interface CountersToolbarProps {
     showNumberLine: boolean
@@ -21,6 +23,10 @@ interface CountersToolbarProps {
     // Animation Controls
     isSequentialMode: boolean
     setIsSequentialMode: (v: boolean) => void
+
+    // Counter Type
+    counterType: CounterType
+    onCounterTypeChange: (type: CounterType) => void
 }
 
 export function CountersToolbar({
@@ -33,7 +39,8 @@ export function CountersToolbar({
     onClear,
     onAddExpression,
     onGenerateLink,
-    isSequentialMode, setIsSequentialMode
+    isSequentialMode, setIsSequentialMode,
+    counterType, onCounterTypeChange
 }: CountersToolbarProps) {
     const [input, setInput] = React.useState("")
 
@@ -51,6 +58,11 @@ export function CountersToolbar({
                     }}
                     placeholder="e.g. 5 + -3"
                     buttonLabel="Add"
+                    disabled={isAnimating}
+                />
+                <CounterTypeSelect
+                    value={counterType}
+                    onChange={onCounterTypeChange}
                     disabled={isAnimating}
                 />
             </div>

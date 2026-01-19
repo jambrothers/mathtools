@@ -11,7 +11,7 @@ import {
     deserializeNumber,
     deserializeString,
 } from '@/lib/url-state';
-import { Counter, SortState } from '../_hooks/use-counters';
+import { Counter, SortState, CounterType } from '../_hooks/use-counters';
 
 /**
  * Full state that can be serialized to/from URL
@@ -24,6 +24,7 @@ export interface CounterURLState {
     animSpeed: number;
     showNumberLine: boolean;
     showStats: boolean;
+    counterType: CounterType;
 }
 
 // URL Parameter Keys (kept short for compact URLs)
@@ -34,6 +35,7 @@ const PARAM_SLOW_MODE = 'sl';
 const PARAM_SPEED = 'sp';
 const PARAM_SORT_STATE = 'so';
 const PARAM_ORDERED = 'or';
+const PARAM_COUNTER_TYPE = 'ct';
 
 /**
  * Serialize counters to compact string format.
@@ -103,6 +105,18 @@ function parseSortState(value: string | null): SortState {
 }
 
 /**
+ * Validate and parse counter type from URL param.
+ * Defaults to 'numeric' for backwards compatibility.
+ */
+function parseCounterType(value: string | null): CounterType {
+    const validTypes: CounterType[] = ['numeric', 'x', 'y', 'z', 'a', 'b', 'c'];
+    if (value && validTypes.includes(value as CounterType)) {
+        return value as CounterType;
+    }
+    return 'numeric';
+}
+
+/**
  * Counter URL state serializer implementation.
  * Use with generateShareableURL() to create shareable links.
  */
@@ -128,6 +142,11 @@ export const counterURLSerializer: URLStateSerializer<CounterURLState> = {
             params.set(PARAM_SPEED, serializeNumber(state.animSpeed));
         }
 
+        // Only add counter type if not numeric (for cleaner backwards-compatible URLs)
+        if (state.counterType && state.counterType !== 'numeric') {
+            params.set(PARAM_COUNTER_TYPE, state.counterType);
+        }
+
         return params;
     },
 
@@ -135,7 +154,8 @@ export const counterURLSerializer: URLStateSerializer<CounterURLState> = {
         // Check if there are any relevant params at all
         const hasAnyParam = [
             PARAM_COUNTERS, PARAM_NUMBER_LINE, PARAM_STATS,
-            PARAM_SLOW_MODE, PARAM_SPEED, PARAM_SORT_STATE, PARAM_ORDERED
+            PARAM_SLOW_MODE, PARAM_SPEED, PARAM_SORT_STATE, PARAM_ORDERED,
+            PARAM_COUNTER_TYPE
         ].some(key => params.has(key));
 
         if (!hasAnyParam) {
@@ -150,6 +170,7 @@ export const counterURLSerializer: URLStateSerializer<CounterURLState> = {
             animSpeed: deserializeNumber(params.get(PARAM_SPEED), 1000),
             sortState: parseSortState(params.get(PARAM_SORT_STATE)),
             isOrdered: deserializeBool(params.get(PARAM_ORDERED), true),
+            counterType: parseCounterType(params.get(PARAM_COUNTER_TYPE)),
         };
     }
 };

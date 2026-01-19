@@ -2,11 +2,13 @@
 
 import * as React from "react"
 import { useDraggable } from "@/lib/hooks/use-draggable"
-import { Counter } from "../_hooks/use-counters"
+import { Counter, CounterType } from "../_hooks/use-counters"
 import { Position } from "@/types/manipulatives"
+import { getCounterLabel } from "./counter-type-select"
 
 interface DraggableCounterProps {
     counter: Counter
+    counterType: CounterType
     isAnimating: boolean
     isBreathing: boolean
     onRemove: (id: number) => void
@@ -25,6 +27,7 @@ const DOUBLE_CLICK_COOLDOWN_MS = 100 // Ignore clicks after double-click for thi
  */
 export function DraggableCounter({
     counter,
+    counterType,
     isAnimating,
     isBreathing,
     onRemove,
@@ -144,8 +147,8 @@ export function DraggableCounter({
                 touchAction: 'none'
             }}
         >
-            <span className="relative z-10 drop-shadow-md pointer-events-none">
-                {counter.value > 0 ? '+' : '−'}
+            <span className="relative z-10 drop-shadow-md pointer-events-none text-lg md:text-xl font-bold">
+                {getCounterLabel(counterType, counter.value > 0)}
             </span>
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/40 via-transparent to-black/5 pointer-events-none" />
             <div className="absolute top-2 left-2 w-1/3 h-1/3 bg-white/30 rounded-full blur-[2px] pointer-events-none" />

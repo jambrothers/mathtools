@@ -4,7 +4,7 @@ import {
     counterURLSerializer,
     CounterURLState,
 } from '@/app/mathematics/double-sided-counters/_lib/url-state';
-import { Counter } from '@/app/mathematics/double-sided-counters/_hooks/use-counters';
+import { Counter, CounterType } from '@/app/mathematics/double-sided-counters/_hooks/use-counters';
 
 describe('Counter URL State', () => {
     describe('serializeCounters', () => {
@@ -117,6 +117,7 @@ describe('Counter URL State', () => {
             animSpeed: 1000,
             showNumberLine: false,
             showStats: true,
+            counterType: 'numeric',
         };
 
         describe('serialize', () => {
@@ -160,6 +161,7 @@ describe('Counter URL State', () => {
                     animSpeed: 2000,
                     showNumberLine: true,
                     showStats: false,
+                    counterType: 'numeric',
                 };
                 const params = counterURLSerializer.serialize(state);
 
@@ -237,6 +239,7 @@ describe('Counter URL State', () => {
                     animSpeed: 750,
                     showNumberLine: true,
                     showStats: false,
+                    counterType: 'numeric',
                 };
 
                 const params = counterURLSerializer.serialize(original);
@@ -250,6 +253,7 @@ describe('Counter URL State', () => {
                 expect(restored!.animSpeed).toBe(original.animSpeed);
                 expect(restored!.showNumberLine).toBe(original.showNumberLine);
                 expect(restored!.showStats).toBe(original.showStats);
+                expect(restored!.counterType).toBe(original.counterType);
 
                 // Counter values and positions should match
                 for (let i = 0; i < original.counters.length; i++) {
@@ -257,6 +261,72 @@ describe('Counter URL State', () => {
                     expect(restored!.counters[i].x).toBe(original.counters[i].x);
                     expect(restored!.counters[i].y).toBe(original.counters[i].y);
                 }
+            });
+        });
+
+        describe('counterType', () => {
+            it('serializes numeric counter type by omitting ct param', () => {
+                const state: CounterURLState = {
+                    ...defaultState,
+                    counterType: 'numeric',
+                };
+                const params = counterURLSerializer.serialize(state);
+                // Numeric is default, so ct param should be omitted for cleaner URLs
+                expect(params.has('ct')).toBe(false);
+            });
+
+            it('serializes variable counter types with ct param', () => {
+                const types: CounterType[] = ['x', 'y', 'z', 'a', 'b', 'c'];
+                for (const counterType of types) {
+                    const state: CounterURLState = {
+                        ...defaultState,
+                        counterType,
+                    };
+                    const params = counterURLSerializer.serialize(state);
+                    expect(params.get('ct')).toBe(counterType);
+                }
+            });
+
+            it('deserializes missing ct param as numeric (backwards compatibility)', () => {
+                const params = new URLSearchParams();
+                params.set('nl', '0'); // Just one param to trigger deserialization
+
+                const result = counterURLSerializer.deserialize(params);
+                expect(result).not.toBeNull();
+                expect(result!.counterType).toBe('numeric');
+            });
+
+            it('deserializes valid counter types', () => {
+                const types: CounterType[] = ['x', 'y', 'z', 'a', 'b', 'c'];
+                for (const counterType of types) {
+                    const params = new URLSearchParams();
+                    params.set('ct', counterType);
+
+                    const result = counterURLSerializer.deserialize(params);
+                    expect(result).not.toBeNull();
+                    expect(result!.counterType).toBe(counterType);
+                }
+            });
+
+            it('defaults invalid counter type to numeric', () => {
+                const params = new URLSearchParams();
+                params.set('ct', 'invalid');
+
+                const result = counterURLSerializer.deserialize(params);
+                expect(result!.counterType).toBe('numeric');
+            });
+
+            it('roundtrips counter type through serialize/deserialize', () => {
+                const state: CounterURLState = {
+                    ...defaultState,
+                    counterType: 'x',
+                    counters: [{ id: 0, value: 1, x: 32, y: 32 }],
+                };
+
+                const params = counterURLSerializer.serialize(state);
+                const restored = counterURLSerializer.deserialize(params);
+
+                expect(restored!.counterType).toBe('x');
             });
         });
     });
