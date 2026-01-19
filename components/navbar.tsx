@@ -4,7 +4,8 @@ import * as React from "react"
 import Link from "next/link"
 import { useTheme } from "next-themes"
 import { usePathname } from "next/navigation"
-import { Moon, Sun, Menu, X, Calculator, ChevronDown } from "lucide-react"
+import Image from "next/image"
+import { Moon, Sun, Menu, X, ChevronDown } from "lucide-react"
 import { usePageTitle } from "./page-title-context"
 
 /**
@@ -48,8 +49,18 @@ export function Navbar() {
                     <div className="flex items-center justify-between h-[81px] relative">
                         <div className="flex items-center flex-shrink-0 z-10 bg-[var(--theme-page)]/0">
                             <Link href="/" className="flex items-center gap-2 group">
-                                <div className="p-2 rounded-lg bg-gradient-to-br from-blue-400 to-purple-600 group-hover:opacity-90 transition-opacity">
-                                    <Calculator className="w-6 h-6 text-white" />
+                                <div className="group-hover:opacity-90 transition-opacity">
+                                    {mounted ? (
+                                        <Image
+                                            src={theme === "dark" ? "/assets/logo-dark.svg" : "/assets/logo.svg"}
+                                            alt="MathTools Logo"
+                                            width={40}
+                                            height={40}
+                                            className="w-10 h-10"
+                                        />
+                                    ) : (
+                                        <div className="w-10 h-10" /> // Placeholder to prevent hydration mismatch
+                                    )}
                                 </div>
                                 <span className="font-bold text-xl tracking-tight text-[var(--theme-main)]">
                                     MathTools

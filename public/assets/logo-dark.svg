@@ -1,0 +1,49 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    
+    <!-- Group for the Compass structure -->
+    <g transform="translate(100, 30)">
+        
+        <!-- Left Leg (Needle Side) -->
+        <!-- Simple rounded rectangle, solid color -->
+        <g transform="rotate(-20) translate(-8, 0)">
+            <rect x="0" y="10" width="16" height="130" rx="8" fill="#e2e8f0"/>
+            <!-- Simple Circle Detail at bottom for 'needle' hint -->
+            <circle cx="8" cy="135" r="2" fill="#1e293b"/> 
+        </g>
+
+        <!-- Right Leg (Pencil Side) -->
+        <g transform="rotate(20) translate(-8, 0)">
+            <!-- Main Leg Body -->
+            <rect x="0" y="10" width="16" height="100" rx="8" fill="#e2e8f0"/>
+            <!-- Minimalist Pencil Tip (Cone) -->
+            <path d="M0 100 L8 135 L16 100 Z" fill="#e2e8f0"/>
+            <!-- The Lead (Accent Color match) -->
+            <path d="M6 126 L8 135 L10 126 Z" fill="#1e293b"/>
+        </g>
+
+        <!-- Hinge (Top Circle) -->
+        <!-- Flat circles, no strokes -->
+        <circle cx="0" cy="15" r="16" fill="#e2e8f0"/>
+        <circle cx="0" cy="15" r="6" fill="#1e293b"/>
+
+        <!-- The Ruler (Crossbar) -->
+        <!-- Flat rectangle, complementary accent color -->
+        <g transform="translate(-45, 75)">
+            <!-- Ruler Body: Vibrant Purple/Lilac -->
+            <rect x="0" y="0" width="90" height="24" rx="4" fill="#a78bfa"/>
+            
+            <!-- Tick Marks: Darker for visibility on light purple -->
+            <g stroke="#1e293b" stroke-width="2" stroke-linecap="round">
+                <line x1="10" y1="0" x2="10" y2="8" />
+                <line x1="20" y1="0" x2="20" y2="5" opacity="0.7"/>
+                <line x1="30" y1="0" x2="30" y2="8" />
+                <line x1="40" y1="0" x2="40" y2="5" opacity="0.7"/>
+                <line x1="50" y1="0" x2="50" y2="10" stroke-width="2.5"/> <!-- Center -->
+                <line x1="60" y1="0" x2="60" y2="5" opacity="0.7"/>
+                <line x1="70" y1="0" x2="70" y2="8" />
+                <line x1="80" y1="0" x2="80" y2="5" opacity="0.7"/>
+            </g>
+        </g>
+
+    </g>
+</svg>
