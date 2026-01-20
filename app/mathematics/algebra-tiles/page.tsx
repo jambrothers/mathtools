@@ -8,10 +8,13 @@ import { AlgebraToolbar } from "./_components/algebra-toolbar"
 import { TileSidebar } from "./_components/sidebar"
 import { Canvas } from '@/components/tool-ui/canvas';
 import { TrashZone } from '@/components/tool-ui/trash-zone';
+import { HelpButton } from '@/components/tool-ui/help-button';
+import { HelpModal } from '@/components/tool-ui/help-modal';
 import { SetPageTitle } from "@/components/set-page-title"
 import { Position } from "@/types/manipulatives"
 import { algebraTilesURLSerializer, AlgebraTilesURLState } from "./_lib/url-state"
 import { generateShareableURL, copyURLToClipboard } from "@/lib/url-state"
+import helpContent from './HELP.md';
 
 /**
  * Loading fallback component for the algebra tiles page.
@@ -69,6 +72,7 @@ function AlgebraTilesPageContent() {
     const [snapToGrid, setSnapToGrid] = useState(false)
     const [isTrashHovered, setIsTrashHovered] = useState(false)
     const [hasInitialized, setHasInitialized] = useState(false)
+    const [showHelp, setShowHelp] = useState(false)
 
     const trashRef = useRef<HTMLDivElement>(null)
     const canvasRef = useRef<HTMLDivElement>(null)
@@ -233,8 +237,14 @@ function AlgebraTilesPageContent() {
                     ))}
 
                     <TrashZone ref={trashRef} isHovered={isTrashHovered} />
+                    <HelpButton onClick={() => setShowHelp(true)} />
                 </Canvas>
             </div>
+
+            {/* Help Modal */}
+            {showHelp && (
+                <HelpModal content={helpContent} onClose={() => setShowHelp(false)} />
+            )}
         </div>
     )
 }

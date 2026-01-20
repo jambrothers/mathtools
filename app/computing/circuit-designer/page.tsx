@@ -1,15 +1,18 @@
 "use client"
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import { SetPageTitle } from "@/components/set-page-title";
 import { ConfirmationModal } from './_components/confirmation-modal';
 import { Canvas } from '@/components/tool-ui/canvas';
 import { TrashZone } from '@/components/tool-ui/trash-zone';
+import { HelpButton } from '@/components/tool-ui/help-button';
+import { HelpModal } from '@/components/tool-ui/help-modal';
 import { CircuitToolbar } from './_components/circuit-toolbar';
 import { CircuitSidebar } from './_components/circuit-sidebar';
 import { CircuitNodeComponent } from './_components/circuit-node';
 import { TruthTableModal } from './_components/truth-table-modal';
 import { useCircuitDesigner } from './_hooks/use-circuit-designer';
+import helpContent from './HELP.md';
 
 import {
     getPortPosition,
@@ -63,6 +66,8 @@ function CircuitDesignerContent() {
         handleCopyLink,
         getWiringSourceNode
     } = useCircuitDesigner();
+
+    const [showHelp, setShowHelp] = useState(false);
 
 
 
@@ -166,6 +171,7 @@ function CircuitDesignerContent() {
 
 
                     <TrashZone ref={trashRef} isHovered={isTrashHovered} />
+                    <HelpButton onClick={() => setShowHelp(true)} />
                 </Canvas>
 
             </div>
@@ -188,6 +194,11 @@ function CircuitDesignerContent() {
                     onConfirm={confirmClear}
                     onCancel={cancelClear}
                 />
+            )}
+
+            {/* Help Modal */}
+            {showHelp && (
+                <HelpModal content={helpContent} onClose={() => setShowHelp(false)} />
             )}
         </div>
     );

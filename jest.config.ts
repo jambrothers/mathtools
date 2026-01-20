@@ -16,7 +16,11 @@ const config: Config = {
         '^@/components/(.*)$': '<rootDir>/components/$1',
         '^@/app/(.*)$': '<rootDir>/app/$1',
         '^@/lib/(.*)$': '<rootDir>/lib/$1',
-    }
+    },
+    // Transform ES modules from react-markdown and its dependencies
+    transformIgnorePatterns: [
+        'node_modules/(?!(react-markdown|remark-parse|remark-rehype|unified|bail|is-plain-obj|trough|vfile|vfile-message|unist-util-stringify-position|mdast-util-from-markdown|mdast-util-to-string|micromark|decode-named-character-reference|character-entities|mdast-util-to-hast|unist-util-position|unist-util-visit|unist-util-is|hast-util-whitespace|space-separated-tokens|comma-separated-tokens|property-information|hast-util-to-jsx-runtime|estree-util-is-identifier-name|devlop|unist-util-position-from-estree|ccount|escape-string-regexp|markdown-table|zwitch|longest-streak|unist-util-visit-parents|trim-lines)/)',
+    ],
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

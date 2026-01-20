@@ -13,8 +13,11 @@ import { Sidebar, SidebarSection, SidebarButton } from "@/components/tool-ui/sid
 import { DraggableSidebarItem } from "@/components/tool-ui/draggable-sidebar-item";
 import { SpeedControl } from '@/components/tool-ui/speed-control';
 import { Canvas } from '@/components/tool-ui/canvas';
+import { HelpButton } from '@/components/tool-ui/help-button';
+import { HelpModal } from '@/components/tool-ui/help-modal';
 import { counterURLSerializer, CounterURLState } from './_lib/url-state';
 import { generateShareableURL, copyURLToClipboard } from '@/lib/url-state';
+import helpContent from './HELP.md';
 
 /**
  * Loading fallback component for the counters page.
@@ -72,6 +75,7 @@ function CountersPageContent() {
     const [showStats, setShowStats] = useState(true);
     const [counterType, setCounterType] = useState<CounterType>('numeric');
     const [hasInitialized, setHasInitialized] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
     const canvasRef = useRef<HTMLDivElement>(null);
 
     // Initialize from URL on mount
@@ -297,6 +301,9 @@ function CountersPageContent() {
                     {showNumberLine && (
                         <NumberLine val={totalSum} />
                     )}
+
+                    {/* Help Button */}
+                    <HelpButton onClick={() => setShowHelp(true)} />
                 </Canvas>
             </div>
 
@@ -304,6 +311,11 @@ function CountersPageContent() {
                 .no-scrollbar::-webkit-scrollbar { display: none; }
                 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
              `}</style>
+
+            {/* Help Modal */}
+            {showHelp && (
+                <HelpModal content={helpContent} onClose={() => setShowHelp(false)} />
+            )}
         </div>
     );
 }
