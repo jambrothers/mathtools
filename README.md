@@ -60,7 +60,7 @@ This project follows a standard Next.js App Router structure with a separation o
 - **`lib/`**: Utility functions and custom hooks.
   - **`url-state.ts`**: Generic URL state serialization utilities for shareable tool configurations.
 
-### key Architectural Concepts
+### Key Architectural Concepts
 
 #### Page Title Context
 We use a global `PageTitleContext` to manage the application header state. This allows individual tools deep in the hierarchy to:
@@ -89,14 +89,14 @@ The project has a clear separation between shared UI (`components/tool-ui`), too
 
 **Opportunities**
 - The URL initialization + shareable link logic is repeated in each tool page (algebra tiles, counters, circuit designer).  
-  **Suggestion:** introduce a small `useUrlState` hook that:
+  **Suggestion:** Introduce a small `useUrlState` hook that:
   - Parses URL state once.
   - Returns `initialState` + `hasUrlState`.
   - Exposes a shared `generateShareableLink` helper.
 - Loading fallbacks (`AlgebraTilesPageLoading`, `CountersPageLoading`, `CircuitDesignerLoading`) are structurally identical.  
-  **Suggestion:** create a shared `<ToolLoadingScreen message="..." />` component.
+  **Suggestion:** Create a shared `<ToolLoadingScreen message="..." />` component.
 - Repeated canvas/drag/drop glue code appears in multiple pages.  
-  **Suggestion:** extract a small `<ToolWorkspace>` layout (Canvas + Sidebar + Trash) and reuse it.
+  **Suggestion:** Extract a small `<ToolWorkspace>` layout (Canvas + Sidebar + Trash) and reuse it.
 
 #### 2) React & Next.js Patterns
 **What is working well**
@@ -105,10 +105,10 @@ The project has a clear separation between shared UI (`components/tool-ui`), too
 
 **Opportunities**
 - Several pages initialize state via `useEffect` + multiple `setState` calls.  
-  **Suggestion:** initialize state via `useState` with a lazy initializer (or a `useReducer`), to avoid chained updates and lint warnings.
+  **Suggestion:** Initialize state via `useState` with a lazy initializer (or a `useReducer`), to avoid chained updates and lint warnings.
 - Some static layout could be moved to server components to reduce client bundle size (e.g., non-interactive headers/footers).
 - `generateShareableURL` depends on `window` directly, which is fine in client components but brittle in tests/SSR.  
-  **Suggestion:** allow passing a base URL from the caller or guard for `typeof window !== 'undefined'`.
+  **Suggestion:** Allow passing a base URL from the caller or guard for `typeof window !== 'undefined'`.
 
 #### 3) Code Clarity & Maintainability
 **What is working well**
@@ -117,15 +117,15 @@ The project has a clear separation between shared UI (`components/tool-ui`), too
 
 **Opportunities**
 - The tool page files are long (200+ lines) and mix UI, handlers, and serialization.  
-  **Suggestion:** split each page into `Toolbar`, `CanvasLayer`, and `Sidebar` components, and move handlers into a `useToolHandlers` hook.
+  **Suggestion:** Split each page into `Toolbar`, `CanvasLayer`, and `Sidebar` components, and move handlers into a `useToolHandlers` hook.
 - A few “magic numbers” (e.g., grid sizes, snap distances) are inline in pages.  
-  **Suggestion:** promote these to `constants.ts` within each tool so intent is clearer.
+  **Suggestion:** Promote these to `constants.ts` within each tool so intent is clearer.
 
 #### 4) Additional Observations
 - The Jest suite currently attempts to run Playwright tests.  
-  **Suggestion:** add a Jest `testPathIgnorePatterns` entry for `/e2e/` or separate unit vs. E2E scripts to keep the unit suite stable.
+  **Suggestion:** Add a Jest `testPathIgnorePatterns` entry for `/e2e/` or separate unit vs. E2E scripts to keep the unit suite stable.
 - Offline builds fail when Next.js fetches Google Fonts.  
-  **Suggestion:** consider `next/font/local` or vendoring fonts if offline builds are expected.
+  **Suggestion:** Consider `next/font/local` or vendoring fonts if offline builds are expected.
 - Lint warnings in tools and hooks (unused variables, `prefer-const`, hook deps) should be cleaned up to improve clarity and avoid regressions.
 
 ## Getting Started
