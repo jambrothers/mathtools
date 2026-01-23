@@ -74,6 +74,60 @@ Most tools follow a similar pattern:
 - **Items**: Individual interactive elements (Tiles) that handle their own drag/drop logic.
 - **Toolbar**: A control panel for modifying tool state.
 
+## Codebase Review (Jan 2026)
+
+### Summary
+The project has a clear separation between shared UI (`components/tool-ui`), tool-specific logic, and URL state serialization (`lib/url-state.ts`). The structure and use of hooks make the tools consistent to build and extend. The main opportunities are around removing duplication across tool pages, tightening state initialization patterns, and improving clarity in long page components.
+
+### Findings & Suggested Changes
+
+#### 1) Code Reuse
+**What is working well**
+- `components/tool-ui` provides a solid base for shared canvas/toolbar/sidebar patterns.
+- `lib/url-state.ts` establishes a generic serialization model that is already reused by multiple tools.
+- Reusable hooks (`use-draggable`, `use-history`, `use-click-stack`) provide good low-level building blocks.
+
+**Opportunities**
+- The URL initialization + shareable link logic is repeated in each tool page (algebra tiles, counters, circuit designer).  
+  **Suggestion:** introduce a small `useUrlState` hook that:
+  - Parses URL state once.
+  - Returns `initialState` + `hasUrlState`.
+  - Exposes a shared `generateShareableLink` helper.
+- Loading fallbacks (`AlgebraTilesPageLoading`, `CountersPageLoading`, `CircuitDesignerLoading`) are structurally identical.  
+  **Suggestion:** create a shared `<ToolLoadingScreen message="..." />` component.
+- Repeated canvas/drag/drop glue code appears in multiple pages.  
+  **Suggestion:** extract a small `<ToolWorkspace>` layout (Canvas + Sidebar + Trash) and reuse it.
+
+#### 2) React & Next.js Patterns
+**What is working well**
+- Good use of the App Router and `Suspense` wrapping for `useSearchParams`.
+- Hooks are used appropriately to separate tool logic from UI.
+
+**Opportunities**
+- Several pages initialize state via `useEffect` + multiple `setState` calls.  
+  **Suggestion:** initialize state via `useState` with a lazy initializer (or a `useReducer`), to avoid chained updates and lint warnings.
+- Some static layout could be moved to server components to reduce client bundle size (e.g., non-interactive headers/footers).
+- `generateShareableURL` depends on `window` directly, which is fine in client components but brittle in tests/SSR.  
+  **Suggestion:** allow passing a base URL from the caller or guard for `typeof window !== 'undefined'`.
+
+#### 3) Code Clarity & Maintainability
+**What is working well**
+- Tools follow a consistent top-level structure and naming scheme.
+- Comments and doc blocks are present and generally helpful.
+
+**Opportunities**
+- The tool page files are long (200+ lines) and mix UI, handlers, and serialization.  
+  **Suggestion:** split each page into `Toolbar`, `CanvasLayer`, and `Sidebar` components, and move handlers into a `useToolHandlers` hook.
+- A few “magic numbers” (e.g., grid sizes, snap distances) are inline in pages.  
+  **Suggestion:** promote these to `constants.ts` within each tool so intent is clearer.
+
+#### 4) Additional Observations
+- The Jest suite currently attempts to run Playwright tests.  
+  **Suggestion:** add a Jest `testPathIgnorePatterns` entry for `/e2e/` or separate unit vs. E2E scripts to keep the unit suite stable.
+- Offline builds fail when Next.js fetches Google Fonts.  
+  **Suggestion:** consider `next/font/local` or vendoring fonts if offline builds are expected.
+- Lint warnings in tools and hooks (unused variables, `prefer-const`, hook deps) should be cleaned up to improve clarity and avoid regressions.
+
 ## Getting Started
 
 First, install the dependencies:
