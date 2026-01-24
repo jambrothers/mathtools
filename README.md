@@ -1,6 +1,6 @@
-# MathTools
+# TeachMaths.net
 
-MathTools is a suite of interactive digital manipulatives designed for mathematics education. It provides teachers and students with virtual tools to explore mathematical concepts visually and kinetically.
+TeachMaths.net (formerly MathTools) is a suite of interactive digital manipulatives designed for mathematics education. It provides teachers and students with virtual tools to explore mathematical concepts visually and kinetically.
 
 ## Project Purpose
 
@@ -8,6 +8,7 @@ The goal of this project is to create high-quality, web-based educational tools 
 - **Intuitive**: Easy for students to pick up and use immediately.
 - **Visual**: Leveraging the power of digital mediums to visualize abstract concepts.
 - **Accessible**: Available on any device with a web browser.
+- **Warm & Academic**: Following our [Design System](DESIGN.md) to create a welcoming learning environment.
 
 ## Available Tools
 
@@ -20,6 +21,7 @@ A comprehensive environment for modeling algebraic concepts such as:
 
 ### 2. Double Sided Counters
 A tool for teaching integer operations using positive (yellow) and negative (red) counters. Features include:
+- **Algebraic Variables**: Support for symbolic variables (x, y, z...) alongside integer counters.
 - Zero pair cancellation animations
 - Automated number line tracking
 - Sorting and grouping animations
@@ -31,16 +33,28 @@ A logic gate simulator for Computer Science students.
 - **Components**: Switches, Bulbs, AND, OR, NOT, XOR gates.
 - **Features**:
     - Real-time signal propagation.
-    - Truth Table generation.
-    - Group selection (Marquee) and Drag-to-Delete.
+    - Truth Table generation and validation.
+    - Multi-selection and Drag-to-Delete.
     - Quick Demo presets.
-*Status: Active development. Recently updated with multi-select and enhanced UI.*
+*Status: Stable. Recently updated with multi-select and enhanced UI.*
+
+## Key Features
+
+### Documentation & Help System
+Each tool includes a built-in help system accessible via the toolbar. Documentation is written in Markdown (e.g., `HELP.md` in each tool's directory) and rendered dynamically using `react-markdown`.
+
+### Design System
+We follow a strict [Design System](DESIGN.md) to ensure consistency and accessibility.
+- **Philosophy**: "Warm and Approachable" yet "Academic".
+- **Typography**: Merriweather for headings, Inter for body text.
+- **Theming**: Full Dark Mode support.
 
 ## Built With
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **Icons**: [Lucide React](https://lucide.dev/)
+- **Content**: [react-markdown](https://github.com/remarkjs/react-markdown)
 - **State Management**: React Context + Hooks
 - **Theme**: [next-themes](https://github.com/pacocoursey/next-themes) for Dark Mode support
 - **Testing**: [Jest](https://jestjs.io/) (unit), [Playwright](https://playwright.dev/) (E2E)
@@ -53,14 +67,14 @@ This project follows a standard Next.js App Router structure with a separation o
 
 - **`app/`**: Contains the route segments and page definitions.
   - **`mathematics/`**: Dedicated section for the interactive mathematics tools.
-    - **`[tool-name]/`**: Each tool (e.g., `algebra-tiles`) has its own subdirectory containing its page and tool-specific local components (in `_components/`).
+    - **`[tool-name]/`**: Each tool (e.g., `algebra-tiles`) has its own subdirectory containing its page, `HELP.md`, and tool-specific local components.
 - **`components/`**: Shared reusable components.
-  - **`tool-ui/`**: Components shared across multiple tools (e.g., `Canvas`, `TileBase`, `Toolbar`).
-  - **`ui/`**: General UI components (coming soon).
+  - **`tool-ui/`**: Components shared across multiple tools (e.g., `Canvas`, `TileBase`, `Toolbar`, `HelpModal`).
+  - **`ui/`**: General UI components.
 - **`lib/`**: Utility functions and custom hooks.
   - **`url-state.ts`**: Generic URL state serialization utilities for shareable tool configurations.
 
-### key Architectural Concepts
+### Key Architectural Concepts
 
 #### Page Title Context
 We use a global `PageTitleContext` to manage the application header state. This allows individual tools deep in the hierarchy to:
@@ -99,6 +113,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ### Styling
 - Use Tailwind CSS utility classes for styling.
 - Support Dark Mode for all components using the `dark:` prefix.
+- Refer to `DESIGN.md` for color tokens and typography rules.
 
 ## Learn More
 
