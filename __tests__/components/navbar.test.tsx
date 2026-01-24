@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { Navbar } from '@/components/navbar'
 import * as PageTitleContext from '@/components/page-title-context'

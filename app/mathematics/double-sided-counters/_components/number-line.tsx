@@ -8,7 +8,6 @@ interface NumberLineProps {
 }
 
 export function NumberLine({ val: currentSum }: NumberLineProps) {
-    const clampedSum = Math.max(-21, Math.min(21, currentSum));
 
     return (
         <FloatingPanel className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-4xl animate-in slide-in-from-bottom duration-300">

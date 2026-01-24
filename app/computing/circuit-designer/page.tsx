@@ -2,7 +2,6 @@
 
 import React, { Suspense, useState, useEffect } from 'react';
 import { SetPageTitle } from "@/components/set-page-title";
-import { ConfirmationModal } from './_components/confirmation-modal';
 import { Canvas } from '@/components/tool-ui/canvas';
 import { TrashZone } from '@/components/tool-ui/trash-zone';
 import { HelpButton } from '@/components/tool-ui/help-button';
@@ -40,12 +39,10 @@ function CircuitDesignerContent() {
     const {
         nodes,
         connections,
-        dragging,
         wiring,
         mousePos,
         truthTable,
         activeSimulation,
-        showClearConfirm,
         selectedIds,
         isTrashHovered,
         trashRef,
@@ -97,7 +94,8 @@ function CircuitDesignerContent() {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const handleTouchDrop = (e: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handleTouchDrop = (e: CustomEvent<{ dragData: { type: string, componentType: any }, clientX: number, clientY: number }>) => {
             const { dragData, clientX, clientY } = e.detail;
             if (dragData?.type === 'circuit-component') {
                 const rect = canvas.getBoundingClientRect();
@@ -107,9 +105,9 @@ function CircuitDesignerContent() {
             }
         };
 
-        canvas.addEventListener('touchdrop', handleTouchDrop);
-        return () => canvas.removeEventListener('touchdrop', handleTouchDrop);
-    }, [addNodeAtPosition]);
+        canvas.addEventListener('touchdrop', handleTouchDrop as EventListener);
+        return () => canvas.removeEventListener('touchdrop', handleTouchDrop as EventListener);
+    }, [addNodeAtPosition, canvasRef]);
 
     // Keyboard shortcut for undo (Ctrl+Z / Cmd+Z)
     useEffect(() => {

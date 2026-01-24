@@ -60,11 +60,10 @@ function CountersPageContent() {
         flipCounter,
         removeCounter,
         updateCounterPosition,
-        snapToOrder,
+        clearBoard,
         flipAll,
         organize,
         cancelZeroPairs,
-        clearBoard,
         animSpeed,
         setAnimSpeed,
         setCountersFromState,
@@ -93,6 +92,7 @@ function CountersPageContent() {
                 state.isSequentialMode,
                 state.animSpeed
             );
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setShowNumberLine(state.showNumberLine);
             setShowStats(state.showStats);
             setCounterType(state.counterType);
@@ -277,7 +277,7 @@ function CountersPageContent() {
                                     </div>
                                 }
                                 label="Zero Pair"
-                                onClick={() => addZeroPair(showNumberLine)}
+                                onClick={() => addZeroPair()}
                                 disabled={isAnimating}
                             />
                         </SidebarSection>

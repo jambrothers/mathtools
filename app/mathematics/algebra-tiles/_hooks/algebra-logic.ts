@@ -1,6 +1,5 @@
 import { TileData } from "./use-algebra-tiles"
 import { TILE_TYPES } from "../constants"
-import { Position } from "@/types/manipulatives"
 
 export function groupTilesLogic(tiles: TileData[], startX: number = 50, startY: number = 50, maxWidth: number = 300): TileData[] {
     const spacing = 10;
@@ -64,7 +63,7 @@ export function groupTilesLogic(tiles: TileData[], startX: number = 50, startY: 
 // --- Helper Functions from original implementation ---
 
 export const parseExpression = (expr: string): TileTerms => {
-    let cleanExpr = expr.replace(/\s+/g, '').replace(/--/g, '+').replace(/\+\+/g, '+').replace(/\+-/g, '-').replace(/-\+/g, '-');
+    const cleanExpr = expr.replace(/\s+/g, '').replace(/--/g, '+').replace(/\+\+/g, '+').replace(/\+-/g, '-').replace(/-\+/g, '-');
     const termRegex = /([+-]?\d*)(x\^2|y\^2|xy|yx|x|y)?/g;
     const terms: TileTerms = { x2: [], y2: [], xy: [], x: [], y: [], 1: [] };
 
@@ -73,8 +72,8 @@ export const parseExpression = (expr: string): TileTerms => {
         if (match.index === termRegex.lastIndex) termRegex.lastIndex++;
         if (!match[0]) continue;
 
-        let coeffStr = match[1];
-        let typeStr = match[2];
+        const coeffStr = match[1];
+        const typeStr = match[2];
 
         let coeff = 1;
         if (coeffStr === '-' || coeffStr === '+-') coeff = -1;

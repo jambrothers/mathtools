@@ -123,7 +123,7 @@ export const COMPONENT_TYPES: Record<ComponentTypeName, ComponentDefinition> = {
         color: 'bg-indigo-600',
         iconColor: 'text-indigo-500',
         evaluate: (inputs: boolean[]) => inputs[0] && inputs[1],
-        render: (_active: boolean) => {
+        render: () => {
             return React.createElement('svg', {
                 width: '50', height: '50', viewBox: '0 0 50 50',
                 className: gateClasses('stroke-indigo-600', 'stroke-indigo-400')
@@ -138,7 +138,7 @@ export const COMPONENT_TYPES: Record<ComponentTypeName, ComponentDefinition> = {
         color: 'bg-purple-600',
         iconColor: 'text-purple-500',
         evaluate: (inputs: boolean[]) => inputs[0] || inputs[1],
-        render: (_active: boolean) => {
+        render: () => {
             return React.createElement('svg', {
                 width: '50', height: '50', viewBox: '0 0 50 50',
                 className: gateClasses('stroke-purple-600', 'stroke-purple-400')
@@ -153,7 +153,7 @@ export const COMPONENT_TYPES: Record<ComponentTypeName, ComponentDefinition> = {
         color: 'bg-rose-600',
         iconColor: 'text-rose-500',
         evaluate: (inputs: boolean[]) => !inputs[0],
-        render: (_active: boolean) => {
+        render: () => {
             return React.createElement('svg', {
                 width: '50', height: '50', viewBox: '0 0 50 50',
                 className: gateClasses('stroke-rose-600', 'stroke-rose-400')
@@ -171,7 +171,7 @@ export const COMPONENT_TYPES: Record<ComponentTypeName, ComponentDefinition> = {
         color: 'bg-cyan-600',
         iconColor: 'text-cyan-500',
         evaluate: (inputs: boolean[]) => (inputs[0] || inputs[1]) && !(inputs[0] && inputs[1]),
-        render: (_active: boolean) => {
+        render: () => {
             return React.createElement('svg', {
                 width: '50', height: '50', viewBox: '0 0 50 50',
                 className: gateClasses('stroke-cyan-600', 'stroke-cyan-400')

@@ -18,7 +18,7 @@ class MockPointerEvent extends MouseEvent {
         this.height = props.height ?? 1;
     }
 }
-(global as any).PointerEvent = MockPointerEvent;
+(global as unknown as { PointerEvent: typeof MockPointerEvent }).PointerEvent = MockPointerEvent;
 
 // Polyfill pointer capture methods for JSDOM
 if (typeof Element !== 'undefined') {
@@ -53,13 +53,12 @@ class MockDOMRect {
         return { x: this.x, y: this.y, width: this.width, height: this.height };
     }
 }
-(global as any).DOMRect = MockDOMRect;
+(global as unknown as { DOMRect: typeof MockDOMRect }).DOMRect = MockDOMRect;
 
 
 jest.mock('next/image', () => ({
     __esModule: true,
-    default: (props: any) => {
-        // eslint-disable-next-line @next/next/no-img-element
+    default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => {
         return React.createElement('img', props)
     },
 }))
@@ -67,7 +66,7 @@ jest.mock('next/image', () => ({
 // Mock react-markdown to render content as basic HTML for testing
 jest.mock('react-markdown', () => ({
     __esModule: true,
-    default: ({ children, components }: { children: string, components?: any }) => {
+    default: ({ children, components }: { children: string, components?: Record<string, React.ElementType> }) => {
         // Simple markdown parsing for testing
         const lines = children.split('\n')
         const elements: React.ReactNode[] = []
@@ -90,7 +89,8 @@ jest.mock('react-markdown', () => ({
                 if (match) {
                     const imgProps = { alt: match[1], src: match[2], key: index }
                     if (components?.img) {
-                        elements.push(components.img(imgProps))
+                        const Img = components.img;
+                        elements.push(React.createElement(Img, imgProps as React.ImgHTMLAttributes<HTMLImageElement>))
                     } else {
                         elements.push(React.createElement('img', imgProps))
                     }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Jest tests for the two-row layout system in double-sided counters.
  * 

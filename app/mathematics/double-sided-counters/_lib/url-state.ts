@@ -9,7 +9,6 @@ import {
     deserializeBool,
     serializeNumber,
     deserializeNumber,
-    deserializeString,
 } from '@/lib/url-state';
 import { Counter, SortState, CounterType } from '../_hooks/use-counters';
 

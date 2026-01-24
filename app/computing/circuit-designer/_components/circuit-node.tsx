@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Monitor } from "lucide-react"
+
 import { CircuitNode as CircuitNodeType, COMPONENT_TYPES, getPortPosition } from "../constants"
 import { cn } from "@/lib/utils"
 

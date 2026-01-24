@@ -70,7 +70,7 @@ function AlgebraTilesPageContent() {
     const [showLabels, setShowLabels] = useState(true)
     const [showY, setShowY] = useState(false)
     const [snapToGrid, setSnapToGrid] = useState(false)
-    const [isTrashHovered, setIsTrashHovered] = useState(false)
+    const [isTrashHovered] = useState(false)
     const [hasInitialized, setHasInitialized] = useState(false)
     const [showHelp, setShowHelp] = useState(false)
 
@@ -84,6 +84,7 @@ function AlgebraTilesPageContent() {
         const state = algebraTilesURLSerializer.deserialize(searchParams);
         if (state) {
             setTilesFromState(state.tiles);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setShowLabels(state.showLabels);
             setShowY(state.showY);
             setSnapToGrid(state.snapToGrid);
@@ -213,7 +214,7 @@ function AlgebraTilesPageContent() {
             const tileCenterY = pos.y + 25;
 
             if (tileCenterX > trashL && tileCenterY > trashT) {
-                const idsToDelete = selectedIds.has(id) ? Array.from(selectedIds) : [id];
+                const idsToDelete = (selectedIds.has(id) ? Array.from(selectedIds) : [id]) as string[];
                 removeTiles(idsToDelete);
                 return;
             }

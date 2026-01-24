@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 import { renderHook, act } from '@testing-library/react';
 import { useCircuitDesigner } from '@/app/computing/circuit-designer/_hooks/use-circuit-designer';
 import { CircuitNode, Connection } from '@/app/computing/circuit-designer/constants';

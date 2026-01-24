@@ -61,6 +61,10 @@ function countByType(counters: Counter[], type: 'positive' | 'negative'): number
     return counters.filter(c => type === 'positive' ? c.value > 0 : c.value < 0).length;
 }
 
+// Constants
+const POSITIVE = 1;
+const NEGATIVE = -1;
+
 export function useCounters() {
     // Use history for undo support
     const {
@@ -86,10 +90,6 @@ export function useCounters() {
     const animationQueueEndRef = useRef(0);
     const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
     const abortAnimationRef = useRef(false);
-
-    // Constants
-    const POSITIVE = 1;
-    const NEGATIVE = -1;
 
     // --- Helpers ---
     const wait = (ms: number) => new Promise(resolve => {
@@ -161,9 +161,9 @@ export function useCounters() {
 
             timeoutsRef.current.push(tId);
         }
-    }, [counters, pushCounters, updateCountersImmediate]);
+    }, [pushCounters, updateCountersImmediate]);
 
-    const addZeroPair = useCallback((showNumberLine = false) => {
+    const addZeroPair = useCallback(() => {
         // ALWAYS add both counters simultaneously in a single setState
         pushCounters((prev: Counter[]) => {
             const posCount = countByType(prev, 'positive');

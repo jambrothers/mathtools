@@ -64,8 +64,7 @@ test.describe('Algebra Tiles', () => {
             await page.waitForTimeout(200);
 
             // After enabling Y, y-tiles should be visible in sidebar
-            const yTile = page.locator('aside, [class*="sidebar"]').locator('text=y').first();
-            // Y tiles should now be accessible
+            await page.locator('aside, [class*="sidebar"]').locator('text=y').first().waitFor();
         }
     });
 
@@ -90,7 +89,7 @@ test.describe('Algebra Tiles', () => {
 
     test('trash zone should be visible', async ({ page }) => {
         // Trash zone for deleting tiles
-        const trashZone = page.locator('[class*="trash"], [data-testid="trash-zone"]').first();
+        await page.locator('[class*="trash"], [data-testid="trash-zone"]').first().waitFor();
         // Trash zone may only be visible during drag, so just check page structure
         const pageContent = await page.content();
         expect(pageContent).toBeDefined();

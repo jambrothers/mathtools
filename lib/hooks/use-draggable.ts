@@ -33,10 +33,11 @@ export function useDraggable(
 
     // Sync visual position if external reset happens (e.g. undo)
     useEffect(() => {
-        if (!isDragging) {
+        if (!isDragging && (position.x !== initialPos.x || position.y !== initialPos.y)) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setPosition(initialPos);
         }
-    }, [initialPos.x, initialPos.y, isDragging]);
+    }, [initialPos, isDragging, position.x, position.y]);
 
     const handlePointerDown = useCallback((e: React.PointerEvent) => {
         if (options.disabled) return;

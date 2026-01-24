@@ -46,6 +46,7 @@ export function HelpModal({ content, onClose }: HelpModalProps) {
                     <Markdown
                         components={{
                             // Custom image component to ensure proper sizing
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
                             img: ({ node, ...props }) => (
                                 // eslint-disable-next-line @next/next/no-img-element
                                 <img
@@ -55,6 +56,7 @@ export function HelpModal({ content, onClose }: HelpModalProps) {
                                 />
                             ),
                             // Custom code block styling
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
                             code: ({ node, className, children, ...props }) => {
                                 const isInline = !className
                                 return isInline ? (
@@ -74,6 +76,7 @@ export function HelpModal({ content, onClose }: HelpModalProps) {
                                 )
                             },
                             // Custom pre block to avoid double-padding
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
                             pre: ({ node, ...props }) => (
                                 <pre className="bg-transparent p-0 m-0" {...props} />
                             )

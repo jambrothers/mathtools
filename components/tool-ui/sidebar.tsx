@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils"
  * </ManipulativeSidebar>
  */
 
-interface ManipulativeSidebarProps extends React.HTMLAttributes<HTMLDivElement> { }
+type ManipulativeSidebarProps = React.HTMLAttributes<HTMLDivElement>
 
 export function Sidebar({ className, children, ...props }: ManipulativeSidebarProps) {
     return (

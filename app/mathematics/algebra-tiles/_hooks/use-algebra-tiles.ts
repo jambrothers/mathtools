@@ -134,7 +134,7 @@ export function useAlgebraTiles() {
         const startY = tiles.length > 0 ? maxY + 20 : 60;
 
         // Helper to generate tiles for a side
-        const generateForSide = (terms: any, side: 'left' | 'right', baseX: number) => {
+        const generateForSide = (terms: Record<string, number[]>, side: 'left' | 'right', baseX: number) => {
             let currentY = startY;
             let currentX = baseX;
             const spacing = 10;

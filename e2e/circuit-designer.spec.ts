@@ -197,8 +197,7 @@ test.describe('Circuit Designer - Truth Table', () => {
             await page.waitForTimeout(500);
 
             // Truth table should appear (look for table or header text)
-            const truthTableContent = page.locator('table, text=Truth Table, text=Output');
-            const isVisible = await truthTableContent.first().isVisible().catch(() => false);
+            await expect(page.locator('table, text=Truth Table, text=Output').first()).toBeVisible();
             // Just checking it doesn't crash
         }
     });

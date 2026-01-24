@@ -2,11 +2,11 @@
 
 import { useState, useCallback, useRef, useEffect } from "react"
 
-interface UseHistoryOptions<T> {
+interface UseHistoryOptions {
     maxHistory?: number;
 }
 
-export function useHistory<T>(initialState: T, options: UseHistoryOptions<T> = {}) {
+export function useHistory<T>(initialState: T, options: UseHistoryOptions = {}) {
     // Current state is separate to allow for fast updates without pushing to history every frame
     const [state, setState] = useState<T>(initialState);
     const stateRef = useRef<T>(state); // Keep ref for clean access in functional tools
