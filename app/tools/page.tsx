@@ -32,6 +32,13 @@ export default function ToolsPage() {
                                 gradient="from-purple-500 to-pink-500"
                                 icon={<Calculator className="w-8 h-8 text-purple-500" />}
                             />
+                            <ToolCard
+                                title="Bar Model"
+                                description="Create and manipulate bar models to visualize mathematical relationships, with support for splitting into halves and thirds."
+                                href="/mathematics/bar-model"
+                                gradient="from-amber-500 to-orange-500"
+                                icon={<Grid2x2 className="w-8 h-8 text-amber-500" />}
+                            />
                         </div>
                     </div>
 

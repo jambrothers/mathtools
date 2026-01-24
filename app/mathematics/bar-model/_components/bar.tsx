@@ -1,0 +1,195 @@
+"use client"
+
+/**
+ * Bar component for the bar model tool.
+ *
+ * Renders an individual bar with:
+ * - Absolute positioning
+ * - Color from BAR_COLORS palette
+ * - Selection visual state
+ * - Resize handle
+ * - Editable label (double-click)
+ */
+
+import * as React from "react"
+import { Move } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { BAR_COLORS, BAR_HEIGHT, MIN_BAR_WIDTH, GRID_SIZE } from "../constants"
+import { BarData } from "../_hooks/use-bar-model"
+
+interface BarProps {
+    /** Bar data */
+    bar: BarData;
+    /** Whether this bar is selected */
+    isSelected: boolean;
+    /** Whether this bar is being dragged */
+    isDragging?: boolean;
+    /** Callback when bar is clicked/selected */
+    onSelect: (id: string, additive: boolean) => void;
+    /** Callback when bar drag starts */
+    onDragStart: (id: string, e: React.PointerEvent) => void;
+    /** Callback when bar is resized */
+    onResize: (id: string, width: number) => void;
+    /** Callback when label is updated */
+    onLabelChange: (id: string, label: string) => void;
+}
+
+export function Bar({
+    bar,
+    isSelected,
+    isDragging,
+    onSelect,
+    onDragStart,
+    onResize,
+    onLabelChange,
+}: BarProps) {
+    const [isEditing, setIsEditing] = React.useState(false);
+    const [localLabel, setLocalLabel] = React.useState(bar.label);
+    const [isResizing, setIsResizing] = React.useState(false);
+    const inputRef = React.useRef<HTMLInputElement>(null);
+    const resizeRef = React.useRef<{
+        startX: number;
+        startWidth: number;
+    } | null>(null);
+
+    const color = BAR_COLORS[bar.colorIndex] || BAR_COLORS[0];
+
+    // Sync local label with bar label when it changes externally
+    React.useEffect(() => {
+        setLocalLabel(bar.label);
+    }, [bar.label]);
+
+    // Focus input when editing
+    React.useEffect(() => {
+        if (isEditing && inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+        }
+    }, [isEditing]);
+
+    const handlePointerDown = (e: React.PointerEvent) => {
+        if (isEditing) return;
+        e.stopPropagation();
+
+        // Check if shift key for additive selection
+        onSelect(bar.id, e.shiftKey);
+        onDragStart(bar.id, e);
+    };
+
+    const handleDoubleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsEditing(true);
+    };
+
+    const handleLabelBlur = () => {
+        setIsEditing(false);
+        if (localLabel !== bar.label) {
+            onLabelChange(bar.id, localLabel);
+        }
+    };
+
+    const handleLabelKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleLabelBlur();
+        } else if (e.key === 'Escape') {
+            setLocalLabel(bar.label);
+            setIsEditing(false);
+        }
+    };
+
+    // Resize handle logic
+    const handleResizePointerDown = (e: React.PointerEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        setIsResizing(true);
+
+        resizeRef.current = {
+            startX: e.clientX,
+            startWidth: bar.width,
+        };
+    };
+
+    const handleResizePointerMove = (e: React.PointerEvent) => {
+        if (!resizeRef.current) return;
+
+        const delta = e.clientX - resizeRef.current.startX;
+        const newWidth = Math.max(MIN_BAR_WIDTH, resizeRef.current.startWidth + delta);
+        const snappedWidth = Math.round(newWidth / GRID_SIZE) * GRID_SIZE;
+        onResize(bar.id, snappedWidth);
+    };
+
+    const handleResizePointerUp = (e: React.PointerEvent) => {
+        resizeRef.current = null;
+        setIsResizing(false);
+        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    };
+
+    return (
+        <div
+            data-testid={`bar-${bar.id}`}
+            className={cn(
+                "absolute flex items-center justify-center transition-shadow",
+                "rounded-lg border-2 shadow-sm cursor-grab active:cursor-grabbing",
+                color.bg, color.border, color.text,
+                color.bgDark, color.borderDark, color.textDark,
+                isSelected && "ring-2 ring-blue-500 ring-offset-1 z-10",
+                isDragging && "opacity-80"
+            )}
+            style={{
+                left: bar.x,
+                top: bar.y,
+                width: bar.width,
+                height: BAR_HEIGHT,
+                transform: isSelected ? 'translateY(-2px)' : 'none',
+            }}
+            onPointerDown={handlePointerDown}
+            onDoubleClick={handleDoubleClick}
+        >
+            {/* Drag indicator for selected bars */}
+            {isSelected && !isEditing && (
+                <div className="absolute left-2 opacity-50">
+                    <Move size={14} />
+                </div>
+            )}
+
+            {/* Label - editable or display */}
+            {isEditing ? (
+                <input
+                    ref={inputRef}
+                    className={cn(
+                        "w-full h-full bg-transparent text-center outline-none",
+                        "font-bold text-lg",
+                        color.text, color.textDark
+                    )}
+                    value={localLabel}
+                    onChange={(e) => setLocalLabel(e.target.value)}
+                    onBlur={handleLabelBlur}
+                    onKeyDown={handleLabelKeyDown}
+                />
+            ) : (
+                <span className="font-bold text-lg pointer-events-none select-none">
+                    {bar.label}
+                </span>
+            )}
+
+            {/* Resize handle */}
+            <div
+                className="absolute right-0 top-0 bottom-0 w-4 cursor-ew-resize flex items-center justify-center hover:bg-black/10 transition-colors rounded-r"
+                onPointerDown={handleResizePointerDown}
+                onPointerMove={handleResizePointerMove}
+                onPointerUp={handleResizePointerUp}
+                onPointerCancel={handleResizePointerUp}
+            >
+                <div className="w-1 h-4 bg-black/20 rounded-full" />
+            </div>
+
+            {/* Width indicator (shown when resizing or no label) */}
+            {(!bar.label || isResizing) && (
+                <div className="absolute -bottom-6 text-[10px] text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 px-1 rounded border border-slate-200 dark:border-slate-700">
+                    {Math.round(bar.width / GRID_SIZE)} units
+                </div>
+            )}
+        </div>
+    );
+}
