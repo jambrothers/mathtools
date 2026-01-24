@@ -16,7 +16,8 @@ interface TileBaseProps extends React.HTMLAttributes<HTMLDivElement> {
     isDragging?: boolean
     /** Whether the tile is selected (applies highlight ring). */
     isSelected?: boolean
-    onMouseDown?: (e: React.MouseEvent) => void
+    /** Handler for pointer down events (supports mouse, touch, and pen). */
+    onPointerDown?: (e: React.PointerEvent) => void
 }
 
 /**
@@ -29,7 +30,7 @@ export function TileBase({
     rotation = 0,
     isDragging,
     isSelected,
-    onMouseDown,
+    onPointerDown,
     className,
     style,
     children,
@@ -51,7 +52,7 @@ export function TileBase({
                 touchAction: 'none',
                 ...style
             }} // Avoid overriding transform if possible, but here we set position
-            onMouseDown={onMouseDown}
+            onPointerDown={onPointerDown}
             {...props}
         >
             {children}

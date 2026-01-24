@@ -57,7 +57,7 @@ export const AlgebraTile = React.memo(function AlgebraTile({
     onFlip,
     onRotate
 }: AlgebraTileProps) {
-    const { position, isDragging, handleMouseDown: handleDragStart } = useDraggable(id, { x, y }, {
+    const { position, isDragging, handlePointerDown: handleDragStart } = useDraggable(id, { x, y }, {
         onDragStart,
         onDragMove,
         onDragEnd,
@@ -77,7 +77,7 @@ export const AlgebraTile = React.memo(function AlgebraTile({
     const bgClasses = `${bgColor} dark:${bgColor}`;
     const borderClasses = `${borderColor} dark:${borderColor}`;
 
-    const handleMouseDown = (e: React.MouseEvent) => {
+    const handlePointerDown = (e: React.PointerEvent) => {
         // Stop bubbling so canvas doesn't clear selection when clicking a tile
         e.stopPropagation();
         onSelect?.(id, e.shiftKey || e.metaKey);
@@ -113,7 +113,7 @@ export const AlgebraTile = React.memo(function AlgebraTile({
             position={position}
             isDragging={isDragging}
             isSelected={isSelected}
-            onMouseDown={handleMouseDown}
+            onPointerDown={handlePointerDown}
             onDoubleClick={handleDoubleClick}
             onClick={handleClick}
             className={cn(

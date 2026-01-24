@@ -52,7 +52,7 @@ function CircuitDesignerContent() {
         canvasRef,
         setTruthTable,
         setSelectedIds,
-        handleMouseDownNode,
+        handlePointerDownNode,
         toggleInput,
         startWiring,
         completeWiring,
@@ -162,7 +162,7 @@ function CircuitDesignerContent() {
                             node={node}
                             isActive={activeSimulation[node.id] ?? false}
                             isSelected={selectedIds.has(node.id)}
-                            onMouseDown={handleMouseDownNode}
+                            onPointerDown={handlePointerDownNode}
                             onClick={toggleInput}
                             onStartWiring={startWiring}
                             onCompleteWiring={completeWiring}

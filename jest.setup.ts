@@ -1,6 +1,61 @@
 import '@testing-library/jest-dom'
 import React from 'react'
 
+// Polyfill PointerEvent for JSDOM (not natively supported)
+class MockPointerEvent extends MouseEvent {
+    public readonly pointerId: number;
+    public readonly pointerType: string;
+    public readonly pressure: number;
+    public readonly width: number;
+    public readonly height: number;
+
+    constructor(type: string, props: PointerEventInit = {}) {
+        super(type, props);
+        this.pointerId = props.pointerId ?? 1;
+        this.pointerType = props.pointerType ?? 'mouse';
+        this.pressure = props.pressure ?? 0;
+        this.width = props.width ?? 1;
+        this.height = props.height ?? 1;
+    }
+}
+(global as any).PointerEvent = MockPointerEvent;
+
+// Polyfill pointer capture methods for JSDOM
+if (typeof Element !== 'undefined') {
+    Element.prototype.setPointerCapture = Element.prototype.setPointerCapture || function () { };
+    Element.prototype.releasePointerCapture = Element.prototype.releasePointerCapture || function () { };
+    Element.prototype.hasPointerCapture = Element.prototype.hasPointerCapture || function () { return false; };
+}
+
+// Polyfill DOMRect for JSDOM
+class MockDOMRect {
+    readonly x: number;
+    readonly y: number;
+    readonly width: number;
+    readonly height: number;
+    readonly top: number;
+    readonly right: number;
+    readonly bottom: number;
+    readonly left: number;
+
+    constructor(x = 0, y = 0, width = 0, height = 0) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.top = y;
+        this.right = x + width;
+        this.bottom = y + height;
+        this.left = x;
+    }
+
+    toJSON() {
+        return { x: this.x, y: this.y, width: this.width, height: this.height };
+    }
+}
+(global as any).DOMRect = MockDOMRect;
+
+
 jest.mock('next/image', () => ({
     __esModule: true,
     default: (props: any) => {

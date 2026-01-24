@@ -13,6 +13,8 @@ interface ManipulativeCanvasProps extends React.HTMLAttributes<HTMLDivElement> {
 /**
  * A canvas component that supports drag-based marquee selection and grid background.
  * ForwardRef exposes the underlying div element.
+ * 
+ * Uses pointer events for touch/pen compatibility.
  */
 export const Canvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
     ({ className, gridSize, children, onSelectionEnd, onClick, ...props }, ref) => {
@@ -23,7 +25,7 @@ export const Canvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
         // Merge refs
         React.useImperativeHandle(ref, () => internalRef.current as HTMLDivElement)
 
-        const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
             // Only start marquee if clicking directly on canvas (not on children)
             if (e.target !== internalRef.current && e.target !== e.currentTarget) return;
 
@@ -38,7 +40,7 @@ export const Canvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
 
         // Track movement for marquee selection box resize
 
-        const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
             if (!selectionBox) return;
             const rect = internalRef.current?.getBoundingClientRect();
             if (!rect) return;
@@ -49,7 +51,7 @@ export const Canvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
             setSelectionBox(prev => prev ? { ...prev, current: { x, y } } : null);
         };
 
-        const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+        const handlePointerUp = () => {
             if (selectionBox && onSelectionEnd) {
                 // Calculate rect
                 const x = Math.min(selectionBox.start.x, selectionBox.current.x);
@@ -84,10 +86,11 @@ export const Canvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
                     "relative flex-1 bg-slate-50 dark:bg-slate-950 overflow-hidden touch-none select-none",
                     className
                 )}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={() => setSelectionBox(null)}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerLeave={() => setSelectionBox(null)}
+                onPointerCancel={() => setSelectionBox(null)}
                 onClick={handleContainerClick}
                 {...props}
             >

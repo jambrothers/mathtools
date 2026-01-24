@@ -38,7 +38,7 @@ export function DraggableCounter({
     const clickTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
     const doubleClickedAtRef = React.useRef<number>(0)
 
-    const { position, isDragging, handleMouseDown } = useDraggable(
+    const { position, isDragging, handlePointerDown } = useDraggable(
         String(counter.id),
         { x: counter.x, y: counter.y },
         {
@@ -106,9 +106,9 @@ export function DraggableCounter({
         }
     }
 
-    const handleMouseDownWrapper = (e: React.MouseEvent) => {
+    const handlePointerDownWrapper = (e: React.PointerEvent) => {
         didDragRef.current = false
-        handleMouseDown(e)
+        handlePointerDown(e)
     }
 
     // Separate transition for entering/leaving vs dragging
@@ -124,7 +124,7 @@ export function DraggableCounter({
             data-testid="counter"
             onClick={handleClick}
             onDoubleClick={handleDoubleClick}
-            onMouseDown={handleMouseDownWrapper}
+            onPointerDown={handlePointerDownWrapper}
             className={`
                 absolute w-16 h-16 md:w-20 md:h-20 rounded-full shadow-lg border-4 
                 flex items-center justify-center text-3xl font-bold 

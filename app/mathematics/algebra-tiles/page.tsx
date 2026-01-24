@@ -162,6 +162,36 @@ function AlgebraTilesPageContent() {
         }
     }, [addTile, snapToGrid]);
 
+    /**
+     * Handle touch-drop from sidebar (custom event for touch/pen devices).
+     */
+    const handleTouchDrop = useCallback((e: Event) => {
+        const customEvent = e as CustomEvent<{ dragData: { type: string; value: number }; clientX: number; clientY: number }>;
+        const { dragData, clientX, clientY } = customEvent.detail;
+
+        if (!canvasRef.current) return;
+
+        const canvasRect = canvasRef.current.getBoundingClientRect();
+        let x = clientX - canvasRect.left;
+        let y = clientY - canvasRect.top;
+
+        if (snapToGrid) {
+            x = Math.round(x / 50) * 50;
+            y = Math.round(y / 50) * 50;
+        }
+
+        addTile(dragData.type, dragData.value, x, y);
+    }, [addTile, snapToGrid]);
+
+    // Register touchdrop listener on canvas
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        canvas.addEventListener('touchdrop', handleTouchDrop);
+        return () => canvas.removeEventListener('touchdrop', handleTouchDrop);
+    }, [handleTouchDrop]);
+
     const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'copy';

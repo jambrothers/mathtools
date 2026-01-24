@@ -9,10 +9,10 @@ interface CircuitNodeProps {
     node: CircuitNodeType
     isActive: boolean
     isSelected?: boolean
-    onMouseDown: (e: React.MouseEvent<HTMLDivElement>, id: string) => void
-    onClick: (e: React.MouseEvent<HTMLDivElement>, id: string) => void
-    onStartWiring: (e: React.MouseEvent<HTMLDivElement>, nodeId: string) => void
-    onCompleteWiring: (e: React.MouseEvent<HTMLDivElement>, targetNodeId: string, inputIndex: number) => void
+    onPointerDown: (e: React.PointerEvent<HTMLDivElement>, id: string) => void
+    onClick: (e: React.PointerEvent<HTMLDivElement>, id: string) => void
+    onStartWiring: (e: React.PointerEvent<HTMLDivElement>, nodeId: string) => void
+    onCompleteWiring: (e: React.PointerEvent<HTMLDivElement>, targetNodeId: string, inputIndex: number) => void
 }
 
 /**
@@ -23,7 +23,7 @@ export function CircuitNodeComponent({
     node,
     isActive,
     isSelected,
-    onMouseDown,
+    onPointerDown,
     onClick,
     onStartWiring,
     onCompleteWiring
@@ -56,7 +56,7 @@ export function CircuitNodeComponent({
                         key={`in-${i}`}
                         className="absolute w-4 h-4 bg-blue-400 rounded-full border-2 border-white dark:border-slate-900 hover:bg-blue-300 hover:scale-125 transition-all cursor-pointer z-20 shadow-sm"
                         style={{ left: `calc(50% + ${pos.x}px)`, top: `calc(50% + ${pos.y}px)`, transform: 'translate(-50%, -50%)' }}
-                        onMouseUp={(e) => onCompleteWiring(e, node.id, i)}
+                        onPointerUp={(e) => onCompleteWiring(e, node.id, i)}
                         title="Input"
                     />
                 );
@@ -67,7 +67,7 @@ export function CircuitNodeComponent({
                 <div
                     className="absolute w-4 h-4 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900 hover:bg-emerald-300 hover:scale-125 transition-all cursor-pointer z-20 shadow-sm"
                     style={{ left: `calc(50% + ${getPortPosition(node.type, 'output', 0).x}px)`, top: `calc(50% + ${getPortPosition(node.type, 'output', 0).y}px)`, transform: 'translate(-50%, -50%)' }}
-                    onMouseDown={(e) => onStartWiring(e, node.id)}
+                    onPointerDown={(e) => onStartWiring(e, node.id)}
                     title="Output (drag to connect)"
                 />
             )}
@@ -75,8 +75,8 @@ export function CircuitNodeComponent({
             {/* Main Node Body */}
             <div
                 className="relative cursor-move"
-                onMouseDown={(e) => onMouseDown(e, node.id)}
-                onClick={(e) => node.type === 'INPUT' ? onClick(e, node.id) : undefined}
+                onPointerDown={(e) => onPointerDown(e, node.id)}
+                onClick={(e) => node.type === 'INPUT' ? onClick(e as unknown as React.PointerEvent<HTMLDivElement>, node.id) : undefined}
             >
                 {def.render(isActive ?? false)}
             </div>

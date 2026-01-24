@@ -171,6 +171,33 @@ function CountersPageContent() {
         }
     }, [addCounterAtPosition]);
 
+    /**
+     * Handle touch-drop from sidebar (custom event for touch/pen devices).
+     * Similar to handleDropOnCanvas but uses custom event detail.
+     */
+    const handleTouchDrop = useCallback((e: Event) => {
+        const customEvent = e as CustomEvent<{ dragData: { type: string; value: number }; clientX: number; clientY: number }>;
+        const { dragData, clientX, clientY } = customEvent.detail;
+
+        if (dragData.type === 'counter' && typeof dragData.value === 'number') {
+            if (canvasRef.current) {
+                const rect = canvasRef.current.getBoundingClientRect();
+                const x = clientX - rect.left;
+                const y = clientY - rect.top;
+                addCounterAtPosition(dragData.value, x, y);
+            }
+        }
+    }, [addCounterAtPosition]);
+
+    // Register touchdrop listener on canvas
+    React.useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        canvas.addEventListener('touchdrop', handleTouchDrop);
+        return () => canvas.removeEventListener('touchdrop', handleTouchDrop);
+    }, [handleTouchDrop]);
+
     const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'copy';

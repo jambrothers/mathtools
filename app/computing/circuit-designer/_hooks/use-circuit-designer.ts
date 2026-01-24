@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, MouseEvent } from 'react';
+import { useState, useRef, useEffect, useCallback, PointerEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
     CircuitNode,
@@ -103,7 +103,7 @@ export function useCircuitDesigner() {
 
     // -- Event Handlers --
 
-    const handleMouseDownNode = (e: MouseEvent<HTMLDivElement>, id: string) => {
+    const handlePointerDownNode = (e: PointerEvent<HTMLDivElement>, id: string) => {
         e.stopPropagation();
 
         let newSelected = new Set(selectedIds);
@@ -151,7 +151,7 @@ export function useCircuitDesigner() {
     useEffect(() => {
         if (!dragging && !wiring) return;
 
-        const handleWindowMouseMove = (e: globalThis.MouseEvent) => {
+        const handleWindowPointerMove = (e: globalThis.PointerEvent) => {
             if (!canvasRef.current) return;
             const rect = canvasRef.current.getBoundingClientRect();
             const x = e.clientX - rect.left;
@@ -197,7 +197,7 @@ export function useCircuitDesigner() {
             }
         };
 
-        const handleWindowMouseUp = () => {
+        const handleWindowPointerUp = () => {
             // Trash Detection & Deletion
             if (isTrashHovered && dragging) {
                 // Delete all selected nodes AND the dragged node (if not selected)
@@ -216,16 +216,16 @@ export function useCircuitDesigner() {
             setWiring(null);
         };
 
-        window.addEventListener('mousemove', handleWindowMouseMove);
-        window.addEventListener('mouseup', handleWindowMouseUp);
+        window.addEventListener('pointermove', handleWindowPointerMove);
+        window.addEventListener('pointerup', handleWindowPointerUp);
 
         return () => {
-            window.removeEventListener('mousemove', handleWindowMouseMove);
-            window.removeEventListener('mouseup', handleWindowMouseUp);
+            window.removeEventListener('pointermove', handleWindowPointerMove);
+            window.removeEventListener('pointerup', handleWindowPointerUp);
         };
     }, [dragging, wiring, isTrashHovered, selectedIds, nodes, connections]); // dependencies updated to be safe
 
-    const toggleInput = (e: MouseEvent<HTMLDivElement>, id: string) => {
+    const toggleInput = (e: PointerEvent<HTMLDivElement>, id: string) => {
         // Don't toggle if we just finished dragging
         if (hasDraggedRef.current) {
             hasDraggedRef.current = false;
@@ -235,12 +235,12 @@ export function useCircuitDesigner() {
         setNodes(prev => prev.map(n => n.id === id ? { ...n, state: !n.state } : n));
     };
 
-    const startWiring = (e: MouseEvent<HTMLDivElement>, nodeId: string) => {
+    const startWiring = (e: PointerEvent<HTMLDivElement>, nodeId: string) => {
         e.stopPropagation();
         setWiring({ nodeId, portType: 'output' });
     };
 
-    const completeWiring = (e: MouseEvent<HTMLDivElement>, targetNodeId: string, inputIndex: number) => {
+    const completeWiring = (e: PointerEvent<HTMLDivElement>, targetNodeId: string, inputIndex: number) => {
         e.stopPropagation();
         if (!wiring) return;
         if (wiring.nodeId === targetNodeId) return;
@@ -444,7 +444,7 @@ export function useCircuitDesigner() {
         setSelectedIds,
 
         // Handlers
-        handleMouseDownNode,
+        handlePointerDownNode,
         toggleInput,
         startWiring,
         completeWiring,

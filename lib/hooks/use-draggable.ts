@@ -26,10 +26,10 @@ export function useDraggable(
     const [isDragging, setIsDragging] = useState(false);
 
     // Internal state for drag detection
-    const [isMouseDown, setIsMouseDown] = useState(false);
-    const [dragStartMouse, setDragStartMouse] = useState<Position | null>(null);
+    const [isPointerDown, setIsPointerDown] = useState(false);
+    const [dragStartPointer, setDragStartPointer] = useState<Position | null>(null);
     const [startPos, setStartPos] = useState<Position | null>(null);
-    const prevMouseRef = React.useRef<Position | null>(null);
+    const prevPointerRef = React.useRef<Position | null>(null);
 
     // Sync visual position if external reset happens (e.g. undo)
     useEffect(() => {
@@ -38,28 +38,31 @@ export function useDraggable(
         }
     }, [initialPos.x, initialPos.y, isDragging]);
 
-    const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    const handlePointerDown = useCallback((e: React.PointerEvent) => {
         if (options.disabled) return;
 
-        setIsMouseDown(true);
+        // Capture pointer for reliable tracking across element boundaries
+        e.currentTarget.setPointerCapture(e.pointerId);
+
+        setIsPointerDown(true);
         setStartPos(position);
-        setDragStartMouse({ x: e.clientX, y: e.clientY });
-        prevMouseRef.current = { x: e.clientX, y: e.clientY };
+        setDragStartPointer({ x: e.clientX, y: e.clientY });
+        prevPointerRef.current = { x: e.clientX, y: e.clientY };
 
         // Do NOT set isDragging yet, wait for threshold
     }, [position, options]);
 
     useEffect(() => {
-        if (!isMouseDown || !startPos || !dragStartMouse) return;
+        if (!isPointerDown || !startPos || !dragStartPointer) return;
 
-        const handleMouseMove = (e: MouseEvent) => {
+        const handlePointerMove = (e: PointerEvent) => {
             const scale = options.scale || 1;
 
             // Check threshold if not yet dragging
             if (!isDragging) {
                 const dist = Math.sqrt(
-                    Math.pow(e.clientX - dragStartMouse.x, 2) +
-                    Math.pow(e.clientY - dragStartMouse.y, 2)
+                    Math.pow(e.clientX - dragStartPointer.x, 2) +
+                    Math.pow(e.clientY - dragStartPointer.y, 2)
                 );
 
                 if (dist < threshold) return; // Ignore movements below threshold
@@ -70,13 +73,13 @@ export function useDraggable(
             }
 
             // Calculate incremental delta for external consumers
-            const movementX = (e.clientX - (prevMouseRef.current?.x || dragStartMouse.x)) / scale;
-            const movementY = (e.clientY - (prevMouseRef.current?.y || dragStartMouse.y)) / scale;
-            prevMouseRef.current = { x: e.clientX, y: e.clientY };
+            const movementX = (e.clientX - (prevPointerRef.current?.x || dragStartPointer.x)) / scale;
+            const movementY = (e.clientY - (prevPointerRef.current?.y || dragStartPointer.y)) / scale;
+            prevPointerRef.current = { x: e.clientX, y: e.clientY };
 
             // Calculate total displacement for local position
-            const dx = (e.clientX - dragStartMouse.x) / scale;
-            const dy = (e.clientY - dragStartMouse.y) / scale;
+            const dx = (e.clientX - dragStartPointer.x) / scale;
+            const dy = (e.clientY - dragStartPointer.y) / scale;
 
             let newX = startPos.x + dx;
             let newY = startPos.y + dy;
@@ -92,30 +95,36 @@ export function useDraggable(
             options.onDragMove?.(id, newPos, { x: movementX, y: movementY });
         };
 
-        const handleMouseUp = (e: MouseEvent) => {
+        const handlePointerUp = () => {
             if (isDragging) {
                 options.onDragEnd?.(id, position);
             }
 
-            setIsMouseDown(false);
+            setIsPointerDown(false);
             setIsDragging(false);
             setStartPos(null);
-            setDragStartMouse(null);
-            prevMouseRef.current = null;
+            setDragStartPointer(null);
+            prevPointerRef.current = null;
         };
 
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
+        window.addEventListener('pointermove', handlePointerMove);
+        window.addEventListener('pointerup', handlePointerUp);
+        // Also listen to pointercancel for touch interruptions
+        window.addEventListener('pointercancel', handlePointerUp);
 
         return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
+            window.removeEventListener('pointermove', handlePointerMove);
+            window.removeEventListener('pointerup', handlePointerUp);
+            window.removeEventListener('pointercancel', handlePointerUp);
         };
-    }, [isMouseDown, isDragging, startPos, dragStartMouse, id, options, position, threshold]);
+    }, [isPointerDown, isDragging, startPos, dragStartPointer, id, options, position, threshold]);
 
+    // Keep backwards-compatible alias for handleMouseDown during migration
     return {
         position,
         isDragging,
-        handleMouseDown
+        handlePointerDown,
+        /** @deprecated Use handlePointerDown instead */
+        handleMouseDown: handlePointerDown as unknown as (e: React.MouseEvent) => void
     };
 }
