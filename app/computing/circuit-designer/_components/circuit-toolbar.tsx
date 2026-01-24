@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Eraser, Table } from "lucide-react"
+import { Eraser, Table, Undo2 } from "lucide-react"
 import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator } from "@/components/tool-ui/toolbar"
 import { CopyLinkButton } from "@/components/tool-ui/copy-link-button"
 
@@ -10,6 +10,8 @@ interface CircuitToolbarProps {
     onGenerateTruthTable: () => void
     onLoadDemo: (type: 'AND' | 'OR' | 'NOT' | 'XOR') => void
     onCopyLink: () => void
+    onUndo?: () => void
+    canUndo?: boolean
 }
 
 /**
@@ -20,7 +22,9 @@ export function CircuitToolbar({
     onClear,
     onGenerateTruthTable,
     onLoadDemo,
-    onCopyLink
+    onCopyLink,
+    onUndo,
+    canUndo = false
 }: CircuitToolbarProps) {
     return (
         <Toolbar>
@@ -62,6 +66,17 @@ export function CircuitToolbar({
                         label="Generate Truth Table"
                         variant="success"
                         onClick={onGenerateTruthTable}
+                    />
+                </ToolbarGroup>
+
+                <ToolbarSeparator />
+
+                <ToolbarGroup>
+                    <ToolbarButton
+                        icon={<Undo2 size={16} />}
+                        label="Undo"
+                        onClick={onUndo}
+                        disabled={!canUndo || !onUndo}
                     />
                 </ToolbarGroup>
 

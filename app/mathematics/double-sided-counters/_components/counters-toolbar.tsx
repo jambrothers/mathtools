@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Eye, EyeOff, Trash2, RefreshCw, ArrowUpDown, Timer } from "lucide-react"
+import { Eye, EyeOff, Trash2, RefreshCw, ArrowUpDown, Timer, Undo } from "lucide-react"
 import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator, ToolbarInput } from "@/components/tool-ui/toolbar"
 import { CopyLinkButton } from "@/components/tool-ui/copy-link-button"
 import { CounterTypeSelect } from "./counter-type-select"
@@ -27,6 +27,10 @@ interface CountersToolbarProps {
     // Counter Type
     counterType: CounterType
     onCounterTypeChange: (type: CounterType) => void
+
+    // Undo
+    onUndo: () => void
+    canUndo: boolean
 }
 
 export function CountersToolbar({
@@ -40,7 +44,8 @@ export function CountersToolbar({
     onAddExpression,
     onGenerateLink,
     isSequentialMode, setIsSequentialMode,
-    counterType, onCounterTypeChange
+    counterType, onCounterTypeChange,
+    onUndo, canUndo
 }: CountersToolbarProps) {
     const [input, setInput] = React.useState("")
 
@@ -80,6 +85,17 @@ export function CountersToolbar({
                         label="Stats"
                         active={showStats}
                         onClick={() => setShowStats(!showStats)}
+                    />
+                </ToolbarGroup>
+
+                <ToolbarSeparator />
+
+                <ToolbarGroup>
+                    <ToolbarButton
+                        icon={<Undo size={16} />}
+                        label="Undo"
+                        onClick={onUndo}
+                        disabled={!canUndo || isAnimating}
                     />
                 </ToolbarGroup>
 

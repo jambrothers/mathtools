@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback, PointerEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useHistory } from '@/lib/hooks/use-history';
 import {
     CircuitNode,
     Connection,
@@ -21,8 +22,23 @@ export function useCircuitDesigner() {
     const searchParams = useSearchParams();
 
     // -- State --
-    const [nodes, setNodes] = useState<CircuitNode[]>(DEFAULT_NODES);
-    const [connections, setConnections] = useState<Connection[]>(DEFAULT_CONNECTIONS);
+    // -- State --
+    const {
+        state: circuitState,
+        pushState,
+        updateState,
+        undo,
+        redo,
+        canUndo,
+        canRedo,
+        clearHistory
+    } = useHistory<{ nodes: CircuitNode[], connections: Connection[] }>({
+        nodes: DEFAULT_NODES,
+        connections: DEFAULT_CONNECTIONS
+    });
+
+    const { nodes, connections } = circuitState;
+
     const [dragging, setDragging] = useState<DragState | null>(null);
     const [wiring, setWiring] = useState<WiringState | null>(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -38,6 +54,7 @@ export function useCircuitDesigner() {
     const trashRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLDivElement>(null);
     const hasDraggedRef = useRef(false);
+    const dragStartNodesRef = useRef<CircuitNode[]>([]); // To support undoing drags
 
     // -- Initialization --
     useEffect(() => {
@@ -45,10 +62,13 @@ export function useCircuitDesigner() {
 
         const restored = circuitURLSerializer.deserialize(searchParams);
         if (restored) {
-            setNodes(restored.nodes);
-            setConnections(restored.connections);
+            pushState({
+                nodes: restored.nodes,
+                connections: restored.connections
+            });
+            clearHistory(); // Clear history after loading from URL
         }
-    }, [searchParams]);
+    }, [searchParams, pushState, clearHistory]);
 
     // -- Simulation --
     // Topological simulation - propagates signals through the circuit.
@@ -128,6 +148,9 @@ export function useCircuitDesigner() {
         const node = nodes.find(n => n.id === id);
         if (!node) return;
 
+        // Capture start nodes for undo
+        dragStartNodesRef.current = nodes;
+
         // Capture start positions of ALL selected nodes for group drag
         const nodeStartPositions: Record<string, { x: number; y: number }> = {};
         nodes.forEach(n => {
@@ -163,19 +186,22 @@ export function useCircuitDesigner() {
                 const dy = e.clientY - dragging.startY;
 
                 // Move all nodes that have stored start positions
-                setNodes(prev => prev.map(n => {
-                    const startPos = dragging.nodeStartPositions![n.id];
-                    if (startPos) {
-                        let newX = startPos.x + dx;
-                        let newY = startPos.y + dy;
+                updateState(prev => ({
+                    ...prev,
+                    nodes: prev.nodes.map(n => {
+                        const startPos = dragging.nodeStartPositions![n.id];
+                        if (startPos) {
+                            let newX = startPos.x + dx;
+                            let newY = startPos.y + dy;
 
-                        // Snap to grid
-                        newX = Math.round(newX / SNAP_GRID) * SNAP_GRID;
-                        newY = Math.round(newY / SNAP_GRID) * SNAP_GRID;
+                            // Snap to grid
+                            newX = Math.round(newX / SNAP_GRID) * SNAP_GRID;
+                            newY = Math.round(newY / SNAP_GRID) * SNAP_GRID;
 
-                        return { ...n, x: newX, y: newY };
-                    }
-                    return n;
+                            return { ...n, x: newX, y: newY };
+                        }
+                        return n;
+                    })
                 }));
 
                 // Mark as actually dragged if moved more than 5px
@@ -204,12 +230,23 @@ export function useCircuitDesigner() {
                 const idsToDelete = new Set(selectedIds);
                 idsToDelete.add(dragging.id);
 
-                setNodes(prev => prev.filter(n => !idsToDelete.has(n.id)));
-                setConnections(prev => prev.filter(c => !idsToDelete.has(c.from) && !idsToDelete.has(c.to)));
+                pushState(prev => ({
+                    nodes: prev.nodes.filter(n => !idsToDelete.has(n.id)),
+                    connections: prev.connections.filter(c => !idsToDelete.has(c.from) && !idsToDelete.has(c.to))
+                }));
 
                 // Clear selection
                 setSelectedIds(new Set());
                 setIsTrashHovered(false);
+            }
+            // If just finished dragging without deletion, commit the drag to history
+            else if (dragging && hasDraggedRef.current) {
+                // Push the current state (which has final positions) to history
+                // Provide the state BEFORE drag as the undo restore point
+                pushState(
+                    { nodes, connections }, // Current state is the "new" state
+                    { nodes: dragStartNodesRef.current, connections } // Previous state was nodes at start + SAME connections
+                );
             }
 
             setDragging(null);
@@ -232,7 +269,10 @@ export function useCircuitDesigner() {
             return;
         }
         e.stopPropagation();
-        setNodes(prev => prev.map(n => n.id === id ? { ...n, state: !n.state } : n));
+        pushState(prev => ({
+            ...prev,
+            nodes: prev.nodes.map(n => n.id === id ? { ...n, state: !n.state } : n)
+        }));
     };
 
     const startWiring = (e: PointerEvent<HTMLDivElement>, nodeId: string) => {
@@ -248,16 +288,20 @@ export function useCircuitDesigner() {
         // Remove existing connection to this specific input port
         const cleanConnections = connections.filter(c => !(c.to === targetNodeId && c.inputIndex === inputIndex));
 
-        setConnections([
-            ...cleanConnections,
-            {
-                id: generateId(),
-                from: wiring.nodeId,
-                to: targetNodeId,
-                inputIndex
-            }
-        ]);
         setWiring(null);
+
+        pushState(prev => ({
+            ...prev,
+            connections: [
+                ...cleanConnections,
+                {
+                    id: generateId(),
+                    from: wiring.nodeId,
+                    to: targetNodeId,
+                    inputIndex
+                }
+            ]
+        }));
     };
 
     const getNextSwitchLabel = (currentNodes: CircuitNode[]): string => {
@@ -271,6 +315,7 @@ export function useCircuitDesigner() {
     };
 
     const addNode = (type: ComponentTypeName) => {
+        console.log(`[DEBUG] addNode called with type: ${type}`);
         const id = generateId();
         const offset = (nodes.length % 10) * 20;
 
@@ -283,21 +328,55 @@ export function useCircuitDesigner() {
             label = type;
         }
 
-        setNodes([...nodes, {
-            id,
-            type,
-            x: 200 + offset,
-            y: 150 + offset,
-            state: false,
-            label
-        }]);
+        pushState(prev => ({
+            ...prev,
+            nodes: [...prev.nodes, {
+                id,
+                type,
+                x: 200 + offset,
+                y: 150 + offset,
+                state: false,
+                label
+            }]
+        }));
+    };
+
+    const addNodeAtPosition = (type: ComponentTypeName, x: number, y: number) => {
+        const id = generateId();
+
+        // Label logic duplicated from addNode (could be extracted)
+        let label: string;
+        if (type === 'INPUT') {
+            label = getNextSwitchLabel(nodes);
+        } else if (type === 'OUTPUT') {
+            label = `Out ${nodes.filter(n => n.type === 'OUTPUT').length + 1}`;
+        } else {
+            label = type;
+        }
+
+        const snappedX = Math.round(x / SNAP_GRID) * SNAP_GRID;
+        const snappedY = Math.round(y / SNAP_GRID) * SNAP_GRID;
+
+        pushState(prev => ({
+            ...prev,
+            nodes: [...prev.nodes, {
+                id,
+                type,
+                x: snappedX,
+                y: snappedY,
+                state: false,
+                label
+            }]
+        }));
     };
 
     const clearCanvas = () => setShowClearConfirm(true);
 
     const confirmClear = () => {
-        setNodes([]);
-        setConnections([]);
+        pushState({
+            nodes: [],
+            connections: []
+        });
         setSelectedIds(new Set());
         setShowClearConfirm(false);
     };
@@ -367,8 +446,6 @@ export function useCircuitDesigner() {
     };
 
     const loadDemo = (type: 'AND' | 'OR' | 'NOT' | 'XOR') => {
-        setNodes([]);
-        setConnections([]);
         setSelectedIds(new Set());
         setWiring(null);
 
@@ -404,8 +481,11 @@ export function useCircuitDesigner() {
             );
         }
 
-        setNodes(newNodes);
-        setConnections(newConnections);
+        // Create new state object
+        pushState({
+            nodes: newNodes,
+            connections: newConnections
+        });
     };
 
     const handleCopyLink = async () => {
@@ -449,6 +529,7 @@ export function useCircuitDesigner() {
         startWiring,
         completeWiring,
         addNode,
+        addNodeAtPosition,
         clearCanvas,
         confirmClear,
         cancelClear,
@@ -456,6 +537,12 @@ export function useCircuitDesigner() {
         generateTruthTable,
         loadDemo,
         handleCopyLink,
-        getWiringSourceNode
+        getWiringSourceNode,
+
+        // History
+        undo,
+        redo,
+        canUndo,
+        canRedo
     };
 }

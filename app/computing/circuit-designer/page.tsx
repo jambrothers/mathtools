@@ -1,6 +1,6 @@
 "use client"
 
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { SetPageTitle } from "@/components/set-page-title";
 import { ConfirmationModal } from './_components/confirmation-modal';
 import { Canvas } from '@/components/tool-ui/canvas';
@@ -57,15 +57,73 @@ function CircuitDesignerContent() {
         startWiring,
         completeWiring,
         addNode,
-        clearCanvas,
+        addNodeAtPosition,
         confirmClear,
-        cancelClear,
         handleMarqueeSelect,
         generateTruthTable,
         loadDemo,
         handleCopyLink,
-        getWiringSourceNode
+        getWiringSourceNode,
+        undo,
+        canUndo
     } = useCircuitDesigner();
+
+    // Drop Handlers
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        const data = e.dataTransfer.getData('application/json');
+        if (!data) return;
+
+        try {
+            const parsed = JSON.parse(data);
+            if (parsed.type === 'circuit-component' && canvasRef.current) {
+                const rect = canvasRef.current.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                addNodeAtPosition(parsed.componentType, x, y);
+            }
+        } catch (err) {
+            console.error('Failed to parse drag data', err);
+        }
+    };
+
+    // Touch Support for DnD
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const handleTouchDrop = (e: any) => {
+            const { dragData, clientX, clientY } = e.detail;
+            if (dragData?.type === 'circuit-component') {
+                const rect = canvas.getBoundingClientRect();
+                const x = clientX - rect.left;
+                const y = clientY - rect.top;
+                addNodeAtPosition(dragData.componentType, x, y);
+            }
+        };
+
+        canvas.addEventListener('touchdrop', handleTouchDrop);
+        return () => canvas.removeEventListener('touchdrop', handleTouchDrop);
+    }, [addNodeAtPosition]);
+
+    // Keyboard shortcut for undo (Ctrl+Z / Cmd+Z)
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                if (canUndo) {
+                    undo();
+                }
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [canUndo, undo]);
 
     const [showHelp, setShowHelp] = useState(false);
 
@@ -76,11 +134,14 @@ function CircuitDesignerContent() {
             <SetPageTitle title="Circuit Designer" />
 
             {/* Toolbar */}
+            {/* Toolbar */}
             <CircuitToolbar
-                onClear={clearCanvas}
+                onClear={confirmClear}
                 onGenerateTruthTable={generateTruthTable}
                 onLoadDemo={loadDemo}
                 onCopyLink={handleCopyLink}
+                onUndo={undo}
+                canUndo={canUndo}
             />
 
             {/* Main Workspace */}
@@ -91,9 +152,12 @@ function CircuitDesignerContent() {
                 {/* Canvas Area */}
                 <Canvas
                     ref={canvasRef}
+                    data-testid="canvas"
                     className="flex-1 relative bg-slate-50 dark:bg-slate-950 overflow-hidden cursor-crosshair"
                     onClick={() => setSelectedIds(new Set())}
                     onSelectionEnd={handleMarqueeSelect}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
                 >
 
                     {/* Grid Background */}
@@ -185,16 +249,7 @@ function CircuitDesignerContent() {
                 />
             )}
 
-            {/* Clear Confirmation Modal */}
-            {showClearConfirm && (
-                <ConfirmationModal
-                    title="Clear Circuit?"
-                    message="This will remove all components and connections from the canvas. This action cannot be undone."
-                    confirmLabel="Clear Everything"
-                    onConfirm={confirmClear}
-                    onCancel={cancelClear}
-                />
-            )}
+
 
             {/* Help Modal */}
             {showHelp && (

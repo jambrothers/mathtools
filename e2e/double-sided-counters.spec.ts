@@ -226,4 +226,47 @@ test.describe('Double Sided Counters - Counter Interactions', () => {
         // Board should be empty after canceling the zero pair
         await expect(page.locator('text=The board is empty')).toBeVisible();
     });
+
+    test('Undo button should revert the last action', async ({ page }) => {
+        await page.goto(BASE_URL);
+        await page.waitForSelector('text=The board is empty');
+
+        // Add a counter
+        await page.click('text=Add +1');
+        await page.waitForTimeout(300);
+        await expect(page.locator('[data-testid="counter"]')).toHaveCount(1);
+
+        // Click Undo
+        await page.click('button:has-text("Undo")');
+        await page.waitForTimeout(300);
+
+        // Board should be empty again
+        await expect(page.locator('text=The board is empty')).toBeVisible();
+    });
+
+    test('Ctrl+Z should trigger undo', async ({ page }) => {
+        await page.goto(BASE_URL);
+        await page.waitForSelector('text=The board is empty');
+
+        // Add a counter
+        await page.click('text=Add +1');
+        await page.waitForTimeout(300);
+        await expect(page.locator('[data-testid="counter"]')).toHaveCount(1);
+
+        // Press Ctrl+Z
+        await page.keyboard.press('Control+z');
+        await page.waitForTimeout(300);
+
+        // Board should be empty again
+        await expect(page.locator('text=The board is empty')).toBeVisible();
+    });
+
+    test('Undo button should be disabled when there is nothing to undo', async ({ page }) => {
+        await page.goto(BASE_URL);
+        await page.waitForSelector('text=The board is empty');
+
+        // Undo button should be disabled
+        const undoButton = page.locator('button:has-text("Undo")');
+        await expect(undoButton).toBeDisabled();
+    });
 });

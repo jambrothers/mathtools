@@ -37,12 +37,20 @@ export function useHistory<T>(initialState: T, options: UseHistoryOptions<T> = {
             }
             return newPast;
         });
+        // Sync ref IMMEDIATELY before setState so subsequent calls in same cycle work
+        stateRef.current = newState;
         setState(newState);
         setFuture([]); // Clear future on new action
     }, [maxHistory]);
 
-    // Update state WITHOUT pushing to history (e.g. during drag)
-    const updateState = useCallback((newState: T) => {
+    // Update state WITHOUT pushing to history (e.g. during drag, animation cleanup)
+    // Supports both direct values and functional updates
+    const updateState = useCallback((newStateOrFn: T | ((prev: T) => T)) => {
+        const newState = typeof newStateOrFn === 'function'
+            ? (newStateOrFn as (prev: T) => T)(stateRef.current)
+            : newStateOrFn;
+        // Sync ref immediately
+        stateRef.current = newState;
         setState(newState);
     }, []);
 

@@ -67,7 +67,9 @@ function CountersPageContent() {
         clearBoard,
         animSpeed,
         setAnimSpeed,
-        setCountersFromState
+        setCountersFromState,
+        undo,
+        canUndo
     } = useCounters();
 
     const searchParams = useSearchParams();
@@ -203,6 +205,20 @@ function CountersPageContent() {
         e.dataTransfer.dropEffect = 'copy';
     }, []);
 
+    // Keyboard shortcut for undo (Ctrl+Z / Cmd+Z)
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                if (canUndo && !isAnimating) {
+                    undo();
+                }
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [canUndo, isAnimating, undo]);
+
     return (
         <div className="flex flex-col h-[calc(100vh-81px)] w-full bg-slate-50 dark:bg-slate-950 overflow-hidden">
             <SetPageTitle title="Double Sided Counters" />
@@ -224,6 +240,8 @@ function CountersPageContent() {
                 onGenerateLink={handleGenerateLink}
                 counterType={counterType}
                 onCounterTypeChange={setCounterType}
+                onUndo={undo}
+                canUndo={canUndo}
             />
 
             <div className="flex flex-1 overflow-hidden relative">

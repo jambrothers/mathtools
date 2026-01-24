@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { useHistory } from '@/lib/hooks/use-history';
 
 export interface Counter {
     id: number;
@@ -61,7 +62,16 @@ function countByType(counters: Counter[], type: 'positive' | 'negative'): number
 }
 
 export function useCounters() {
-    const [counters, setCounters] = useState<Counter[]>([]);
+    // Use history for undo support
+    const {
+        state: counters,
+        pushState: pushCounters,
+        updateState: updateCountersImmediate,
+        undo,
+        canUndo,
+        clearHistory
+    } = useHistory<Counter[]>([]);
+
     const [sortState, setSortState] = useState<SortState>('none');
     const [isOrdered, setIsOrdered] = useState(true);
 
@@ -97,7 +107,7 @@ export function useCounters() {
     const addCounter = useCallback((value: number, count = 1, showNumberLine = false) => {
         // Instant Add (if Number Line hidden or just simple add)
         if (!showNumberLine) {
-            setCounters(prev => {
+            pushCounters((prev: Counter[]) => {
                 const newCounters: Counter[] = [];
                 // Count existing counters of this type to determine position in row
                 const existingCount = countByType(prev, value > 0 ? 'positive' : 'negative');
@@ -116,7 +126,7 @@ export function useCounters() {
             });
 
             const tId = setTimeout(() => {
-                setCounters(prev => prev.map(c => ({ ...c, isNew: false })));
+                updateCountersImmediate((prev: Counter[]) => prev.map(c => ({ ...c, isNew: false })));
             }, 100);
             timeoutsRef.current.push(tId);
             return;
@@ -131,7 +141,7 @@ export function useCounters() {
 
             const tId = setTimeout(() => {
                 const newId = nextIdRef.current++;
-                setCounters(prev => {
+                pushCounters((prev: Counter[]) => {
                     const existingCount = countByType(prev, value > 0 ? 'positive' : 'negative');
                     const pos = calculateGridPosition(value, existingCount);
                     return [...prev, {
@@ -144,18 +154,18 @@ export function useCounters() {
                 });
 
                 const cleanTId = setTimeout(() => {
-                    setCounters(prev => prev.map(c => c.id === newId ? { ...c, isNew: false } : c));
+                    updateCountersImmediate((prev: Counter[]) => prev.map(c => c.id === newId ? { ...c, isNew: false } : c));
                 }, 50);
                 timeoutsRef.current.push(cleanTId);
             }, delay);
 
             timeoutsRef.current.push(tId);
         }
-    }, []);
+    }, [counters, pushCounters, updateCountersImmediate]);
 
     const addZeroPair = useCallback((showNumberLine = false) => {
         // ALWAYS add both counters simultaneously in a single setState
-        setCounters(prev => {
+        pushCounters((prev: Counter[]) => {
             const posCount = countByType(prev, 'positive');
             const negCount = countByType(prev, 'negative');
 
@@ -182,16 +192,16 @@ export function useCounters() {
         });
 
         const tId = setTimeout(() => {
-            setCounters(prev => prev.map(c => ({ ...c, isNew: false })));
+            updateCountersImmediate((prev: Counter[]) => prev.map(c => ({ ...c, isNew: false })));
         }, 100);
         timeoutsRef.current.push(tId);
-    }, []);
+    }, [pushCounters, updateCountersImmediate]);
 
     /**
      * Add a counter at a specific position (used for drag-from-sidebar).
      */
     const addCounterAtPosition = useCallback((value: number, x: number, y: number) => {
-        setCounters(prev => [
+        pushCounters((prev: Counter[]) => [
             ...prev,
             {
                 id: nextIdRef.current++,
@@ -203,36 +213,37 @@ export function useCounters() {
         ]);
 
         const tId = setTimeout(() => {
-            setCounters(prev => prev.map(c => ({ ...c, isNew: false })));
+            updateCountersImmediate((prev: Counter[]) => prev.map(c => ({ ...c, isNew: false })));
         }, 100);
         timeoutsRef.current.push(tId);
-    }, []);
+    }, [pushCounters, updateCountersImmediate]);
 
     const flipCounter = useCallback((id: number) => {
         if (isAnimating) return;
-        setCounters(prev => prev.map(c =>
+        pushCounters((prev: Counter[]) => prev.map(c =>
             c.id === id ? { ...c, value: c.value * -1 } : c
         ));
         setSortState('none');
-    }, [isAnimating]);
+    }, [isAnimating, pushCounters]);
 
     const removeCounter = useCallback((id: number) => {
         if (isAnimating) return;
         // Simply filter out the counter - do NOT recalculate positions
-        setCounters(prev => prev.filter(c => c.id !== id));
-    }, [isAnimating]);
+        pushCounters((prev: Counter[]) => prev.filter(c => c.id !== id));
+    }, [isAnimating, pushCounters]);
 
     const updateCounterPosition = useCallback((id: number, x: number, y: number) => {
         if (isAnimating) return;
-        setCounters(prev => prev.map(c =>
+        // Use updateCountersImmediate to avoid polluting history with drag positions
+        updateCountersImmediate((prev: Counter[]) => prev.map(c =>
             c.id === id ? { ...c, x, y } : c
         ));
         // Moving a counter manually disables ordered mode
         setIsOrdered(false);
-    }, [isAnimating]);
+    }, [isAnimating, updateCountersImmediate]);
 
     const snapToOrder = useCallback(() => {
-        setCounters(prev => {
+        pushCounters((prev: Counter[]) => {
             const positives = prev.filter(c => c.value > 0);
             const negatives = prev.filter(c => c.value < 0);
 
@@ -242,19 +253,19 @@ export function useCounters() {
             ];
         });
         setIsOrdered(true);
-    }, []);
+    }, [pushCounters]);
 
     const flipAll = useCallback(() => {
         if (isAnimating) return;
-        setCounters(prev => prev.map(c => ({ ...c, value: c.value * -1 })));
+        pushCounters((prev: Counter[]) => prev.map(c => ({ ...c, value: c.value * -1 })));
         setSortState('none');
-    }, [isAnimating]);
+    }, [isAnimating, pushCounters]);
 
     const organize = useCallback(() => {
         if (isAnimating) return;
 
         // Sort into two-row layout: positives on top, negatives on bottom
-        setCounters(currentCounters => {
+        pushCounters((currentCounters: Counter[]) => {
             const positives = currentCounters.filter(c => c.value === POSITIVE);
             const negatives = currentCounters.filter(c => c.value === NEGATIVE);
 
@@ -266,7 +277,7 @@ export function useCounters() {
 
         setSortState('grouped');
         setIsOrdered(true);
-    }, [isAnimating]);
+    }, [isAnimating, pushCounters]);
 
     const cancelZeroPairs = useCallback(async () => {
         if (isAnimating) return;
@@ -288,20 +299,20 @@ export function useCounters() {
 
         // SEQUENTIAL MODE
         if (isSequentialMode) {
-            // Sort first
-            setCounters(prev => {
-                const remaining = prev.filter(c => !pairs.flat().includes(c.id));
+            // Sort first - use immediate update for animation prep
+            updateCountersImmediate((() => {
+                const remaining = counters.filter(c => !pairs.flat().includes(c.id));
                 const pairedObjs: Counter[] = [];
                 pairs.forEach(([pId, nId]) => {
-                    const p = prev.find(c => c.id === pId);
-                    const n = prev.find(c => c.id === nId);
+                    const p = counters.find(c => c.id === pId);
+                    const n = counters.find(c => c.id === nId);
                     if (p && n) {
                         pairedObjs.push(p);
                         pairedObjs.push(n);
                     }
                 });
                 return [...pairedObjs, ...remaining];
-            });
+            })());
 
             await wait(300);
 
@@ -311,7 +322,7 @@ export function useCounters() {
                 await wait(animSpeed * 0.6);
                 if (abortAnimationRef.current) break;
 
-                setCounters(prev => prev.map(c =>
+                updateCountersImmediate(counters.map(c =>
                     (c.id === posId || c.id === negId) ? { ...c, isLeaving: true } : c
                 ));
                 setHighlightedPair([]);
@@ -319,33 +330,35 @@ export function useCounters() {
                 const exitDuration = Math.min(600, animSpeed * 0.4);
                 await wait(exitDuration);
 
-                setCounters(prev => prev.filter(c => c.id !== posId && c.id !== negId));
+                // Final removal - push to history for undo
+                pushCounters((prev: Counter[]) => prev.filter(c => c.id !== posId && c.id !== negId));
             }
         }
         // BATCH MODE
         else {
             const allIdsToRemove = new Set(pairs.flat());
-            setCounters(prev => prev.map(c =>
+            updateCountersImmediate(counters.map(c =>
                 allIdsToRemove.has(c.id) ? { ...c, isLeaving: true } : c
             ));
             await wait(600);
-            setCounters(prev => prev.filter(c => !allIdsToRemove.has(c.id)));
+            // Final removal - push to history for undo
+            pushCounters((prev: Counter[]) => prev.filter(c => !allIdsToRemove.has(c.id)));
         }
 
         setHighlightedPair([]);
         setIsAnimating(false);
-    }, [counters, isAnimating, isSequentialMode, animSpeed]);
+    }, [counters, isAnimating, isSequentialMode, animSpeed, pushCounters, updateCountersImmediate]);
 
     const clearBoard = useCallback(() => {
         abortAnimationRef.current = true;
         clearTimeouts();
         animationQueueEndRef.current = 0;
 
-        setCounters([]);
+        pushCounters([]);
         setHighlightedPair([]);
         setSortState('none');
         setIsAnimating(false);
-    }, []);
+    }, [pushCounters]);
 
     // Cleanup on unmount
     // useEffect(() => {
@@ -364,7 +377,8 @@ export function useCounters() {
         importedIsSequentialMode: boolean,
         importedAnimSpeed: number
     ) => {
-        setCounters(importedCounters);
+        pushCounters(importedCounters);
+        clearHistory(); // Clear history after URL restore
         setSortState(importedSortState);
         setIsOrdered(importedIsOrdered);
         setIsSequentialMode(importedIsSequentialMode);
@@ -373,7 +387,7 @@ export function useCounters() {
         if (importedCounters.length > 0) {
             nextIdRef.current = Math.max(...importedCounters.map(c => c.id)) + 1;
         }
-    }, []);
+    }, [pushCounters, clearHistory]);
 
     return {
         counters,
@@ -396,6 +410,8 @@ export function useCounters() {
         organize,
         cancelZeroPairs,
         clearBoard,
-        setCountersFromState
+        setCountersFromState,
+        undo,
+        canUndo
     };
 }

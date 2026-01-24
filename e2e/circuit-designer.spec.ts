@@ -263,3 +263,110 @@ test.describe('Circuit Designer - Component Dragging', () => {
         }
     });
 });
+
+test.describe('Circuit Designer - Undo Functionality', () => {
+    const BASE_URL = '/computing/circuit-designer';
+
+    test('Undo button should revert adding a component', async ({ page }) => {
+        page.on('console', msg => console.log(`[BROWSER] ${msg.text()}`));
+        await page.goto(BASE_URL);
+        await page.waitForLoadState('networkidle');
+
+        // Get initial count of nodes
+        const initialNodes = await page.locator('[data-testid="circuit-node"]').count();
+
+        // Add an AND gate
+        // Use :has(span:text("AND")) to distinguish from toolbar demo button which is plain text
+        const andButton = page.locator('button').filter({ has: page.locator('span', { hasText: 'AND' }) }).first();
+        if (await andButton.isVisible()) {
+            await andButton.click();
+            await page.waitForTimeout(300);
+        }
+
+        // Verify count increased
+        await expect(page.locator('[data-testid="circuit-node"]')).toHaveCount(initialNodes + 1);
+
+        // Click Undo
+        await page.click('button:has-text("Undo")');
+
+        // Verify count returned to initial
+        await expect(page.locator('[data-testid="circuit-node"]')).toHaveCount(initialNodes);
+    });
+
+    test('Ctrl+Z should trigger undo', async ({ page }) => {
+        await page.goto(BASE_URL);
+        await page.waitForLoadState('networkidle');
+
+        // Get initial count of nodes
+        const initialNodes = await page.locator('[data-testid="circuit-node"]').count();
+
+        // Add a Switch
+        const switchButton = page.locator('button').filter({ has: page.locator('span', { hasText: 'Switch' }) }).first();
+        if (await switchButton.isVisible()) {
+            await switchButton.click();
+            await page.waitForTimeout(300);
+        }
+
+        await expect(page.locator('[data-testid="circuit-node"]')).toHaveCount(initialNodes + 1);
+
+        // Press Ctrl+Z
+        await page.keyboard.press('Control+z');
+
+        await expect(page.locator('[data-testid="circuit-node"]')).toHaveCount(initialNodes);
+    });
+
+    test('Undo should revert Clear Canvas', async ({ page }) => {
+        await page.goto(BASE_URL);
+        await page.waitForLoadState('networkidle');
+
+        const initialNodes = await page.locator('[data-testid="circuit-node"]').count();
+        expect(initialNodes).toBeGreaterThan(0);
+
+        // Click Clear
+        await page.click('button:has-text("Clear")');
+        // No confirmation modal anymore, so it should clear immediately
+
+        await expect(page.locator('[data-testid="circuit-node"]')).toHaveCount(0);
+
+        // Click Undo
+        await page.click('button:has-text("Undo")');
+
+        await expect(page.locator('[data-testid="circuit-node"]')).toHaveCount(initialNodes);
+    });
+});
+
+test.describe('Circuit Designer - Drag Drop', () => {
+    const BASE_URL = '/computing/circuit-designer';
+
+    test('should allow dragging components from sidebar to canvas', async ({ page }) => {
+        await page.goto(BASE_URL);
+        await page.waitForLoadState('networkidle');
+
+        const initialNodes = await page.locator('[data-testid="circuit-node"]').count();
+        const canvas = page.locator('[data-testid="canvas"]');
+        const switchButton = page.locator('button').filter({ has: page.locator('span', { hasText: 'Switch' }) }).first();
+
+        // Drag switch to canvas center
+        await switchButton.dragTo(canvas, {
+            targetPosition: { x: 300, y: 300 }
+        });
+
+        // Check node count increased
+        await expect(page.locator('[data-testid="circuit-node"]')).toHaveCount(initialNodes + 1);
+    });
+
+    test('should allow dragging Logic Gates from sidebar', async ({ page }) => {
+        await page.goto(BASE_URL);
+        await page.waitForLoadState('networkidle');
+
+        const initialNodes = await page.locator('[data-testid="circuit-node"]').count();
+        const canvas = page.locator('[data-testid="canvas"]');
+        const andButton = page.locator('button').filter({ has: page.locator('span', { hasText: 'AND' }) }).first();
+
+        await andButton.dragTo(canvas, {
+            targetPosition: { x: 400, y: 300 }
+        });
+
+        await expect(page.locator('[data-testid="circuit-node"]')).toHaveCount(initialNodes + 1);
+    });
+});
