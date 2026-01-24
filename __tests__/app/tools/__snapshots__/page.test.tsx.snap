@@ -5,16 +5,6 @@ exports[`Tools Page matches snapshot 1`] = `
   <div
     class="flex flex-col min-h-screen"
   >
-    <div
-      class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none"
-    >
-      <div
-        class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/10 blur-[120px]"
-      />
-      <div
-        class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-600/10 blur-[120px]"
-      />
-    </div>
     <section
       class="py-20 px-4 sm:px-6 lg:px-8 relative"
     >
@@ -25,11 +15,11 @@ exports[`Tools Page matches snapshot 1`] = `
           class="mb-12 text-center lg:text-left"
         >
           <h1
-            class="text-4xl md:text-6xl font-bold text-[var(--theme-main)] mb-6"
+            class="text-4xl md:text-6xl font-bold text-[var(--theme-main)] mb-6 font-[family-name:var(--font-heading)]"
           >
             Our 
             <span
-              class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600"
+              class="text-[var(--color-primary)]"
             >
               Tools
             </span>
@@ -45,7 +35,7 @@ exports[`Tools Page matches snapshot 1`] = `
           id="mathematics"
         >
           <h2
-            class="text-2xl font-bold text-[var(--theme-main)] mb-8"
+            class="text-2xl font-bold text-[var(--theme-main)] mb-8 font-[family-name:var(--font-heading)]"
           >
             Mathematics
           </h2>
@@ -57,66 +47,17 @@ exports[`Tools Page matches snapshot 1`] = `
               href="/mathematics/algebra-tiles"
             >
               <div
-                class="relative h-full rounded-[2rem] bg-gradient-to-br from-blue-500 to-cyan-500 p-[1px] shadow-lg transition-transform duration-300 hover:scale-[1.02] hover:shadow-xl"
+                class="relative h-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card)] shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col justify-between"
               >
                 <div
-                  class="relative h-full rounded-[calc(2rem-1px)] bg-[var(--theme-card)] p-8 flex flex-col justify-between overflow-hidden"
+                  class="relative z-10"
                 >
                   <div
-                    class="absolute -right-20 -top-20 h-[300px] w-[300px] rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 opacity-10 blur-[60px] group-hover:opacity-20 transition-opacity duration-500"
-                  />
-                  <div
-                    class="relative z-10"
+                    class="mb-4 inline-flex items-center justify-center rounded-lg bg-[var(--theme-page)] p-3 border border-[var(--theme-border)]"
                   >
-                    <div
-                      class="mb-4 inline-flex items-center justify-center rounded-xl bg-[var(--theme-page)] p-3 shadow-sm border border-[var(--theme-border)]"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        class="lucide lucide-grid2x2 lucide-grid-2x2 w-8 h-8 text-blue-500"
-                        fill="none"
-                        height="24"
-                        stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        viewBox="0 0 24 24"
-                        width="24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M12 3v18"
-                        />
-                        <path
-                          d="M3 12h18"
-                        />
-                        <rect
-                          height="18"
-                          rx="2"
-                          width="18"
-                          x="3"
-                          y="3"
-                        />
-                      </svg>
-                    </div>
-                    <h3
-                      class="mb-2 text-2xl font-bold tracking-tight text-[var(--theme-main)] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-600 transition-all duration-300"
-                    >
-                      Algebra Tiles
-                    </h3>
-                    <p
-                      class="text-[var(--theme-muted)] leading-relaxed"
-                    >
-                      Visualize algebraic concepts including expressions, equations, and factorisation with virtual algebraic tiles.
-                    </p>
-                  </div>
-                  <div
-                    class="relative z-10 mt-8 flex items-center font-medium text-blue-600 group-hover:translate-x-1 transition-transform"
-                  >
-                    Launch Tool 
                     <svg
                       aria-hidden="true"
-                      class="lucide lucide-arrow-right ml-2 w-4 h-4"
+                      class="lucide lucide-grid2x2 lucide-grid-2x2 w-8 h-8 text-blue-500"
                       fill="none"
                       height="24"
                       stroke="currentColor"
@@ -128,13 +69,55 @@ exports[`Tools Page matches snapshot 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M5 12h14"
+                        d="M12 3v18"
                       />
                       <path
-                        d="m12 5 7 7-7 7"
+                        d="M3 12h18"
+                      />
+                      <rect
+                        height="18"
+                        rx="2"
+                        width="18"
+                        x="3"
+                        y="3"
                       />
                     </svg>
                   </div>
+                  <h3
+                    class="mb-2 text-xl font-bold tracking-tight text-[var(--theme-main)] group-hover:text-[var(--color-primary)] transition-colors font-[family-name:var(--font-heading)]"
+                  >
+                    Algebra Tiles
+                  </h3>
+                  <p
+                    class="text-[var(--theme-muted)] leading-relaxed"
+                  >
+                    Visualize algebraic concepts including expressions, equations, and factorisation with virtual algebraic tiles.
+                  </p>
+                </div>
+                <div
+                  class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
+                >
+                  Launch Tool 
+                  <svg
+                    aria-hidden="true"
+                    class="lucide lucide-arrow-right ml-2 w-4 h-4"
+                    fill="none"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12h14"
+                    />
+                    <path
+                      d="m12 5 7 7-7 7"
+                    />
+                  </svg>
                 </div>
               </div>
             </a>
@@ -143,93 +126,17 @@ exports[`Tools Page matches snapshot 1`] = `
               href="/mathematics/double-sided-counters"
             >
               <div
-                class="relative h-full rounded-[2rem] bg-gradient-to-br from-purple-500 to-pink-500 p-[1px] shadow-lg transition-transform duration-300 hover:scale-[1.02] hover:shadow-xl"
+                class="relative h-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card)] shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col justify-between"
               >
                 <div
-                  class="relative h-full rounded-[calc(2rem-1px)] bg-[var(--theme-card)] p-8 flex flex-col justify-between overflow-hidden"
+                  class="relative z-10"
                 >
                   <div
-                    class="absolute -right-20 -top-20 h-[300px] w-[300px] rounded-full bg-gradient-to-br from-purple-500 to-pink-500 opacity-10 blur-[60px] group-hover:opacity-20 transition-opacity duration-500"
-                  />
-                  <div
-                    class="relative z-10"
+                    class="mb-4 inline-flex items-center justify-center rounded-lg bg-[var(--theme-page)] p-3 border border-[var(--theme-border)]"
                   >
-                    <div
-                      class="mb-4 inline-flex items-center justify-center rounded-xl bg-[var(--theme-page)] p-3 shadow-sm border border-[var(--theme-border)]"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        class="lucide lucide-calculator w-8 h-8 text-purple-500"
-                        fill="none"
-                        height="24"
-                        stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        viewBox="0 0 24 24"
-                        width="24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <rect
-                          height="20"
-                          rx="2"
-                          width="16"
-                          x="4"
-                          y="2"
-                        />
-                        <line
-                          x1="8"
-                          x2="16"
-                          y1="6"
-                          y2="6"
-                        />
-                        <line
-                          x1="16"
-                          x2="16"
-                          y1="14"
-                          y2="18"
-                        />
-                        <path
-                          d="M16 10h.01"
-                        />
-                        <path
-                          d="M12 10h.01"
-                        />
-                        <path
-                          d="M8 10h.01"
-                        />
-                        <path
-                          d="M12 14h.01"
-                        />
-                        <path
-                          d="M8 14h.01"
-                        />
-                        <path
-                          d="M12 18h.01"
-                        />
-                        <path
-                          d="M8 18h.01"
-                        />
-                      </svg>
-                    </div>
-                    <h3
-                      class="mb-2 text-2xl font-bold tracking-tight text-[var(--theme-main)] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-600 transition-all duration-300"
-                    >
-                      Double Sided Counters
-                    </h3>
-                    <p
-                      class="text-[var(--theme-muted)] leading-relaxed"
-                    >
-                      Explore integer operations, probability, and ratios with interactive two-colored counters.
-                    </p>
-                  </div>
-                  <div
-                    class="relative z-10 mt-8 flex items-center font-medium text-blue-600 group-hover:translate-x-1 transition-transform"
-                  >
-                    Launch Tool 
                     <svg
                       aria-hidden="true"
-                      class="lucide lucide-arrow-right ml-2 w-4 h-4"
+                      class="lucide lucide-calculator w-8 h-8 text-purple-500"
                       fill="none"
                       height="24"
                       stroke="currentColor"
@@ -240,14 +147,83 @@ exports[`Tools Page matches snapshot 1`] = `
                       width="24"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <path
-                        d="M5 12h14"
+                      <rect
+                        height="20"
+                        rx="2"
+                        width="16"
+                        x="4"
+                        y="2"
+                      />
+                      <line
+                        x1="8"
+                        x2="16"
+                        y1="6"
+                        y2="6"
+                      />
+                      <line
+                        x1="16"
+                        x2="16"
+                        y1="14"
+                        y2="18"
                       />
                       <path
-                        d="m12 5 7 7-7 7"
+                        d="M16 10h.01"
+                      />
+                      <path
+                        d="M12 10h.01"
+                      />
+                      <path
+                        d="M8 10h.01"
+                      />
+                      <path
+                        d="M12 14h.01"
+                      />
+                      <path
+                        d="M8 14h.01"
+                      />
+                      <path
+                        d="M12 18h.01"
+                      />
+                      <path
+                        d="M8 18h.01"
                       />
                     </svg>
                   </div>
+                  <h3
+                    class="mb-2 text-xl font-bold tracking-tight text-[var(--theme-main)] group-hover:text-[var(--color-primary)] transition-colors font-[family-name:var(--font-heading)]"
+                  >
+                    Double Sided Counters
+                  </h3>
+                  <p
+                    class="text-[var(--theme-muted)] leading-relaxed"
+                  >
+                    Explore integer operations, probability, and ratios with interactive two-colored counters.
+                  </p>
+                </div>
+                <div
+                  class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
+                >
+                  Launch Tool 
+                  <svg
+                    aria-hidden="true"
+                    class="lucide lucide-arrow-right ml-2 w-4 h-4"
+                    fill="none"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12h14"
+                    />
+                    <path
+                      d="m12 5 7 7-7 7"
+                    />
+                  </svg>
                 </div>
               </div>
             </a>
@@ -258,7 +234,7 @@ exports[`Tools Page matches snapshot 1`] = `
           id="computing"
         >
           <h2
-            class="text-2xl font-bold text-[var(--theme-main)] mb-8"
+            class="text-2xl font-bold text-[var(--theme-main)] mb-8 font-[family-name:var(--font-heading)]"
           >
             Computing
           </h2>
@@ -270,103 +246,17 @@ exports[`Tools Page matches snapshot 1`] = `
               href="/computing/circuit-designer"
             >
               <div
-                class="relative h-full rounded-[2rem] bg-gradient-to-br from-emerald-500 to-teal-500 p-[1px] shadow-lg transition-transform duration-300 hover:scale-[1.02] hover:shadow-xl"
+                class="relative h-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card)] shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col justify-between"
               >
                 <div
-                  class="relative h-full rounded-[calc(2rem-1px)] bg-[var(--theme-card)] p-8 flex flex-col justify-between overflow-hidden"
+                  class="relative z-10"
                 >
                   <div
-                    class="absolute -right-20 -top-20 h-[300px] w-[300px] rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 opacity-10 blur-[60px] group-hover:opacity-20 transition-opacity duration-500"
-                  />
-                  <div
-                    class="relative z-10"
+                    class="mb-4 inline-flex items-center justify-center rounded-lg bg-[var(--theme-page)] p-3 border border-[var(--theme-border)]"
                   >
-                    <div
-                      class="mb-4 inline-flex items-center justify-center rounded-xl bg-[var(--theme-page)] p-3 shadow-sm border border-[var(--theme-border)]"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        class="lucide lucide-cpu w-8 h-8 text-emerald-500"
-                        fill="none"
-                        height="24"
-                        stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        viewBox="0 0 24 24"
-                        width="24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M12 20v2"
-                        />
-                        <path
-                          d="M12 2v2"
-                        />
-                        <path
-                          d="M17 20v2"
-                        />
-                        <path
-                          d="M17 2v2"
-                        />
-                        <path
-                          d="M2 12h2"
-                        />
-                        <path
-                          d="M2 17h2"
-                        />
-                        <path
-                          d="M2 7h2"
-                        />
-                        <path
-                          d="M20 12h2"
-                        />
-                        <path
-                          d="M20 17h2"
-                        />
-                        <path
-                          d="M20 7h2"
-                        />
-                        <path
-                          d="M7 20v2"
-                        />
-                        <path
-                          d="M7 2v2"
-                        />
-                        <rect
-                          height="16"
-                          rx="2"
-                          width="16"
-                          x="4"
-                          y="4"
-                        />
-                        <rect
-                          height="8"
-                          rx="1"
-                          width="8"
-                          x="8"
-                          y="8"
-                        />
-                      </svg>
-                    </div>
-                    <h3
-                      class="mb-2 text-2xl font-bold tracking-tight text-[var(--theme-main)] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-600 transition-all duration-300"
-                    >
-                      Circuit Designer
-                    </h3>
-                    <p
-                      class="text-[var(--theme-muted)] leading-relaxed"
-                    >
-                      Build and simulate logic circuits with AND, OR, NOT, and XOR gates. Generate truth tables to verify circuit behaviour.
-                    </p>
-                  </div>
-                  <div
-                    class="relative z-10 mt-8 flex items-center font-medium text-blue-600 group-hover:translate-x-1 transition-transform"
-                  >
-                    Launch Tool 
                     <svg
                       aria-hidden="true"
-                      class="lucide lucide-arrow-right ml-2 w-4 h-4"
+                      class="lucide lucide-cpu w-8 h-8 text-emerald-500"
                       fill="none"
                       height="24"
                       stroke="currentColor"
@@ -378,13 +268,92 @@ exports[`Tools Page matches snapshot 1`] = `
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M5 12h14"
+                        d="M12 20v2"
                       />
                       <path
-                        d="m12 5 7 7-7 7"
+                        d="M12 2v2"
+                      />
+                      <path
+                        d="M17 20v2"
+                      />
+                      <path
+                        d="M17 2v2"
+                      />
+                      <path
+                        d="M2 12h2"
+                      />
+                      <path
+                        d="M2 17h2"
+                      />
+                      <path
+                        d="M2 7h2"
+                      />
+                      <path
+                        d="M20 12h2"
+                      />
+                      <path
+                        d="M20 17h2"
+                      />
+                      <path
+                        d="M20 7h2"
+                      />
+                      <path
+                        d="M7 20v2"
+                      />
+                      <path
+                        d="M7 2v2"
+                      />
+                      <rect
+                        height="16"
+                        rx="2"
+                        width="16"
+                        x="4"
+                        y="4"
+                      />
+                      <rect
+                        height="8"
+                        rx="1"
+                        width="8"
+                        x="8"
+                        y="8"
                       />
                     </svg>
                   </div>
+                  <h3
+                    class="mb-2 text-xl font-bold tracking-tight text-[var(--theme-main)] group-hover:text-[var(--color-primary)] transition-colors font-[family-name:var(--font-heading)]"
+                  >
+                    Circuit Designer
+                  </h3>
+                  <p
+                    class="text-[var(--theme-muted)] leading-relaxed"
+                  >
+                    Build and simulate logic circuits with AND, OR, NOT, and XOR gates. Generate truth tables to verify circuit behaviour.
+                  </p>
+                </div>
+                <div
+                  class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
+                >
+                  Launch Tool 
+                  <svg
+                    aria-hidden="true"
+                    class="lucide lucide-arrow-right ml-2 w-4 h-4"
+                    fill="none"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12h14"
+                    />
+                    <path
+                      d="m12 5 7 7-7 7"
+                    />
+                  </svg>
                 </div>
               </div>
             </a>

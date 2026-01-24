@@ -5,16 +5,6 @@ exports[`Home Page matches snapshot 1`] = `
   <div
     class="flex flex-col min-h-screen"
   >
-    <div
-      class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none"
-    >
-      <div
-        class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/10 blur-[120px]"
-      />
-      <div
-        class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-600/10 blur-[120px]"
-      />
-    </div>
     <section
       class="relative px-4 sm:px-6 lg:px-8 pt-24 pb-12 md:pt-32 md:pb-20 overflow-hidden"
     >
@@ -37,7 +27,7 @@ exports[`Home Page matches snapshot 1`] = `
               between 
               <br />
               <span
-                class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600"
+                class="text-[var(--color-primary)]"
               >
                 Exposition & Understanding
               </span>
@@ -51,13 +41,13 @@ exports[`Home Page matches snapshot 1`] = `
               class="flex flex-wrap items-center justify-center lg:justify-start gap-4"
             >
               <a
-                class="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white rounded-xl bg-gradient-to-r from-blue-400 to-purple-600 hover:opacity-90 shadow-lg shadow-blue-600/20 transition-all duration-200"
+                class="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white rounded-lg bg-[var(--color-primary)] hover:opacity-90 shadow-sm transition-all duration-200"
                 href="/tools"
               >
                 Explore Tools
               </a>
               <a
-                class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-xl text-[var(--theme-main)] bg-[var(--theme-card)] border border-[var(--theme-border)] hover:bg-[var(--theme-border)] transition-colors"
+                class="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg text-[var(--theme-main)] bg-[var(--theme-card)] border border-[var(--theme-border)] hover:bg-[var(--theme-border)] transition-colors"
                 href="/about"
               >
                 Learn More
@@ -65,13 +55,13 @@ exports[`Home Page matches snapshot 1`] = `
             </div>
           </div>
           <div
-            class="flex-1 w-full max-w-[600px] lg:max-w-full relative perspective-1000"
+            class="flex-1 w-full max-w-[600px] lg:max-w-full relative"
           >
             <div
-              class="relative rounded-[2.5rem] bg-gradient-to-br from-blue-400 to-purple-600 p-1 shadow-2xl transform rotate-y-[-5deg] rotate-x-[5deg] hover:rotate-0 transition-transform duration-500"
+              class="relative rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card)] shadow-md overflow-hidden"
             >
               <div
-                class="rounded-[2.4rem] bg-[var(--theme-card)] h-[400px] flex items-center justify-center relative overflow-hidden"
+                class="h-[400px] flex items-center justify-center relative"
               >
                 <div
                   class="relative w-full h-full flex items-center justify-center opacity-80"
@@ -87,9 +77,6 @@ exports[`Home Page matches snapshot 1`] = `
                     src="/assets/tools-dark.svg"
                   />
                 </div>
-                <div
-                  class="absolute inset-0 bg-gradient-to-tr from-blue-500/10 to-transparent pointer-events-none"
-                />
               </div>
             </div>
           </div>

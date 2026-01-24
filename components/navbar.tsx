@@ -44,7 +44,7 @@ export function Navbar() {
                 <ChevronDown size={20} />
             </button>
 
-            <nav className={`fixed top-0 w-full z-50 border-b border-[var(--theme-border)] bg-[var(--theme-page)]/80 backdrop-blur-md transition-transform duration-300 ${isNavbarVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+            <nav className={`fixed top-0 w-full z-50 border-b border-[var(--theme-border)] bg-[var(--theme-page)]/95 backdrop-blur-sm transition-transform duration-300 ${isNavbarVisible ? 'translate-y-0' : '-translate-y-full'}`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-[81px] relative">
                         <div className="flex items-center flex-shrink-0 z-10 bg-[var(--theme-page)]/0">
@@ -62,7 +62,10 @@ export function Navbar() {
                                         <div className="w-10 h-10" /> // Placeholder to prevent hydration mismatch
                                     )}
                                 </div>
-                                <span className="font-bold text-xl tracking-tight text-[var(--theme-main)]">
+                                <span
+                                    className="font-bold text-xl tracking-tight text-[var(--theme-main)]"
+                                    style={{ fontFamily: 'var(--font-merriweather), serif' }}
+                                >
                                     MathTools
                                 </span>
                             </Link>
@@ -71,7 +74,7 @@ export function Navbar() {
                         {/* Centered Title */}
                         <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
                             {title && (
-                                <h1 className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 animate-in fade-in zoom-in duration-300 fill-mode-forwards" style={{ opacity: 1 }}>
+                                <h1 className="text-xl md:text-2xl font-bold text-[var(--color-primary)] opacity-0 animate-in fade-in zoom-in duration-300 fill-mode-forwards font-[family-name:var(--font-heading)]" style={{ opacity: 1 }}>
                                     {title}
                                 </h1>
                             )}

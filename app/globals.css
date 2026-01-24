@@ -7,30 +7,39 @@
 
 @theme {
   --font-sans: var(--font-inter);
+  --font-heading: var(--font-merriweather);
 
   --color-theme-page: var(--theme-page);
   --color-theme-card: var(--theme-card);
   --color-theme-main: var(--theme-main);
   --color-theme-muted: var(--theme-muted);
   --color-theme-border: var(--theme-border);
-
-  --background-image-gradient-primary: linear-gradient(to bottom right, var(--color-blue-400), var(--color-purple-600));
 }
 
 :root {
-  --theme-page: #f8fafc;
+  --theme-page: #FEFCF9;
   --theme-card: #ffffff;
-  --theme-main: #0f172a;
-  --theme-muted: #475569;
-  --theme-border: #e2e8f0;
+  --theme-main: #1F2937;
+  --theme-muted: #6B7280;
+  --theme-border: #E5E7EB;
+  --color-primary: #2563EB;
+  --color-success: #059669;
+  --color-danger: #DC2626;
+  --color-warning: #D97706;
+  --color-info: #0891B2;
 }
 
 .dark {
-  --theme-page: #020617;
-  --theme-card: #0f172a;
-  --theme-main: #f1f5f9;
-  --theme-muted: #94a3b8;
-  --theme-border: rgba(255, 255, 255, 0.05);
+  --theme-page: #111827;
+  --theme-card: #1F2937;
+  --theme-main: #F9FAFB;
+  --theme-muted: #9CA3AF;
+  --theme-border: #374151;
+  --color-primary: #3B82F6;
+  --color-success: #10B981;
+  --color-danger: #EF4444;
+  --color-warning: #F59E0B;
+  --color-info: #06B6D4;
 }
 
 body {
@@ -40,4 +49,13 @@ body {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 300ms;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-merriweather), serif;
 }
