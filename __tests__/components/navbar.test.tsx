@@ -27,9 +27,9 @@ describe('Navbar', () => {
         })
     })
 
-    it('renders MathTools logo', () => {
+    it('renders TeachMaths.net logo', () => {
         render(<Navbar />)
-        expect(screen.getByText('MathTools')).toBeInTheDocument()
+        expect(screen.getByText('TeachMaths.net')).toBeInTheDocument()
     })
 
     it('renders Main Navigation links', () => {

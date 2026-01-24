@@ -17,7 +17,7 @@ export default function Home() {
                 </span>
               </h1>
               <p className="text-lg md:text-xl text-[var(--theme-muted)] max-w-2xl mx-auto lg:mx-0 leading-relaxed mb-8">
-                Interactive digital tools designed to make abstract mathematical concepts concrete, accessible, and engaging for every student.
+                Interactive digital tools designed to make abstract mathematical and computational concepts concrete, accessible, and engaging for every student.
               </p>
 
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">

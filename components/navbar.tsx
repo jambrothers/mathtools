@@ -66,7 +66,7 @@ export function Navbar() {
                                     className="font-bold text-xl tracking-tight text-[var(--theme-main)]"
                                     style={{ fontFamily: 'var(--font-merriweather), serif' }}
                                 >
-                                    MathTools
+                                    TeachMaths.net
                                 </span>
                             </Link>
                         </div>

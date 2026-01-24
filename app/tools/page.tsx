@@ -27,7 +27,7 @@ export default function ToolsPage() {
                             />
                             <ToolCard
                                 title="Double Sided Counters"
-                                description="Explore integer operations, probability, and ratios with interactive two-colored counters."
+                                description="Explore integer and algebraic operations on directed number with interactive two-coloured counters."
                                 href="/mathematics/double-sided-counters"
                                 gradient="from-purple-500 to-pink-500"
                                 icon={<Calculator className="w-8 h-8 text-purple-500" />}

@@ -46,7 +46,7 @@ test.describe('Tools Page', () => {
         await expect(countersCard).toBeVisible();
 
         // Check for description
-        const description = page.locator('text=Explore integer operations');
+        const description = page.locator('text=Explore integer and algebraic operations');
         await expect(description).toBeVisible();
     });
 

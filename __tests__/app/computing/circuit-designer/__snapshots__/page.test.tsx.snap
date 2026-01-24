@@ -9,6 +9,35 @@ exports[`Circuit Designer Page matches snapshot 1`] = `
       class="p-2 bg-white dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800 z-10 flex flex-wrap gap-2 items-center justify-between"
     >
       <div
+        class="flex items-center gap-2"
+      >
+        <span
+          class="text-xs text-slate-500 dark:text-slate-400 mr-2 font-medium"
+        >
+          Quick Demo:
+        </span>
+        <button
+          class="px-3 py-1.5 text-xs font-bold rounded-md bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-800/60 transition-colors"
+        >
+          AND
+        </button>
+        <button
+          class="px-3 py-1.5 text-xs font-bold rounded-md bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800/60 transition-colors"
+        >
+          OR
+        </button>
+        <button
+          class="px-3 py-1.5 text-xs font-bold rounded-md bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 hover:bg-rose-200 dark:hover:bg-rose-800/60 transition-colors"
+        >
+          NOT
+        </button>
+        <button
+          class="px-3 py-1.5 text-xs font-bold rounded-md bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300 hover:bg-cyan-200 dark:hover:bg-cyan-800/60 transition-colors"
+        >
+          XOR
+        </button>
+      </div>
+      <div
         class="flex-1"
       />
       <div
@@ -94,6 +123,47 @@ exports[`Circuit Designer Page matches snapshot 1`] = `
               Clear
             </span>
           </button>
+        </div>
+        <div
+          class="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1"
+        />
+        <div
+          class="flex items-center gap-2"
+        >
+          <div
+            class="relative"
+          >
+            <button
+              class="px-3 py-2 border text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700"
+              type="button"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-link"
+                fill="none"
+                height="16"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+                />
+                <path
+                  d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+                />
+              </svg>
+              <span
+                class="hidden sm:inline"
+              >
+                Link
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -268,82 +338,55 @@ exports[`Circuit Designer Page matches snapshot 1`] = `
               <span
                 class="font-bold text-slate-700 dark:text-slate-200"
               >
-                Hover
+                Drag
               </span>
-               node to delete.
+               to trash to delete.
+            </li>
+            <li>
+              <span
+                class="font-bold text-slate-700 dark:text-slate-200"
+              >
+                Marquee
+              </span>
+               to select multiple.
             </li>
           </ul>
         </div>
       </div>
       <div
-        class="flex-1 relative bg-slate-50 dark:bg-slate-950 overflow-hidden cursor-crosshair"
+        class="touch-none select-none flex-1 relative bg-slate-50 dark:bg-slate-950 overflow-hidden cursor-crosshair"
       >
         <div
-          class="absolute inset-0 opacity-10 dark:opacity-20 pointer-events-none"
+          class="absolute inset-0 opacity-10 dark:opacity-20 pointer-events-none bg-[radial-gradient(#94a3b8_1px,transparent_1px)] dark:bg-[radial-gradient(#6366f1_1px,transparent_1px)]"
           style="background-size: 20px 20px;"
         />
         <svg
           class="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible"
         >
           <path
-            class="transition-colors duration-150"
+            class="transition-colors duration-150 stroke-slate-400 dark:stroke-slate-600"
             d="M 130 100 C 200 100, 200 165, 270 165"
             fill="none"
-            stroke="#94a3b8"
             stroke-width="3"
           />
           <path
-            class="transition-colors duration-150"
+            class="transition-colors duration-150 stroke-slate-400 dark:stroke-slate-600"
             d="M 130 250 C 200 250, 200 185, 270 185"
             fill="none"
-            stroke="#94a3b8"
             stroke-width="3"
           />
           <path
-            class="transition-colors duration-150"
+            class="transition-colors duration-150 stroke-slate-400 dark:stroke-slate-600"
             d="M 330 175 C 400 175, 400 175, 470 175"
             fill="none"
-            stroke="#94a3b8"
             stroke-width="3"
           />
         </svg>
         <div
-          class="absolute flex flex-col items-center group z-10"
+          class="absolute flex flex-col items-center group z-10 select-none"
+          data-testid="circuit-node"
           style="left: 100px; top: 100px; transform: translate(-50%, -50%);"
         >
-          <button
-            class="absolute -top-8 bg-red-500/80 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 pointer-events-auto"
-          >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-trash2 lucide-trash-2"
-              fill="none"
-              height="12"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="12"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10 11v6"
-              />
-              <path
-                d="M14 11v6"
-              />
-              <path
-                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
-              />
-              <path
-                d="M3 6h18"
-              />
-              <path
-                d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-              />
-            </svg>
-          </button>
           <div
             class="absolute w-4 h-4 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900 hover:bg-emerald-300 hover:scale-125 transition-all cursor-pointer z-20 shadow-sm"
             style="left: calc(50% + 30px); top: calc(50% + 0px); transform: translate(-50%, -50%);"
@@ -353,56 +396,25 @@ exports[`Circuit Designer Page matches snapshot 1`] = `
             class="relative cursor-move"
           >
             <div
-              class="w-12 h-12 rounded border-2 flex items-center justify-center cursor-pointer transition-colors bg-slate-200 border-slate-400"
+              class="w-12 h-12 rounded border-2 flex items-center justify-center cursor-pointer transition-colors bg-slate-200 dark:bg-slate-700 border-slate-400 dark:border-slate-500"
             >
               <div
-                class="w-4 h-8 rounded-sm border transition-transform bg-slate-300 border-slate-400 translate-y-0.5"
+                class="w-4 h-8 rounded-sm border transition-transform bg-slate-300 dark:bg-slate-800 border-slate-400 dark:border-slate-600 translate-y-0.5"
               />
             </div>
           </div>
           <div
             class="mt-2 text-xs font-mono text-slate-600 dark:text-slate-400 bg-white/80 dark:bg-slate-800/80 px-1.5 py-0.5 rounded pointer-events-none shadow-sm"
+            data-testid="node-label"
           >
             A
           </div>
         </div>
         <div
-          class="absolute flex flex-col items-center group z-10"
+          class="absolute flex flex-col items-center group z-10 select-none"
+          data-testid="circuit-node"
           style="left: 100px; top: 250px; transform: translate(-50%, -50%);"
         >
-          <button
-            class="absolute -top-8 bg-red-500/80 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 pointer-events-auto"
-          >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-trash2 lucide-trash-2"
-              fill="none"
-              height="12"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="12"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10 11v6"
-              />
-              <path
-                d="M14 11v6"
-              />
-              <path
-                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
-              />
-              <path
-                d="M3 6h18"
-              />
-              <path
-                d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-              />
-            </svg>
-          </button>
           <div
             class="absolute w-4 h-4 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900 hover:bg-emerald-300 hover:scale-125 transition-all cursor-pointer z-20 shadow-sm"
             style="left: calc(50% + 30px); top: calc(50% + 0px); transform: translate(-50%, -50%);"
@@ -412,56 +424,25 @@ exports[`Circuit Designer Page matches snapshot 1`] = `
             class="relative cursor-move"
           >
             <div
-              class="w-12 h-12 rounded border-2 flex items-center justify-center cursor-pointer transition-colors bg-slate-200 border-slate-400"
+              class="w-12 h-12 rounded border-2 flex items-center justify-center cursor-pointer transition-colors bg-slate-200 dark:bg-slate-700 border-slate-400 dark:border-slate-500"
             >
               <div
-                class="w-4 h-8 rounded-sm border transition-transform bg-slate-300 border-slate-400 translate-y-0.5"
+                class="w-4 h-8 rounded-sm border transition-transform bg-slate-300 dark:bg-slate-800 border-slate-400 dark:border-slate-600 translate-y-0.5"
               />
             </div>
           </div>
           <div
             class="mt-2 text-xs font-mono text-slate-600 dark:text-slate-400 bg-white/80 dark:bg-slate-800/80 px-1.5 py-0.5 rounded pointer-events-none shadow-sm"
+            data-testid="node-label"
           >
             B
           </div>
         </div>
         <div
-          class="absolute flex flex-col items-center group z-10"
+          class="absolute flex flex-col items-center group z-10 select-none"
+          data-testid="circuit-node"
           style="left: 300px; top: 175px; transform: translate(-50%, -50%);"
         >
-          <button
-            class="absolute -top-8 bg-red-500/80 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 pointer-events-auto"
-          >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-trash2 lucide-trash-2"
-              fill="none"
-              height="12"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="12"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10 11v6"
-              />
-              <path
-                d="M14 11v6"
-              />
-              <path
-                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
-              />
-              <path
-                d="M3 6h18"
-              />
-              <path
-                d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-              />
-            </svg>
-          </button>
           <div
             class="absolute w-4 h-4 bg-blue-400 rounded-full border-2 border-white dark:border-slate-900 hover:bg-blue-300 hover:scale-125 transition-all cursor-pointer z-20 shadow-sm"
             style="left: calc(50% + -30px); top: calc(50% + -10px); transform: translate(-50%, -50%);"
@@ -481,7 +462,7 @@ exports[`Circuit Designer Page matches snapshot 1`] = `
             class="relative cursor-move"
           >
             <svg
-              class="fill-white stroke-indigo-600 stroke-2"
+              class="fill-white dark:fill-slate-800 stroke-2 stroke-indigo-600 dark:stroke-indigo-400"
               height="50"
               viewBox="0 0 50 50"
               width="50"
@@ -493,47 +474,16 @@ exports[`Circuit Designer Page matches snapshot 1`] = `
           </div>
           <div
             class="mt-2 text-xs font-mono text-slate-600 dark:text-slate-400 bg-white/80 dark:bg-slate-800/80 px-1.5 py-0.5 rounded pointer-events-none shadow-sm"
+            data-testid="node-label"
           >
             AND
           </div>
         </div>
         <div
-          class="absolute flex flex-col items-center group z-10"
+          class="absolute flex flex-col items-center group z-10 select-none"
+          data-testid="circuit-node"
           style="left: 500px; top: 175px; transform: translate(-50%, -50%);"
         >
-          <button
-            class="absolute -top-8 bg-red-500/80 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 pointer-events-auto"
-          >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-trash2 lucide-trash-2"
-              fill="none"
-              height="12"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="12"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10 11v6"
-              />
-              <path
-                d="M14 11v6"
-              />
-              <path
-                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
-              />
-              <path
-                d="M3 6h18"
-              />
-              <path
-                d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-              />
-            </svg>
-          </button>
           <div
             class="absolute w-4 h-4 bg-blue-400 rounded-full border-2 border-white dark:border-slate-900 hover:bg-blue-300 hover:scale-125 transition-all cursor-pointer z-20 shadow-sm"
             style="left: calc(50% + -30px); top: calc(50% + 0px); transform: translate(-50%, -50%);"
@@ -543,11 +493,11 @@ exports[`Circuit Designer Page matches snapshot 1`] = `
             class="relative cursor-move"
           >
             <div
-              class="w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all duration-300 bg-slate-100 border-slate-300"
+              class="w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all duration-300 bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-zap text-slate-400"
+                class="lucide lucide-zap text-slate-400 dark:text-slate-600"
                 fill="none"
                 height="20"
                 stroke="currentColor"
@@ -566,10 +516,75 @@ exports[`Circuit Designer Page matches snapshot 1`] = `
           </div>
           <div
             class="mt-2 text-xs font-mono text-slate-600 dark:text-slate-400 bg-white/80 dark:bg-slate-800/80 px-1.5 py-0.5 rounded pointer-events-none shadow-sm"
+            data-testid="node-label"
           >
             Out
           </div>
         </div>
+        <div
+          class="absolute bottom-4 right-4 p-4 rounded-full transition-all duration-200 z-40 border-2 bg-white/80 dark:bg-slate-900/80 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-red-300 dark:hover:border-red-800"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-trash2 lucide-trash-2"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M10 11v6"
+            />
+            <path
+              d="M14 11v6"
+            />
+            <path
+              d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
+            />
+            <path
+              d="M3 6h18"
+            />
+            <path
+              d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+            />
+          </svg>
+        </div>
+        <button
+          aria-label="Help"
+          class="absolute bottom-4 left-4 p-4 rounded-full transition-all duration-200 z-40 border-2 bg-white/80 dark:bg-slate-900/80 border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-indigo-300 dark:hover:border-indigo-700 hover:text-indigo-500 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-info"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+            />
+            <path
+              d="M12 16v-4"
+            />
+            <path
+              d="M12 8h.01"
+            />
+          </svg>
+        </button>
       </div>
     </div>
   </div>

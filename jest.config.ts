@@ -16,6 +16,7 @@ const config: Config = {
         '^@/components/(.*)$': '<rootDir>/components/$1',
         '^@/app/(.*)$': '<rootDir>/app/$1',
         '^@/lib/(.*)$': '<rootDir>/lib/$1',
+        '\\.md$': '<rootDir>/__mocks__/fileMock.js',
     },
     // Transform ES modules from react-markdown and its dependencies
     transformIgnorePatterns: [

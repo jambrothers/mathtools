@@ -197,7 +197,7 @@ exports[`Tools Page matches snapshot 1`] = `
                   <p
                     class="text-[var(--theme-muted)] leading-relaxed"
                   >
-                    Explore integer operations, probability, and ratios with interactive two-colored counters.
+                    Explore integer and algebraic operations on directed number with interactive two-coloured counters.
                   </p>
                 </div>
                 <div

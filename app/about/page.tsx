@@ -17,6 +17,16 @@ export default function AboutPage() {
                             We believe that every student deserves access to high-quality, intuitive tools that make learning mathematics engaging and accessible. By leveraging modern web technologies, we bring traditional classroom counters, tiles, and more into the digital age.
                         </p>
                     </div>
+
+                    <div className="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl p-8 mb-8">
+                        <h2 className="text-2xl font-bold text-[var(--theme-main)] mb-4 font-[family-name:var(--font-heading)]">Get in Touch</h2>
+                        <p className="text-[var(--theme-muted)]">
+                            We welcome any feedback and suggestions. Please contact us at{' '}
+                            <a href="mailto:help@teachmaths.net" className="text-[var(--color-primary)] hover:underline">
+                                help@teachmaths.net
+                            </a>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

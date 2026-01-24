@@ -40,6 +40,27 @@ exports[`About Page matches snapshot 1`] = `
             We believe that every student deserves access to high-quality, intuitive tools that make learning mathematics engaging and accessible. By leveraging modern web technologies, we bring traditional classroom counters, tiles, and more into the digital age.
           </p>
         </div>
+        <div
+          class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl p-8 mb-8"
+        >
+          <h2
+            class="text-2xl font-bold text-[var(--theme-main)] mb-4 font-[family-name:var(--font-heading)]"
+          >
+            Get in Touch
+          </h2>
+          <p
+            class="text-[var(--theme-muted)]"
+          >
+            We welcome any feedback and suggestions. Please contact us at
+             
+            <a
+              class="text-[var(--color-primary)] hover:underline"
+              href="mailto:help@teachmaths.net"
+            >
+              help@teachmaths.net
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   </div>
