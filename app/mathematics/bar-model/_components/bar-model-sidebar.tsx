@@ -40,7 +40,6 @@ export function BarModelSidebar() {
                         <DraggableSidebarItem
                             key={item.id}
                             dragData={dragData}
-                            label={item.sidebarLabel}
                             icon={
                                 <div
                                     className={`w-12 h-6 rounded border-2 ${color.bg} ${color.border} ${color.bgDark} ${color.borderDark} flex items-center justify-center`}

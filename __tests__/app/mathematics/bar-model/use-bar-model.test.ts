@@ -268,23 +268,24 @@ describe('useBarModel', () => {
         });
     });
 
-    describe('cloneSelected', () => {
-        it('should clone selected bars with offset', () => {
+    describe('cloneSelectedRight', () => {
+        it('should clone selected bars to the right', () => {
             const { result } = renderHook(() => useBarModel());
 
             act(() => {
                 const bar = result.current.addBar(100, 100, 0, 'Original');
+                result.current.resizeBar(bar.id, 80);
                 result.current.selectBar(bar.id);
             });
 
             act(() => {
-                result.current.cloneSelected();
+                result.current.cloneSelectedRight();
             });
 
             expect(result.current.bars).toHaveLength(2);
             expect(result.current.bars[1].label).toBe('Original');
-            expect(result.current.bars[1].x).toBe(120); // Offset by 20
-            expect(result.current.bars[1].y).toBe(120);
+            expect(result.current.bars[1].x).toBe(180); // 100 + 80 (bar width)
+            expect(result.current.bars[1].y).toBe(100); // Same Y
             // New bar should be selected
             expect(result.current.selectedIds.has(result.current.bars[1].id)).toBe(true);
         });
@@ -294,10 +295,192 @@ describe('useBarModel', () => {
 
             act(() => {
                 result.current.addBar(100, 100, 0, 'Test');
-                result.current.cloneSelected();
+                result.current.cloneSelectedRight();
             });
 
             expect(result.current.bars).toHaveLength(1);
+        });
+    });
+
+    describe('cloneSelectedDown', () => {
+        it('should clone selected bars below', () => {
+            const { result } = renderHook(() => useBarModel());
+
+            act(() => {
+                const bar = result.current.addBar(100, 100, 0, 'Original');
+                result.current.selectBar(bar.id);
+            });
+
+            act(() => {
+                result.current.cloneSelectedDown();
+            });
+
+            expect(result.current.bars).toHaveLength(2);
+            expect(result.current.bars[1].label).toBe('Original');
+            expect(result.current.bars[1].x).toBe(100); // Same X
+            expect(result.current.bars[1].y).toBe(100 + BAR_HEIGHT + GRID_SIZE); // Below
+            // New bar should be selected
+            expect(result.current.selectedIds.has(result.current.bars[1].id)).toBe(true);
+        });
+
+        it('should do nothing if no selection', () => {
+            const { result } = renderHook(() => useBarModel());
+
+            act(() => {
+                result.current.addBar(100, 100, 0, 'Test');
+                result.current.cloneSelectedDown();
+            });
+
+            expect(result.current.bars).toHaveLength(1);
+        });
+    });
+
+    describe('isTotal property', () => {
+        it('should set a bar as total', () => {
+            const { result } = renderHook(() => useBarModel());
+            let bar: BarData | undefined;
+
+            act(() => {
+                bar = result.current.addBar(100, 100, 0, 'Test');
+            });
+
+            act(() => {
+                result.current.setBarAsTotal(bar!.id, true);
+            });
+
+            expect(result.current.bars[0].isTotal).toBe(true);
+        });
+
+        it('should unset a bar as total', () => {
+            const { result } = renderHook(() => useBarModel());
+            let bar: BarData | undefined;
+
+            act(() => {
+                bar = result.current.addBar(100, 100, 0, 'Test');
+                result.current.setBarAsTotal(bar!.id, true);
+            });
+
+            act(() => {
+                result.current.setBarAsTotal(bar!.id, false);
+            });
+
+            expect(result.current.bars[0].isTotal).toBe(false);
+        });
+    });
+
+    describe('applyQuickLabel', () => {
+        it('should apply x label to selected bars', () => {
+            const { result } = renderHook(() => useBarModel());
+
+            act(() => {
+                const bar = result.current.addBar(100, 100, 0, 'Original');
+                result.current.selectBar(bar.id);
+            });
+
+            act(() => {
+                result.current.applyQuickLabel('x');
+            });
+
+            expect(result.current.bars[0].label).toBe('x');
+        });
+
+        it('should apply y label to selected bars', () => {
+            const { result } = renderHook(() => useBarModel());
+
+            act(() => {
+                const bar = result.current.addBar(100, 100, 0, 'Original');
+                result.current.selectBar(bar.id);
+            });
+
+            act(() => {
+                result.current.applyQuickLabel('y');
+            });
+
+            expect(result.current.bars[0].label).toBe('y');
+        });
+
+        it('should apply ? label to selected bars', () => {
+            const { result } = renderHook(() => useBarModel());
+
+            act(() => {
+                const bar = result.current.addBar(100, 100, 0, 'Original');
+                result.current.selectBar(bar.id);
+            });
+
+            act(() => {
+                result.current.applyQuickLabel('?');
+            });
+
+            expect(result.current.bars[0].label).toBe('?');
+        });
+
+        it('should apply units label (width in grid units)', () => {
+            const { result } = renderHook(() => useBarModel());
+
+            act(() => {
+                const bar = result.current.addBar(100, 100, 0, 'Original');
+                result.current.resizeBar(bar.id, 100); // 100px = 5 grid units
+                result.current.selectBar(bar.id);
+            });
+
+            act(() => {
+                result.current.applyQuickLabel('units');
+            });
+
+            expect(result.current.bars[0].label).toBe('5'); // 100 / 20 = 5 units
+        });
+
+        it('should apply relative label (fraction of total bar)', () => {
+            const { result } = renderHook(() => useBarModel());
+
+            act(() => {
+                // Create total bar of 200px = 10 units
+                const totalBar = result.current.addBar(100, 200, 5, 'Total');
+                result.current.resizeBar(totalBar.id, 200);
+                result.current.setBarAsTotal(totalBar.id, true);
+
+                // Create smaller bar of 40px = 2 units
+                const bar = result.current.addBar(100, 100, 0, 'Part');
+                result.current.resizeBar(bar.id, 40);
+                result.current.selectBar(bar.id);
+            });
+
+            act(() => {
+                result.current.applyQuickLabel('relative');
+            });
+
+            // 40/200 = 1/5
+            expect(result.current.bars[1].label).toBe('1/5');
+        });
+
+        it('should apply relative label as fraction if no total bar exists', () => {
+            const { result } = renderHook(() => useBarModel());
+
+            act(() => {
+                const bar = result.current.addBar(100, 100, 0, 'Test');
+                result.current.selectBar(bar.id);
+            });
+
+            act(() => {
+                result.current.applyQuickLabel('relative');
+            });
+
+            // No total bar, should just show empty or unchanged
+            expect(result.current.bars[0].label).toBe('');
+        });
+
+        it('should do nothing if no selection', () => {
+            const { result } = renderHook(() => useBarModel());
+
+            act(() => {
+                result.current.addBar(100, 100, 0, 'Original');
+            });
+
+            act(() => {
+                result.current.applyQuickLabel('x');
+            });
+
+            expect(result.current.bars[0].label).toBe('Original');
         });
     });
 
@@ -353,8 +536,8 @@ describe('useBarModel', () => {
             expect(result.current.bars).toHaveLength(2);
             expect(result.current.bars[0].width).toBe(60);
             expect(result.current.bars[1].width).toBe(60);
-            expect(result.current.bars[0].label).toBe('½');
-            expect(result.current.bars[1].label).toBe('½');
+            expect(result.current.bars[0].label).toBe(''); // No label on split
+            expect(result.current.bars[1].label).toBe(''); // No label on split
             expect(result.current.bars[1].x).toBe(160); // 100 + 60 = 160
         });
 
@@ -374,7 +557,7 @@ describe('useBarModel', () => {
 
             expect(result.current.bars).toHaveLength(3);
             expect(result.current.bars[0].width).toBe(40);
-            expect(result.current.bars[0].label).toBe('⅓');
+            expect(result.current.bars[0].label).toBe(''); // No label on split
         });
 
         it('should handle non-divisible widths by giving remainder to last part', () => {

@@ -20,6 +20,9 @@ export const DEFAULT_BAR_WIDTH = 100;
 /** Minimum bar width (1 grid unit) */
 export const MIN_BAR_WIDTH = 20;
 
+/** Quick label types for labeling bars */
+export type QuickLabelType = 'x' | 'y' | '?' | 'units' | 'relative';
+
 // =============================================================================
 // Color Definitions
 // =============================================================================
@@ -119,55 +122,63 @@ export const BAR_COLORS: BarColor[] = [
 /**
  * Sidebar item configuration for draggable bar blocks.
  */
-export interface SidebarBarItem {
+export interface SidebarItem {
     /** Unique identifier */
     id: string;
-    /** Display label in sidebar */
-    sidebarLabel: string;
-    /** Default label when placed on canvas */
+    /** Default label when placed on canvas (empty = no label) */
     defaultLabel: string;
     /** Color index into BAR_COLORS */
     colorIndex: number;
+    /** Width in grid units relative to default */
+    width: number;
+    /** Label shown in sidebar */
+    sidebarLabel: string;
 }
 
 /**
  * Predefined bar types available in the sidebar.
  */
-export const SIDEBAR_ITEMS: SidebarBarItem[] = [
+export const SIDEBAR_ITEMS: SidebarItem[] = [
     {
         id: 'unit',
         sidebarLabel: '1 Unit',
-        defaultLabel: '1',
+        defaultLabel: '',
         colorIndex: 0,
+        width: 1,
     },
     {
         id: 'var-x',
         sidebarLabel: 'Variable x',
-        defaultLabel: 'x',
+        defaultLabel: '',
         colorIndex: 1,
+        width: 1,
     },
     {
         id: 'var-y',
         sidebarLabel: 'Variable y',
-        defaultLabel: 'y',
+        defaultLabel: '',
         colorIndex: 2,
+        width: 1,
     },
     {
         id: 'generic',
         sidebarLabel: 'Generic',
         defaultLabel: '',
         colorIndex: 3,
+        width: 1,
     },
     {
         id: 'quantity',
         sidebarLabel: 'Quantity',
-        defaultLabel: '100',
+        defaultLabel: '',
         colorIndex: 4,
+        width: 1,
     },
     {
         id: 'unknown',
-        sidebarLabel: 'Total / ?',
-        defaultLabel: '?',
+        sidebarLabel: 'Unknown',
+        defaultLabel: '',
         colorIndex: 5,
+        width: 1,
     },
 ];

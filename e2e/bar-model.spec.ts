@@ -18,14 +18,13 @@ test.describe('Bar Model Tool', () => {
         // Check empty state message
         await expect(page.getByText('Drag bars here to start')).toBeVisible();
 
-        // Check sidebar has bar blocks
-        await expect(page.getByText('1 Unit')).toBeVisible();
-        await expect(page.getByText('Variable x')).toBeVisible();
-        await expect(page.getByText('Variable y')).toBeVisible();
+        // Check sidebar section exists (labels removed, but section title should exist)
+        await expect(page.getByText('Bar Blocks')).toBeVisible();
     });
 
     test('can add a bar via drag and drop', async ({ page }) => {
-        const sidebar = page.getByText('1 Unit');
+        // Get the first draggable bar in sidebar (buttons within the Bar Blocks section)
+        const sidebarButton = page.locator('[data-testid="bar-model-canvas"]').locator('..').locator('button').first();
         const canvas = page.locator('[data-testid="bar-model-canvas"]');
 
         // Get canvas bounding box
@@ -33,7 +32,7 @@ test.describe('Bar Model Tool', () => {
         expect(canvasBox).not.toBeNull();
 
         // Drag from sidebar to canvas
-        await sidebar.dragTo(canvas, {
+        await sidebarButton.dragTo(canvas, {
             targetPosition: { x: 200, y: 200 }
         });
 
@@ -41,18 +40,16 @@ test.describe('Bar Model Tool', () => {
         await expect(page.getByText('Drag bars here to start')).not.toBeVisible();
     });
 
-    test('toolbar shows selected count', async ({ page }) => {
-        // Check initial selected count
-        await expect(page.getByText('Selected: 0')).toBeVisible();
-    });
 
     test('toolbar buttons exist', async ({ page }) => {
         // Check operation buttons exist
+        await expect(page.getByRole('button', { name: /Quick Label/i })).toBeVisible();
         await expect(page.getByRole('button', { name: /Join/i })).toBeVisible();
         await expect(page.getByRole('button', { name: /Split ½/i })).toBeVisible();
         await expect(page.getByRole('button', { name: /Split ⅓/i })).toBeVisible();
-        await expect(page.getByRole('button', { name: /Clone/i })).toBeVisible();
-        await expect(page.getByRole('button', { name: /Delete/i })).toBeVisible();
+        await expect(page.getByRole('button', { name: /Clone R/i })).toBeVisible();
+        await expect(page.getByRole('button', { name: /Clone D/i })).toBeVisible();
+        await expect(page.getByRole('button', { name: /Clear/i })).toBeVisible();
         await expect(page.getByRole('button', { name: /Undo/i })).toBeVisible();
     });
 

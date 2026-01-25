@@ -14,6 +14,7 @@ import {
     DEFAULT_BAR_WIDTH,
     MIN_BAR_WIDTH,
     BAR_HEIGHT,
+    QuickLabelType,
 } from "../constants"
 
 // =============================================================================
@@ -33,6 +34,8 @@ export interface BarData {
     colorIndex: number;
     /** Display label */
     label: string;
+    /** Whether this bar is marked as the "total" bar */
+    isTotal?: boolean;
 }
 
 export interface UseBarModelReturn {
@@ -46,6 +49,7 @@ export interface UseBarModelReturn {
     deleteSelected: () => void;
     updateBar: (id: string, updates: Partial<BarData>) => void;
     updateBarLabel: (id: string, label: string) => void;
+    setBarAsTotal: (id: string, isTotal: boolean) => void;
 
     // Movement/Resize
     moveBar: (id: string, x: number, y: number) => void;
@@ -59,9 +63,12 @@ export interface UseBarModelReturn {
     selectInRect: (rect: DOMRect) => void;
 
     // Operations
-    cloneSelected: () => void;
+    cloneSelectedRight: () => void;
+    cloneSelectedDown: () => void;
     joinSelected: () => void;
     splitSelected: (parts: 2 | 3) => void;
+    applyQuickLabel: (labelType: QuickLabelType) => void;
+    toggleTotal: () => void;
 
     // History
     undo: () => void;
@@ -81,6 +88,28 @@ const snap = (val: number): number => Math.round(val / GRID_SIZE) * GRID_SIZE;
 
 /** Generate a unique bar ID */
 const generateId = (): string => `bar-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+/** Calculate GCD of two numbers using Euclidean algorithm */
+const gcd = (a: number, b: number): number => {
+    a = Math.abs(Math.round(a));
+    b = Math.abs(Math.round(b));
+    while (b > 0) {
+        const t = b;
+        b = a % b;
+        a = t;
+    }
+    return a;
+};
+
+/** Simplify a fraction and return as "n/d" string */
+const simplifyFraction = (numerator: number, denominator: number): string => {
+    if (denominator === 0) return '';
+    const divisor = gcd(numerator, denominator);
+    const n = Math.round(numerator / divisor);
+    const d = Math.round(denominator / divisor);
+    if (d === 1) return String(n);
+    return `${n}/${d}`;
+};
 
 // =============================================================================
 // Hook Implementation
@@ -149,6 +178,30 @@ export function useBarModel(): UseBarModelReturn {
             b.id === id ? { ...b, label } : b
         ));
     }, [pushBars]);
+
+    const setBarAsTotal = useCallback((id: string, isTotal: boolean): void => {
+        pushBars(prev => prev.map(b =>
+            b.id === id ? { ...b, isTotal } : b
+        ));
+    }, [pushBars]);
+
+    const toggleTotal = useCallback((): void => {
+        if (selectedIds.size !== 1) return; // Only apply to single selection for now
+        const id = Array.from(selectedIds)[0];
+
+        pushBars(prev => {
+            const bar = prev.find(b => b.id === id);
+            if (!bar) return prev;
+
+            const newIsTotal = !bar.isTotal;
+            // If setting to true, unset others
+            const newBars = prev.map(b => ({
+                ...b,
+                isTotal: b.id === id ? newIsTotal : (newIsTotal ? false : b.isTotal)
+            }));
+            return newBars;
+        });
+    }, [selectedIds, pushBars]);
 
     // =========================================================================
     // Movement & Resize
@@ -226,15 +279,32 @@ export function useBarModel(): UseBarModelReturn {
     // Operations
     // =========================================================================
 
-    const cloneSelected = useCallback((): void => {
+    const cloneSelectedRight = useCallback((): void => {
         if (selectedIds.size === 0) return;
 
         const selectedBars = bars.filter(b => selectedIds.has(b.id));
         const clones: BarData[] = selectedBars.map(bar => ({
             ...bar,
             id: generateId(),
-            x: bar.x + GRID_SIZE,
-            y: bar.y + GRID_SIZE,
+            x: bar.x + bar.width, // Place directly to the right
+            y: bar.y, // Same Y
+            isTotal: false, // Clones shouldn't inherit total status
+        }));
+
+        pushBars(prev => [...prev, ...clones]);
+        setSelectedIds(new Set(clones.map(b => b.id)));
+    }, [bars, selectedIds, pushBars]);
+
+    const cloneSelectedDown = useCallback((): void => {
+        if (selectedIds.size === 0) return;
+
+        const selectedBars = bars.filter(b => selectedIds.has(b.id));
+        const clones: BarData[] = selectedBars.map(bar => ({
+            ...bar,
+            id: generateId(),
+            x: bar.x, // Same X
+            y: bar.y + BAR_HEIGHT + GRID_SIZE, // Place directly below
+            isTotal: false, // Clones shouldn't inherit total status
         }));
 
         pushBars(prev => [...prev, ...clones]);
@@ -256,6 +326,7 @@ export function useBarModel(): UseBarModelReturn {
             width: totalWidth,
             colorIndex: 5, // Gray/unknown
             label: 'Total',
+            isTotal: true, // Mark as total bar
         };
 
         pushBars(prev => [...prev, totalBar]);
@@ -272,8 +343,6 @@ export function useBarModel(): UseBarModelReturn {
             const partWidth = snap(bar.width / parts);
             const minPartWidth = Math.max(MIN_BAR_WIDTH, partWidth);
 
-            const labels = parts === 2 ? ['½', '½'] : ['⅓', '⅓', '⅓'];
-
             let currentX = bar.x;
             for (let i = 0; i < parts; i++) {
                 // Last part gets any remaining width to maintain total
@@ -287,7 +356,7 @@ export function useBarModel(): UseBarModelReturn {
                     id: generateId(),
                     x: currentX,
                     width: Math.max(MIN_BAR_WIDTH, width),
-                    label: labels[i],
+                    label: '', // No label on split
                 });
                 currentX += minPartWidth;
             }
@@ -301,6 +370,41 @@ export function useBarModel(): UseBarModelReturn {
             ]);
             setSelectedIds(new Set(toAdd.map(b => b.id)));
         }
+    }, [bars, selectedIds, pushBars]);
+
+    const applyQuickLabel = useCallback((labelType: QuickLabelType): void => {
+        if (selectedIds.size === 0) return;
+
+        // Find the total bar if one exists
+        const totalBar = bars.find(b => b.isTotal);
+
+        pushBars(prev => prev.map(bar => {
+            if (!selectedIds.has(bar.id)) return bar;
+
+            let newLabel: string;
+            switch (labelType) {
+                case 'x':
+                case 'y':
+                case '?':
+                    newLabel = labelType;
+                    break;
+                case 'units':
+                    // Label with width in grid units
+                    newLabel = String(Math.round(bar.width / GRID_SIZE));
+                    break;
+                case 'relative':
+                    // Label with fraction of total bar
+                    if (totalBar && totalBar.width > 0) {
+                        newLabel = simplifyFraction(bar.width, totalBar.width);
+                    } else {
+                        newLabel = '';
+                    }
+                    break;
+                default:
+                    newLabel = bar.label;
+            }
+            return { ...bar, label: newLabel };
+        }));
     }, [bars, selectedIds, pushBars]);
 
     // =========================================================================
@@ -331,6 +435,7 @@ export function useBarModel(): UseBarModelReturn {
         deleteSelected,
         updateBar,
         updateBarLabel,
+        setBarAsTotal,
         moveBar,
         moveSelected,
         resizeBar,
@@ -338,9 +443,12 @@ export function useBarModel(): UseBarModelReturn {
         selectBars,
         clearSelection,
         selectInRect,
-        cloneSelected,
+        cloneSelectedRight,
+        cloneSelectedDown,
         joinSelected,
         splitSelected,
+        applyQuickLabel,
+        toggleTotal,
         undo,
         canUndo,
         clearAll,

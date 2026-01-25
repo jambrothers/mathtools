@@ -10,21 +10,21 @@
 
 import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { Trash2 } from 'lucide-react';
+
 import { SetPageTitle } from '@/components/set-page-title';
-
-import { Canvas } from '@/components/tool-ui/canvas';
-import { TrashZone } from '@/components/tool-ui/trash-zone';
-import { HelpButton } from '@/components/tool-ui/help-button';
 import { HelpModal } from '@/components/tool-ui/help-modal';
+import { HelpButton } from '@/components/tool-ui/help-button';
+import { Canvas } from '@/components/tool-ui/canvas';
+import { cn } from '@/lib/utils';
+import { generateShareableURL, copyURLToClipboard } from '@/lib/url-state';
 
-import { useBarModel } from './_hooks/use-bar-model';
+import { useBarModel, BarData } from './_hooks/use-bar-model';
 import { Bar } from './_components/bar';
 import { BarModelSidebar, BarDragData } from './_components/bar-model-sidebar';
 import { BarModelToolbar } from './_components/bar-model-toolbar';
-
-import { GRID_SIZE } from './constants';
+import { GRID_SIZE, BAR_HEIGHT } from './constants';
 import { barModelURLSerializer, BarModelURLState } from './_lib/url-state';
-import { generateShareableURL, copyURLToClipboard } from '@/lib/url-state';
 import helpContent from './HELP.md';
 
 // =============================================================================
@@ -33,8 +33,8 @@ import helpContent from './HELP.md';
 
 function BarModelPageLoading() {
     return (
-        <div className="flex flex-col h-screen bg-slate-50 dark:bg-slate-950 items-center justify-center">
-            <div className="text-slate-500 dark:text-slate-400 text-lg">Loading Bar Model Tool...</div>
+        <div className="flex flex-col h-[calc(100vh-81px)] w-full bg-slate-50 dark:bg-slate-950 overflow-hidden items-center justify-center">
+            <div className="animate-pulse text-slate-400 dark:text-slate-500">Loading...</div>
         </div>
     );
 }
@@ -69,32 +69,36 @@ function BarModelPageContent() {
         deleteSelected,
         updateBarLabel,
         moveBar,
+        moveSelected,
         resizeBar,
         selectBar,
         clearSelection,
         selectInRect,
-        cloneSelected,
+        cloneSelectedRight,
+        cloneSelectedDown,
         joinSelected,
         splitSelected,
+        applyQuickLabel,
+        toggleTotal,
         undo,
         canUndo,
         clearAll,
         initFromState,
     } = useBarModel();
 
-    // Drag state
+    // Local UI State
     const [draggingId, setDraggingId] = useState<string | null>(null);
     const [isOverTrash, setIsOverTrash] = useState(false);
     const [isHelpOpen, setIsHelpOpen] = useState(false);
     const [hasInitialized, setHasInitialized] = useState(false);
 
-    // Drag tracking
+    // Drag tracking (mutable ref for performance)
+    // For multi-select drag, we track the initial positions and the start click position
     const dragRef = useRef<{
-        id: string;
         startX: number;
         startY: number;
-        initialX: number;
-        initialY: number;
+        lastX: number;
+        lastY: number;
     } | null>(null);
 
     // Initialize from URL on mount
@@ -113,7 +117,6 @@ function BarModelPageContent() {
         if (!hasInitialized) return;
 
         if (bars.length === 0) {
-            // Clear URL params if no bars
             const url = new URL(window.location.href);
             url.search = '';
             window.history.replaceState({}, '', url.toString());
@@ -127,16 +130,13 @@ function BarModelPageContent() {
     // Keyboard shortcuts
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // Ignore if typing in an input
             if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
-            // Delete selected
             if ((e.key === 'Delete' || e.key === 'Backspace') && selectedIds.size > 0) {
                 e.preventDefault();
                 deleteSelected();
             }
 
-            // Undo
             if ((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey)) {
                 e.preventDefault();
                 undo();
@@ -146,6 +146,81 @@ function BarModelPageContent() {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedIds, deleteSelected, undo]);
+
+    // =========================================================================
+    // Bar Dragging - handled at document level for smooth dragging
+    // =========================================================================
+
+    // Handle bar drag start (called from Bar component)
+    const handleBarDragStart = useCallback((id: string, e: React.PointerEvent) => {
+        // Capture pointer on the target element
+        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        setDraggingId(id);
+
+        // For delta-based movement tracking
+        dragRef.current = {
+            startX: e.clientX,
+            startY: e.clientY,
+            lastX: e.clientX,
+            lastY: e.clientY,
+        };
+    }, []);
+
+    // Document-level pointer move handler for bar dragging
+    useEffect(() => {
+        if (!draggingId) return;
+
+        const handlePointerMove = (e: PointerEvent) => {
+            if (!dragRef.current) return;
+
+            // Calculate delta since last move
+            const deltaX = e.clientX - dragRef.current.lastX;
+            const deltaY = e.clientY - dragRef.current.lastY;
+
+            // Update last position
+            dragRef.current.lastX = e.clientX;
+            dragRef.current.lastY = e.clientY;
+
+            // Move all selected bars together
+            if (selectedIds.size > 0) {
+                moveSelected(deltaX, deltaY);
+            }
+
+            // Check trash hover
+            if (trashRef.current) {
+                const tr = trashRef.current.getBoundingClientRect();
+                const isOver = e.clientX >= tr.left && e.clientX <= tr.right &&
+                    e.clientY >= tr.top && e.clientY <= tr.bottom;
+                setIsOverTrash(isOver);
+            }
+        };
+
+        const handlePointerUp = () => {
+            if (dragRef.current) {
+                if (isOverTrash && draggingId) {
+                    // Delete all selected bars when dropped on trash
+                    deleteSelected();
+                }
+                setDraggingId(null);
+                setIsOverTrash(false);
+                dragRef.current = null;
+            }
+        };
+
+        document.addEventListener('pointermove', handlePointerMove);
+        document.addEventListener('pointerup', handlePointerUp);
+        document.addEventListener('pointercancel', handlePointerUp);
+
+        return () => {
+            document.removeEventListener('pointermove', handlePointerMove);
+            document.removeEventListener('pointerup', handlePointerUp);
+            document.removeEventListener('pointercancel', handlePointerUp);
+        };
+    }, [draggingId, isOverTrash, moveSelected, deleteSelected, selectedIds.size]);
+
+    // =========================================================================
+    // Drop Handlers
+    // =========================================================================
 
     // Handle drop from sidebar (HTML5 drag and drop)
     const handleDropOnCanvas = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -197,68 +272,49 @@ function BarModelPageContent() {
         e.dataTransfer.dropEffect = 'copy';
     }, []);
 
-    // Handle bar drag start
-    const handleBarDragStart = useCallback((id: string, e: React.PointerEvent) => {
-        const bar = bars.find(b => b.id === id);
-        if (!bar) return;
+    // =========================================================================
+    // Selection Handlers
+    // =========================================================================
 
-        (e.target as HTMLElement).setPointerCapture(e.pointerId);
-        setDraggingId(id);
+    // Handle marquee selection end from Canvas component
+    const handleSelectionEnd = useCallback((rect: DOMRect) => {
+        // Canvas provides canvas-relative coordinates
+        // We need to find bars that intersect with this rect
+        const selected: string[] = [];
+        bars.forEach((bar: BarData) => {
+            const barRight = bar.x + bar.width;
+            const barBottom = bar.y + BAR_HEIGHT;
+            const rectRight = rect.x + rect.width;
+            const rectBottom = rect.y + rect.height;
 
-        dragRef.current = {
-            id,
-            startX: e.clientX,
-            startY: e.clientY,
-            initialX: bar.x,
-            initialY: bar.y,
-        };
-    }, [bars]);
+            // Check for intersection
+            const intersects = !(
+                bar.x > rectRight ||
+                barRight < rect.x ||
+                bar.y > rectBottom ||
+                barBottom < rect.y
+            );
 
-    // Canvas pointer move for dragging
-    const handleCanvasPointerMove = useCallback((e: React.PointerEvent) => {
-        if (!dragRef.current) return;
+            if (intersects) {
+                selected.push(bar.id);
+            }
+        });
 
-        const delta = {
-            x: e.clientX - dragRef.current.startX,
-            y: e.clientY - dragRef.current.startY,
-        };
-
-        const newX = dragRef.current.initialX + delta.x;
-        const newY = dragRef.current.initialY + delta.y;
-
-        moveBar(dragRef.current.id, newX, newY);
-
-        // Check if over trash
-        if (trashRef.current) {
-            const rect = trashRef.current.getBoundingClientRect();
-            const isOver = e.clientX >= rect.left && e.clientX <= rect.right &&
-                e.clientY >= rect.top && e.clientY <= rect.bottom;
-            setIsOverTrash(isOver);
+        if (selected.length > 0) {
+            // Select all bars in the marquee
+            selected.forEach((id, index) => {
+                selectBar(id, index > 0); // First one replaces, rest are additive
+            });
         }
-    }, [moveBar]);
+    }, [bars, selectBar]);
 
-    // Canvas pointer up for drag end
-    const handleCanvasPointerUp = useCallback(() => {
-        if (dragRef.current && isOverTrash) {
-            deleteBar(dragRef.current.id);
-        }
-
-        dragRef.current = null;
-        setDraggingId(null);
-        setIsOverTrash(false);
-    }, [deleteBar, isOverTrash]);
-
-    // Canvas click to clear selection
+    // Clear selection when clicking canvas background (not on a bar)
     const handleCanvasClick = useCallback((e: React.MouseEvent) => {
-        if (e.target === canvasRef.current) {
+        // Only clear if clicking directly on canvas, not on children
+        if (e.target === e.currentTarget || (e.target as HTMLElement).dataset.testid === 'bar-model-canvas') {
             clearSelection();
         }
     }, [clearSelection]);
-
-    // Marquee selection
-    const handleSelectionEnd = useCallback((rect: DOMRect) => {
-        selectInRect(rect);
-    }, [selectInRect]);
 
     // Copy link to clipboard
     const handleCopyLink = useCallback(() => {
@@ -267,47 +323,44 @@ function BarModelPageContent() {
         copyURLToClipboard(url);
     }, [bars]);
 
-    // Clear all with confirmation
-    const handleClearAll = useCallback(() => {
-        if (bars.length === 0 || window.confirm('Clear all bars?')) {
-            clearAll();
-        }
-    }, [bars.length, clearAll]);
+    // Clear all
+    const handleClear = useCallback(() => {
+        clearAll();
+    }, [clearAll]);
 
     return (
-        <div className="flex flex-col h-screen bg-slate-50 dark:bg-slate-950 select-none overflow-hidden">
+        <div className="flex flex-col h-[calc(100vh-81px)] w-full bg-slate-50 dark:bg-slate-950 overflow-hidden">
             <SetPageTitle title="Bar Model Tool" />
 
-            {/* Toolbar */}
+            {/* Toolbar - inline, matching counters page pattern */}
             <BarModelToolbar
                 selectedCount={selectedIds.size}
                 canUndo={canUndo}
                 onJoin={joinSelected}
                 onSplitHalf={() => splitSelected(2)}
                 onSplitThird={() => splitSelected(3)}
-                onClone={cloneSelected}
-                onDeleteSelected={deleteSelected}
-                onClearAll={handleClearAll}
+                onCloneRight={cloneSelectedRight}
+                onCloneDown={cloneSelectedDown}
+                onQuickLabel={applyQuickLabel}
+                onToggleTotal={toggleTotal}
+                onClear={handleClear}
                 onUndo={undo}
                 onCopyLink={handleCopyLink}
             />
 
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-hidden relative">
                 {/* Sidebar */}
                 <BarModelSidebar />
 
-                {/* Canvas */}
+                {/* Main Canvas - let Canvas handle marquee selection internally */}
                 <Canvas
                     ref={canvasRef}
-                    data-testid="bar-model-canvas"
                     gridSize={GRID_SIZE}
-                    onSelectionEnd={handleSelectionEnd}
-                    onClick={handleCanvasClick}
+                    data-testid="bar-model-canvas"
                     onDrop={handleDropOnCanvas}
                     onDragOver={handleDragOver}
-                    onPointerMove={handleCanvasPointerMove}
-                    onPointerUp={handleCanvasPointerUp}
-                    onPointerLeave={handleCanvasPointerUp}
+                    onSelectionEnd={handleSelectionEnd}
+                    onClick={handleCanvasClick}
                 >
                     {/* Bars */}
                     {bars.map((bar) => (
@@ -323,27 +376,33 @@ function BarModelPageContent() {
                         />
                     ))}
 
-                    {/* Empty state */}
+                    {/* Trash Drop Zone */}
+                    <div
+                        ref={trashRef}
+                        className={cn(
+                            "absolute bottom-6 right-6 p-4 rounded-full transition-all duration-200 z-40",
+                            "flex items-center justify-center",
+                            isOverTrash
+                                ? "bg-red-100 text-red-600 scale-110 border-2 border-red-500 dark:bg-red-900/30 dark:text-red-400"
+                                : "bg-white text-slate-400 border border-slate-200 shadow-sm dark:bg-slate-800 dark:border-slate-700"
+                        )}
+                    >
+                        <Trash2 size={24} />
+                    </div>
+
+                    {/* Empty State */}
                     {bars.length === 0 && (
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-50">
                             <div className="text-center">
-                                <div className="text-6xl mb-4">📊</div>
-                                <h3 className="text-2xl font-bold text-slate-400 dark:text-slate-500">
+                                <p className="text-xl font-medium text-slate-400 dark:text-slate-600">
                                     Drag bars here to start
-                                </h3>
+                                </p>
                             </div>
                         </div>
                     )}
 
-                    {/* Floating buttons - bottom right */}
-                    <div className="absolute bottom-4 right-4 flex items-center gap-3 z-40">
-                        <HelpButton onClick={() => setIsHelpOpen(true)} className="static" />
-                        <TrashZone
-                            ref={trashRef}
-                            className="static"
-                            isHovered={isOverTrash}
-                        />
-                    </div>
+                    {/* Help Button */}
+                    <HelpButton onClick={() => setIsHelpOpen(true)} />
                 </Canvas>
             </div>
 

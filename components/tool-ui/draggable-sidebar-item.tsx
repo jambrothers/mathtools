@@ -19,8 +19,8 @@ interface DraggableSidebarItemProps extends React.ButtonHTMLAttributes<HTMLButto
     dragData: SidebarDragData
     /** Visual icon/preview to display on the left (e.g., a colored div representing the item) */
     icon?: React.ReactNode
-    /** Label text to display */
-    label: React.ReactNode
+    /** Label text to display (optional) */
+    label?: React.ReactNode
 }
 
 /**

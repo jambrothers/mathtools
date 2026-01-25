@@ -168,9 +168,22 @@ export function Bar({
                     onKeyDown={handleLabelKeyDown}
                 />
             ) : (
-                <span className="font-bold text-lg pointer-events-none select-none">
-                    {bar.label}
-                </span>
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <span className={cn(
+                        "text-lg font-medium select-none truncate px-1",
+                        color.text,
+                        color.textDark
+                    )}>
+                        {bar.label}
+                    </span>
+                </div>
+            )}
+
+            {/* Total Indicator */}
+            {bar.isTotal && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm z-10 pointer-events-none">
+                    TOTAL
+                </div>
             )}
 
             {/* Resize handle */}
@@ -184,8 +197,8 @@ export function Bar({
                 <div className="w-1 h-4 bg-black/20 rounded-full" />
             </div>
 
-            {/* Width indicator (shown when resizing or no label) */}
-            {(!bar.label || isResizing) && (
+            {/* Width indicator (shown only when resizing) */}
+            {isResizing && (
                 <div className="absolute -bottom-6 text-[10px] text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 px-1 rounded border border-slate-200 dark:border-slate-700">
                     {Math.round(bar.width / GRID_SIZE)} units
                 </div>
