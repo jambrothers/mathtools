@@ -71,8 +71,16 @@ export function Bar({
         if (isEditing) return;
         e.stopPropagation();
 
-        // Check if shift key for additive selection
-        onSelect(bar.id, e.shiftKey);
+        // If shift key, toggle selection
+        if (e.shiftKey) {
+            onSelect(bar.id, true);
+        }
+        // If not selected, select it (exclusive)
+        // If already selected, do nothing (wait for drag or click)
+        else if (!isSelected) {
+            onSelect(bar.id, false);
+        }
+
         onDragStart(bar.id, e);
     };
 

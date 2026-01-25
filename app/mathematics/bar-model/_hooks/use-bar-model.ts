@@ -77,6 +77,11 @@ export interface UseBarModelReturn {
     // State management
     clearAll: () => void;
     initFromState: (bars: BarData[]) => void;
+
+    // Explicit Drag (Performance optimization)
+    dragStart: () => void;
+    dragMove: (dx: number, dy: number) => void;
+    dragEnd: () => void;
 }
 
 // =============================================================================
@@ -424,6 +429,37 @@ export function useBarModel(): UseBarModelReturn {
     }, [updateBars, clearHistory]);
 
     // =========================================================================
+    // Explicit Drag Implementation (Perf + Smoothness)
+    // =========================================================================
+
+    const dragStart = useCallback((): void => {
+        // Push current state to history (checkpoint) before modification
+        pushBars(prev => prev);
+    }, [pushBars]);
+
+    const dragMove = useCallback((dx: number, dy: number): void => {
+        if (selectedIds.size === 0) return;
+        // Update WITHOUT snapping for smooth 1:1 movement
+        // Use updateBars (transient) instead of pushBars
+        updateBars(prev => prev.map(b =>
+            selectedIds.has(b.id)
+                ? { ...b, x: b.x + dx, y: b.y + dy }
+                : b
+        ));
+    }, [updateBars, selectedIds]);
+
+    const dragEnd = useCallback((): void => {
+        if (selectedIds.size === 0) return;
+        // Finalize by snapping to grid
+        // Use updateBars to commit the final state (history already has the pre-drag state)
+        updateBars(prev => prev.map(b =>
+            selectedIds.has(b.id)
+                ? { ...b, x: snap(b.x), y: snap(b.y) }
+                : b
+        ));
+    }, [updateBars, selectedIds]);
+
+    // =========================================================================
     // Return
     // =========================================================================
 
@@ -453,5 +489,8 @@ export function useBarModel(): UseBarModelReturn {
         canUndo,
         clearAll,
         initFromState,
+        dragStart,
+        dragMove,
+        dragEnd,
     };
 }

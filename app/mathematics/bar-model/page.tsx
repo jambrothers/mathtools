@@ -65,15 +65,11 @@ function BarModelPageContent() {
         bars,
         selectedIds,
         addBar,
-        deleteBar,
         deleteSelected,
         updateBarLabel,
-        moveBar,
-        moveSelected,
         resizeBar,
         selectBar,
         clearSelection,
-        selectInRect,
         cloneSelectedRight,
         cloneSelectedDown,
         joinSelected,
@@ -84,6 +80,9 @@ function BarModelPageContent() {
         canUndo,
         clearAll,
         initFromState,
+        dragStart,
+        dragMove,
+        dragEnd,
     } = useBarModel();
 
     // Local UI State
@@ -99,6 +98,7 @@ function BarModelPageContent() {
         startY: number;
         lastX: number;
         lastY: number;
+        hasStarted: boolean;
     } | null>(null);
 
     // Initialize from URL on mount
@@ -163,6 +163,7 @@ function BarModelPageContent() {
             startY: e.clientY,
             lastX: e.clientX,
             lastY: e.clientY,
+            hasStarted: false,
         };
     }, []);
 
@@ -173,17 +174,36 @@ function BarModelPageContent() {
         const handlePointerMove = (e: PointerEvent) => {
             if (!dragRef.current) return;
 
-            // Calculate delta since last move
+            // Update simple lastX/Y for tracking delta
             const deltaX = e.clientX - dragRef.current.lastX;
             const deltaY = e.clientY - dragRef.current.lastY;
-
-            // Update last position
             dragRef.current.lastX = e.clientX;
             dragRef.current.lastY = e.clientY;
 
             // Move all selected bars together
-            if (selectedIds.size > 0) {
-                moveSelected(deltaX, deltaY);
+            if (draggingId) {
+                // If we haven't started a history/drag op yet, check threshold
+                if (!dragRef.current.hasStarted) {
+                    const dist = Math.hypot(
+                        e.clientX - dragRef.current.startX,
+                        e.clientY - dragRef.current.startY
+                    );
+
+                    if (dist > 3) {
+                        // Threshold crossed - start drag
+                        dragStart(); // Checkpoint history
+                        dragRef.current.hasStarted = true;
+
+                        // Apply the initial movement (from start to now)
+                        // This prevents "jump" where we lose the first 3px
+                        const totalDx = e.clientX - dragRef.current.startX;
+                        const totalDy = e.clientY - dragRef.current.startY;
+                        dragMove(totalDx, totalDy);
+                    }
+                } else {
+                    // Already inside a drag op, just apply incremental delta
+                    dragMove(deltaX, deltaY);
+                }
             }
 
             // Check trash hover
@@ -195,8 +215,17 @@ function BarModelPageContent() {
             }
         };
 
-        const handlePointerUp = () => {
+        const handlePointerUp = (e: PointerEvent) => {
             if (dragRef.current) {
+                // If we started a drag op, finish it (snap)
+                if (dragRef.current.hasStarted) {
+                    dragEnd();
+                }
+                // If NOT started (moved < 3px), treat as click
+                else if (draggingId && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
+                    selectBar(draggingId, false);
+                }
+
                 if (isOverTrash && draggingId) {
                     // Delete all selected bars when dropped on trash
                     deleteSelected();
@@ -216,7 +245,7 @@ function BarModelPageContent() {
             document.removeEventListener('pointerup', handlePointerUp);
             document.removeEventListener('pointercancel', handlePointerUp);
         };
-    }, [draggingId, isOverTrash, moveSelected, deleteSelected, selectedIds.size]);
+    }, [draggingId, isOverTrash, deleteSelected, selectBar, dragStart, dragMove, dragEnd]);
 
     // =========================================================================
     // Drop Handlers
