@@ -76,6 +76,7 @@ function BarModelPageContent() {
         splitSelected,
         applyQuickLabel,
         toggleTotal,
+        toggleRelativeLabel,
         undo,
         canUndo,
         clearAll,
@@ -85,11 +86,27 @@ function BarModelPageContent() {
         dragEnd,
     } = useBarModel();
 
+    // Derived state
+    const totalBar = bars.find(b => b.isTotal);
+
+    // Validation Logic
+    const selectedBars = bars.filter(b => selectedIds.has(b.id));
+    const hasTotalSelected = selectedBars.some(b => b.isTotal);
+    const selectedCount = selectedIds.size;
+
+    const canSplit = {
+        half: selectedCount > 0 && !hasTotalSelected && selectedBars.every(b => (b.width / GRID_SIZE) % 2 === 0),
+        third: selectedCount > 0 && !hasTotalSelected && selectedBars.every(b => (b.width / GRID_SIZE) % 3 === 0),
+        fifth: selectedCount > 0 && !hasTotalSelected && selectedBars.every(b => (b.width / GRID_SIZE) % 5 === 0),
+    };
+
+    const canToggleRelative = selectedCount > 0;
+
     // Local UI State
     const [draggingId, setDraggingId] = useState<string | null>(null);
     const [isOverTrash, setIsOverTrash] = useState(false);
     const [isHelpOpen, setIsHelpOpen] = useState(false);
-    const [hasInitialized, setHasInitialized] = useState(false);
+    const hasInitialized = useRef(false);
 
     // Drag tracking (mutable ref for performance)
     // For multi-select drag, we track the initial positions and the start click position
@@ -103,18 +120,18 @@ function BarModelPageContent() {
 
     // Initialize from URL on mount
     useEffect(() => {
-        if (hasInitialized) return;
+        if (hasInitialized.current) return;
 
         const state = barModelURLSerializer.deserialize(searchParams);
         if (state && state.bars.length > 0) {
             initFromState(state.bars);
         }
-        setHasInitialized(true);
-    }, [searchParams, hasInitialized, initFromState]);
+        hasInitialized.current = true;
+    }, [searchParams, initFromState]);
 
     // Update URL when state changes
     useEffect(() => {
-        if (!hasInitialized) return;
+        if (!hasInitialized.current) return;
 
         if (bars.length === 0) {
             const url = new URL(window.location.href);
@@ -125,7 +142,7 @@ function BarModelPageContent() {
             const url = generateShareableURL(barModelURLSerializer, state);
             window.history.replaceState({}, '', url);
         }
-    }, [bars, hasInitialized]);
+    }, [bars]);
 
     // Keyboard shortcuts
     useEffect(() => {
@@ -368,10 +385,14 @@ function BarModelPageContent() {
                 onJoin={joinSelected}
                 onSplitHalf={() => splitSelected(2)}
                 onSplitThird={() => splitSelected(3)}
+                onSplitFifth={() => splitSelected(5)}
                 onCloneRight={cloneSelectedRight}
                 onCloneDown={cloneSelectedDown}
                 onQuickLabel={applyQuickLabel}
                 onToggleTotal={toggleTotal}
+                onToggleRelative={toggleRelativeLabel}
+                canToggleRelative={canToggleRelative}
+                canSplit={canSplit}
                 onClear={handleClear}
                 onUndo={undo}
                 onCopyLink={handleCopyLink}
@@ -396,6 +417,7 @@ function BarModelPageContent() {
                         <Bar
                             key={bar.id}
                             bar={bar}
+                            totalBar={totalBar}
                             isSelected={selectedIds.has(bar.id)}
                             isDragging={draggingId === bar.id}
                             onSelect={selectBar}

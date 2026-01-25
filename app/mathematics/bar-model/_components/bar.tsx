@@ -16,10 +16,13 @@ import { Move } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { BAR_COLORS, BAR_HEIGHT, MIN_BAR_WIDTH, GRID_SIZE } from "../constants"
 import { BarData } from "../_hooks/use-bar-model"
+import { computeRelativeLabel } from "../_lib/compute-relative-label"
 
 interface BarProps {
     /** Bar data */
     bar: BarData;
+    /** The total bar for relative calculation */
+    totalBar?: BarData;
     /** Whether this bar is selected */
     isSelected: boolean;
     /** Whether this bar is being dragged */
@@ -36,6 +39,7 @@ interface BarProps {
 
 export function Bar({
     bar,
+    totalBar,
     isSelected,
     isDragging,
     onSelect,
@@ -53,6 +57,15 @@ export function Bar({
     } | null>(null);
 
     const color = BAR_COLORS[bar.colorIndex] || BAR_COLORS[0];
+
+    // Compute display label
+    const displayLabel = React.useMemo(() => {
+        if (bar.showRelativeLabel) {
+            if (!totalBar) return "?";
+            return computeRelativeLabel(bar.width, totalBar.width, totalBar.label);
+        }
+        return bar.label;
+    }, [bar.label, bar.width, bar.showRelativeLabel, totalBar]);
 
     // Sync local label with bar label when it changes externally
     React.useEffect(() => {
@@ -182,7 +195,7 @@ export function Bar({
                         color.text,
                         color.textDark
                     )}>
-                        {bar.label}
+                        {displayLabel}
                     </span>
                 </div>
             )}

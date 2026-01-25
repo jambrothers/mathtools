@@ -366,6 +366,25 @@ describe('useBarModel', () => {
 
             expect(result.current.bars[0].isTotal).toBe(false);
         });
+
+        it('should ensure only one bar is total at a time', () => {
+            const { result } = renderHook(() => useBarModel());
+
+            act(() => {
+                const bar1 = result.current.addBar(100, 100, 0, 'A');
+                const bar2 = result.current.addBar(200, 100, 1, 'B');
+                result.current.setBarAsTotal(bar1.id, true); // Set A as total
+            });
+
+            expect(result.current.bars[0].isTotal).toBe(true);
+
+            act(() => {
+                result.current.setBarAsTotal(result.current.bars[1].id, true); // Set B as total
+            });
+
+            expect(result.current.bars[1].isTotal).toBe(true);
+            expect(result.current.bars[0].isTotal).toBe(false); // A should be unset
+        });
     });
 
     describe('applyQuickLabel', () => {
@@ -430,44 +449,14 @@ describe('useBarModel', () => {
             expect(result.current.bars[0].label).toBe('5'); // 100 / 20 = 5 units
         });
 
-        it('should apply relative label (fraction of total bar)', () => {
-            const { result } = renderHook(() => useBarModel());
-
-            act(() => {
-                // Create total bar of 200px = 10 units
-                const totalBar = result.current.addBar(100, 200, 5, 'Total');
-                result.current.resizeBar(totalBar.id, 200);
-                result.current.setBarAsTotal(totalBar.id, true);
-
-                // Create smaller bar of 40px = 2 units
-                const bar = result.current.addBar(100, 100, 0, 'Part');
-                result.current.resizeBar(bar.id, 40);
-                result.current.selectBar(bar.id);
-            });
-
-            act(() => {
-                result.current.applyQuickLabel('relative');
-            });
-
-            // 40/200 = 1/5
-            expect(result.current.bars[1].label).toBe('1/5');
+        it('should not support relative as quick label anymore', () => {
+            // 'relative' removed from QuickLabelType, so this test is now obsolete
+            // or should verify it's not accepted if we were using strings.
+            // Typescript prevents this, so we just remove the old test.
         });
 
-        it('should apply relative label as fraction if no total bar exists', () => {
-            const { result } = renderHook(() => useBarModel());
 
-            act(() => {
-                const bar = result.current.addBar(100, 100, 0, 'Test');
-                result.current.selectBar(bar.id);
-            });
 
-            act(() => {
-                result.current.applyQuickLabel('relative');
-            });
-
-            // No total bar, should just show empty or unchanged
-            expect(result.current.bars[0].label).toBe('');
-        });
 
         it('should do nothing if no selection', () => {
             const { result } = renderHook(() => useBarModel());
@@ -576,6 +565,50 @@ describe('useBarModel', () => {
             // Total should still be 100 (snapped: 40 + 40 + 20 = 100)
             const totalWidth = result.current.bars.reduce((sum, b) => sum + b.width, 0);
             expect(totalWidth).toBeGreaterThanOrEqual(MIN_BAR_WIDTH * 3);
+        });
+
+        it('should split bar into fifths', () => {
+            const { result } = renderHook(() => useBarModel());
+
+            act(() => {
+                // 100 units / 5 = 20 units
+                const bar = result.current.addBar(100, 100, 0, 'Whole');
+                result.current.resizeBar(bar.id, 100);
+                result.current.selectBar(bar.id);
+            });
+
+            act(() => {
+                result.current.splitSelected(5);
+            });
+
+            expect(result.current.bars).toHaveLength(5);
+            expect(result.current.bars[0].width).toBe(20);
+        });
+    });
+
+    describe('toggleRelativeLabel', () => {
+        it('should toggle the relative label property', () => {
+            const { result } = renderHook(() => useBarModel());
+            let bar: BarData | undefined;
+
+            act(() => {
+                bar = result.current.addBar(100, 100, 0, 'Test');
+                result.current.selectBar(bar.id);
+            });
+
+            expect(result.current.bars[0].showRelativeLabel).toBeFalsy();
+
+            act(() => {
+                result.current.toggleRelativeLabel();
+            });
+
+            expect(result.current.bars[0].showRelativeLabel).toBe(true);
+
+            act(() => {
+                result.current.toggleRelativeLabel();
+            });
+
+            expect(result.current.bars[0].showRelativeLabel).toBe(false);
         });
     });
 

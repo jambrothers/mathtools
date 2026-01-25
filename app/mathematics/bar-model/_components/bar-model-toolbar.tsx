@@ -38,6 +38,8 @@ interface BarModelToolbarProps {
     onSplitHalf: () => void;
     /** Callback for split into thirds */
     onSplitThird: () => void;
+    /** Callback for split into fifths */
+    onSplitFifth: () => void;
     /** Callback for clone right */
     onCloneRight: () => void;
     /** Callback for clone down */
@@ -46,6 +48,16 @@ interface BarModelToolbarProps {
     onQuickLabel: (labelType: QuickLabelType) => void;
     /** Callback to toggle total/unit status */
     onToggleTotal: () => void;
+    /** Callback to toggle relative label */
+    onToggleRelative: () => void;
+    /** Whether properties can be applied (checkboxes) */
+    canToggleRelative: boolean;
+    /** Split validation states */
+    canSplit: {
+        half: boolean;
+        third: boolean;
+        fifth: boolean;
+    };
     /** Callback for clear all */
     onClear: () => void;
     /** Callback for undo */
@@ -60,10 +72,14 @@ export function BarModelToolbar({
     onJoin,
     onSplitHalf,
     onSplitThird,
+    onSplitFifth,
     onCloneRight,
     onCloneDown,
     onQuickLabel,
     onToggleTotal,
+    onToggleRelative,
+    canToggleRelative,
+    canSplit,
     onClear,
     onUndo,
     onCopyLink,
@@ -140,12 +156,7 @@ export function BarModelToolbar({
                             >
                                 Units
                             </button>
-                            <button
-                                className="w-full px-4 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700 last:rounded-b-lg transition-colors"
-                                onClick={() => handleQuickLabel('relative')}
-                            >
-                                Relative
-                            </button>
+
                         </div>
                     </>,
                     document.body
@@ -158,6 +169,15 @@ export function BarModelToolbar({
                     onClick={onToggleTotal}
                     disabled={selectedCount !== 1}
                     title="Mark selected bar as Total for relative calculations"
+                />
+
+                {/* Toggle Relative */}
+                <ToolbarButton
+                    icon={<span className="text-xs font-bold">%</span>}
+                    label="Relative"
+                    onClick={onToggleRelative}
+                    disabled={!canToggleRelative}
+                    title="Toggle relative label display"
                 />
 
                 <ToolbarSeparator />
@@ -174,15 +194,22 @@ export function BarModelToolbar({
                     icon={<Scissors size={18} />}
                     label="Split ½"
                     onClick={onSplitHalf}
-                    disabled={selectedCount === 0}
+                    disabled={!canSplit.half}
                     title="Split selected bars in half"
                 />
                 <ToolbarButton
                     icon={<Scissors size={18} />}
                     label="Split ⅓"
                     onClick={onSplitThird}
-                    disabled={selectedCount === 0}
+                    disabled={!canSplit.third}
                     title="Split selected bars into thirds"
+                />
+                <ToolbarButton
+                    icon={<Scissors size={18} />}
+                    label="Split ⅕"
+                    onClick={onSplitFifth}
+                    disabled={!canSplit.fifth}
+                    title="Split selected bars into fifths"
                 />
                 <ToolbarButton
                     icon={<ArrowRight size={18} />}

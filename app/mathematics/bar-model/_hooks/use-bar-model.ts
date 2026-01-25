@@ -15,6 +15,8 @@ import {
     MIN_BAR_WIDTH,
     BAR_HEIGHT,
     QuickLabelType,
+    SPLIT_PARTS,
+    SplitPart,
 } from "../constants"
 
 // =============================================================================
@@ -36,6 +38,8 @@ export interface BarData {
     label: string;
     /** Whether this bar is marked as the "total" bar */
     isTotal?: boolean;
+    /** Whether to show a dynamically computed relative label */
+    showRelativeLabel?: boolean;
 }
 
 export interface UseBarModelReturn {
@@ -50,6 +54,7 @@ export interface UseBarModelReturn {
     updateBar: (id: string, updates: Partial<BarData>) => void;
     updateBarLabel: (id: string, label: string) => void;
     setBarAsTotal: (id: string, isTotal: boolean) => void;
+    toggleRelativeLabel: () => void;
 
     // Movement/Resize
     moveBar: (id: string, x: number, y: number) => void;
@@ -66,7 +71,7 @@ export interface UseBarModelReturn {
     cloneSelectedRight: () => void;
     cloneSelectedDown: () => void;
     joinSelected: () => void;
-    splitSelected: (parts: 2 | 3) => void;
+    splitSelected: (parts: SplitPart) => void;
     applyQuickLabel: (labelType: QuickLabelType) => void;
     toggleTotal: () => void;
 
@@ -95,7 +100,7 @@ const snap = (val: number): number => Math.round(val / GRID_SIZE) * GRID_SIZE;
 const generateId = (): string => `bar-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 /** Calculate GCD of two numbers using Euclidean algorithm */
-const gcd = (a: number, b: number): number => {
+export const gcd = (a: number, b: number): number => {
     a = Math.abs(Math.round(a));
     b = Math.abs(Math.round(b));
     while (b > 0) {
@@ -106,15 +111,7 @@ const gcd = (a: number, b: number): number => {
     return a;
 };
 
-/** Simplify a fraction and return as "n/d" string */
-const simplifyFraction = (numerator: number, denominator: number): string => {
-    if (denominator === 0) return '';
-    const divisor = gcd(numerator, denominator);
-    const n = Math.round(numerator / divisor);
-    const d = Math.round(denominator / divisor);
-    if (d === 1) return String(n);
-    return `${n}/${d}`;
-};
+
 
 // =============================================================================
 // Hook Implementation
@@ -185,10 +182,28 @@ export function useBarModel(): UseBarModelReturn {
     }, [pushBars]);
 
     const setBarAsTotal = useCallback((id: string, isTotal: boolean): void => {
-        pushBars(prev => prev.map(b =>
-            b.id === id ? { ...b, isTotal } : b
-        ));
+        pushBars(prev => {
+            // If setting to true, we must unset isTotal on all other bars
+            if (isTotal) {
+                return prev.map(b => ({
+                    ...b,
+                    isTotal: b.id === id ? true : false
+                }));
+            } else {
+                // Just unset this one
+                return prev.map(b =>
+                    b.id === id ? { ...b, isTotal: false } : b
+                );
+            }
+        });
     }, [pushBars]);
+
+    const toggleRelativeLabel = useCallback((): void => {
+        if (selectedIds.size === 0) return;
+        pushBars(prev => prev.map(b =>
+            selectedIds.has(b.id) ? { ...b, showRelativeLabel: !b.showRelativeLabel } : b
+        ));
+    }, [pushBars, selectedIds]);
 
     const toggleTotal = useCallback((): void => {
         if (selectedIds.size !== 1) return; // Only apply to single selection for now
@@ -199,12 +214,17 @@ export function useBarModel(): UseBarModelReturn {
             if (!bar) return prev;
 
             const newIsTotal = !bar.isTotal;
-            // If setting to true, unset others
-            const newBars = prev.map(b => ({
-                ...b,
-                isTotal: b.id === id ? newIsTotal : (newIsTotal ? false : b.isTotal)
-            }));
-            return newBars;
+            if (newIsTotal) {
+                // Set this one to true, others to false
+                return prev.map(b => ({
+                    ...b,
+                    isTotal: b.id === id
+                }));
+            } else {
+                return prev.map(b =>
+                    b.id === id ? { ...b, isTotal: false } : b
+                );
+            }
         });
     }, [selectedIds, pushBars]);
 
@@ -334,11 +354,18 @@ export function useBarModel(): UseBarModelReturn {
             isTotal: true, // Mark as total bar
         };
 
-        pushBars(prev => [...prev, totalBar]);
+        // If we add a total bar, unset others!
+        // Wait, 'join' creates a NEW bar. logic above handles existing.
+        // We should ensure only one total bar.
+        // If we create a new one as 'Total', we should unset others.
+        pushBars(prev => {
+            const cleanedPrev = prev.map(b => ({ ...b, isTotal: false }));
+            return [...cleanedPrev, totalBar];
+        });
         setSelectedIds(new Set([totalBar.id]));
     }, [bars, selectedIds, pushBars]);
 
-    const splitSelected = useCallback((parts: 2 | 3): void => {
+    const splitSelected = useCallback((parts: SplitPart): void => {
         if (selectedIds.size === 0) return;
 
         const toAdd: BarData[] = [];
@@ -362,6 +389,8 @@ export function useBarModel(): UseBarModelReturn {
                     x: currentX,
                     width: Math.max(MIN_BAR_WIDTH, width),
                     label: '', // No label on split
+                    showRelativeLabel: false, // Reset relative label
+                    isTotal: false, // Split parts can't be total
                 });
                 currentX += minPartWidth;
             }
@@ -380,9 +409,6 @@ export function useBarModel(): UseBarModelReturn {
     const applyQuickLabel = useCallback((labelType: QuickLabelType): void => {
         if (selectedIds.size === 0) return;
 
-        // Find the total bar if one exists
-        const totalBar = bars.find(b => b.isTotal);
-
         pushBars(prev => prev.map(bar => {
             if (!selectedIds.has(bar.id)) return bar;
 
@@ -397,20 +423,12 @@ export function useBarModel(): UseBarModelReturn {
                     // Label with width in grid units
                     newLabel = String(Math.round(bar.width / GRID_SIZE));
                     break;
-                case 'relative':
-                    // Label with fraction of total bar
-                    if (totalBar && totalBar.width > 0) {
-                        newLabel = simplifyFraction(bar.width, totalBar.width);
-                    } else {
-                        newLabel = '';
-                    }
-                    break;
                 default:
                     newLabel = bar.label;
             }
             return { ...bar, label: newLabel };
         }));
-    }, [bars, selectedIds, pushBars]);
+    }, [selectedIds, pushBars]);
 
     // =========================================================================
     // State Management
@@ -485,6 +503,7 @@ export function useBarModel(): UseBarModelReturn {
         splitSelected,
         applyQuickLabel,
         toggleTotal,
+        toggleRelativeLabel,
         undo,
         canUndo,
         clearAll,
