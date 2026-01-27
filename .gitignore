@@ -46,3 +46,4 @@ test_output.txt
 # playwright
 /playwright-report
 /playwright-video
+test-results/
