@@ -120,10 +120,12 @@ export function ToolbarInput({
             {onSubmit && (
                 <ToolbarButton
                     label={buttonLabel}
+                    aria-label={buttonLabel}
                     icon={buttonIcon}
                     variant="primary"
                     onClick={() => onSubmit(value)}
                     disabled={!value}
+                    className="shrink-0"
                 />
             )}
         </div>

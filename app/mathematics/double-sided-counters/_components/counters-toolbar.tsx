@@ -52,7 +52,7 @@ export function CountersToolbar({
     return (
         <Toolbar className="gap-x-4 gap-y-2">
             {/* Search / Input - Allow full width on small screens */}
-            <div className="flex-1 flex gap-2 min-w-[200px] max-w-xl">
+            <div className="flex-1 flex gap-2 min-w-[340px] max-w-xl">
                 <ToolbarInput
                     className="flex-1"
                     value={input}
@@ -69,10 +69,11 @@ export function CountersToolbar({
                     value={counterType}
                     onChange={onCounterTypeChange}
                     disabled={isAnimating}
+                    className="shrink-0"
                 />
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 ml-auto">
+            <div className="flex flex-wrap items-center gap-2 ml-auto shrink-0">
                 <ToolbarGroup>
                     <ToolbarButton
                         icon={showNumberLine ? <Eye size={16} /> : <EyeOff size={16} />}
