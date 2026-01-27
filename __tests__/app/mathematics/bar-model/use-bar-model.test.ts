@@ -474,7 +474,7 @@ describe('useBarModel', () => {
     });
 
     describe('joinSelected', () => {
-        it('should create a total bar with combined width', () => {
+        it('should merge selected bars into one', () => {
             const { result } = renderHook(() => useBarModel());
 
             act(() => {
@@ -487,12 +487,12 @@ describe('useBarModel', () => {
                 result.current.joinSelected();
             });
 
-            expect(result.current.bars).toHaveLength(3);
-            const totalBar = result.current.bars[2];
-            expect(totalBar.width).toBe(200); // 100 + 100
-            expect(totalBar.label).toBe('Total');
-            expect(totalBar.colorIndex).toBe(5); // Gray/unknown
-            expect(totalBar.y).toBe(100 + BAR_HEIGHT + GRID_SIZE); // Below selected bars
+            expect(result.current.bars).toHaveLength(1);
+            const mergedBar = result.current.bars[0];
+            expect(mergedBar.width).toBe(200); // 100 + 100 (default widths)
+            expect(mergedBar.label).toBe(''); // Reset label
+            expect(mergedBar.colorIndex).toBe(0); // Inherit first bar color
+            expect(mergedBar.y).toBe(100); // Same Y level
         });
 
         it('should do nothing with no selection', () => {

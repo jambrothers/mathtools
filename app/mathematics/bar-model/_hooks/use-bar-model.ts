@@ -342,27 +342,28 @@ export function useBarModel(): UseBarModelReturn {
         const selectedBars = bars.filter(b => selectedIds.has(b.id));
         const totalWidth = selectedBars.reduce((sum, b) => sum + b.width, 0);
         const minX = Math.min(...selectedBars.map(b => b.x));
-        const maxY = Math.max(...selectedBars.map(b => b.y));
+        const minY = Math.min(...selectedBars.map(b => b.y));
 
-        const totalBar: BarData = {
+        // Check if all selected bars have relative label enabled
+        const allRelative = selectedBars.every(b => b.showRelativeLabel);
+
+        const mergedBar: BarData = {
             id: generateId(),
             x: minX,
-            y: maxY + BAR_HEIGHT + GRID_SIZE,
+            y: minY,
             width: totalWidth,
-            colorIndex: 5, // Gray/unknown
-            label: 'Total',
-            isTotal: true, // Mark as total bar
+            colorIndex: selectedBars[0].colorIndex, // Use color of first bar
+            label: '', // Reset label
+            isTotal: false,
+            showRelativeLabel: allRelative,
         };
 
-        // If we add a total bar, unset others!
-        // Wait, 'join' creates a NEW bar. logic above handles existing.
-        // We should ensure only one total bar.
-        // If we create a new one as 'Total', we should unset others.
         pushBars(prev => {
-            const cleanedPrev = prev.map(b => ({ ...b, isTotal: false }));
-            return [...cleanedPrev, totalBar];
+            // Remove selected bars and add the merged one
+            const remaining = prev.filter(b => !selectedIds.has(b.id));
+            return [...remaining, mergedBar];
         });
-        setSelectedIds(new Set([totalBar.id]));
+        setSelectedIds(new Set([mergedBar.id]));
     }, [bars, selectedIds, pushBars]);
 
     const splitSelected = useCallback((parts: SplitPart): void => {
