@@ -50,8 +50,8 @@ export function CountersToolbar({
     const [input, setInput] = React.useState("")
 
     return (
-        <Toolbar className="gap-4">
-            {/* Search / Input */}
+        <Toolbar className="gap-x-4 gap-y-2">
+            {/* Search / Input - Allow full width on small screens */}
             <div className="flex-1 flex gap-2 min-w-[200px] max-w-xl">
                 <ToolbarInput
                     className="flex-1"
@@ -72,7 +72,7 @@ export function CountersToolbar({
                 />
             </div>
 
-            <div className="flex items-center gap-2 ml-auto">
+            <div className="flex flex-wrap items-center gap-2 ml-auto">
                 <ToolbarGroup>
                     <ToolbarButton
                         icon={showNumberLine ? <Eye size={16} /> : <EyeOff size={16} />}

@@ -238,17 +238,22 @@ The interactive tools have their own considerations:
 
 ---
 
+## Breakpoint Policy (Canvas Tools)
+      
+| Range | Device Class | UI Policy | Label Visibility | Layout Behavior |
+| :--- | :--- | :--- | :--- | :--- |
+| **≥ 1024px** | **Desktop / Landscape Tablet** | **Full Experience** | **Visible** (`inline`) | Single Row. |
+| **768px - 1023px** | **Portrait Tablet** | **Compact Experience** | **Hidden** (`hidden`) | Single Row preferred, icons only. |
+| **< 768px** | **Mobile / Phablet** | **Restricted** | **Hidden** (`hidden`) | **Banner Active**. Override enables Multi-row wrapping (`flex-wrap`). |
+      
+### Banner Implementation
+- **Trigger**: Screen width < 768px.
+- **Content**: "This tool is designed for tablets and desktops. Please use a larger device for the best experience."
+- **Action**: "Continue Anyway" (Dismiss).
+
+---
+
 ## Responsive Behavior
-
-| Breakpoint | Width | Behavior |
-|------------|-------|----------|
-| Mobile | < 640px | Single column, collapsed nav |
-| Tablet | 640-1024px | Two columns, simplified layout |
-| Desktop | > 1024px | Full layout, max-width containers |
-
-- Maximum content width: `max-w-7xl` (1280px)
-- Horizontal padding scales: `px-4` → `px-6` → `px-8`
-
 ---
 
 ## Accessibility Requirements

@@ -27,13 +27,17 @@ function AlgebraTilesPageLoading() {
     );
 }
 
+import { ResolutionGuard } from "@/components/tool-ui/resolution-guard";
+
 /**
  * Main page component wrapped in Suspense for useSearchParams compatibility.
  */
 export default function AlgebraTilesPage() {
     return (
         <Suspense fallback={<AlgebraTilesPageLoading />}>
-            <AlgebraTilesPageContent />
+            <ResolutionGuard>
+                <AlgebraTilesPageContent />
+            </ResolutionGuard>
         </Suspense>
     );
 }

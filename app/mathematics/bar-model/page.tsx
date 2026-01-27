@@ -43,10 +43,15 @@ function BarModelPageLoading() {
 // Main Page Component
 // =============================================================================
 
+// Imports
+import { ResolutionGuard } from "@/components/tool-ui/resolution-guard";
+
 export default function BarModelPage() {
     return (
         <Suspense fallback={<BarModelPageLoading />}>
-            <BarModelPageContent />
+            <ResolutionGuard>
+                <BarModelPageContent />
+            </ResolutionGuard>
         </Suspense>
     );
 }

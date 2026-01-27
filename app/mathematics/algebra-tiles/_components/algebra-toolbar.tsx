@@ -40,7 +40,7 @@ export function AlgebraToolbar({
     const [input, setInput] = React.useState("")
 
     return (
-        <Toolbar className="gap-4">
+        <Toolbar className="gap-x-4 gap-y-2">
             <div className="flex-1 flex gap-2 min-w-[300px] max-w-4xl">
                 <ToolbarInput
                     className="flex-1"
@@ -53,7 +53,7 @@ export function AlgebraToolbar({
                 />
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
                 <ToolbarGroup>
                     <ToolbarButton
                         icon={showLabels ? <Eye size={16} /> : <EyeOff size={16} />}

@@ -105,7 +105,7 @@ export function BarModelToolbar({
     };
 
     return (
-        <Toolbar>
+        <Toolbar className="gap-x-4 gap-y-2">
             <ToolbarGroup>
                 {/* Quick Label Dropdown */}
                 <div className="relative" ref={buttonRef}>

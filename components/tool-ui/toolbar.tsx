@@ -30,7 +30,7 @@ export function Toolbar({ className, children }: { className?: string, children?
  */
 export function ToolbarGroup({ className, children }: { className?: string, children?: React.ReactNode }) {
     return (
-        <div className={cn("flex items-center gap-2", className)}>
+        <div className={cn("flex flex-wrap items-center gap-2", className)}>
             {children}
         </div>
     )
@@ -40,7 +40,7 @@ export function ToolbarGroup({ className, children }: { className?: string, chil
  * A visual separator line for toolbar groups.
  */
 export function ToolbarSeparator() {
-    return <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
+    return <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block" />
 }
 
 interface ToolbarButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -68,14 +68,14 @@ export function ToolbarButton({ icon, label, active, variant = 'default', classN
         <button
             type="button"
             className={cn(
-                "px-3 py-2 border text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed",
+                "px-3 py-2 border text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed h-10 whitespace-nowrap",
                 variants[variant],
                 className
             )}
             {...props}
         >
             {icon}
-            {label && <span className="hidden sm:inline">{label}</span>}
+            {label && <span className="hidden lg:inline">{label}</span>}
         </button>
     )
 }

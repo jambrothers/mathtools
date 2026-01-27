@@ -18,6 +18,7 @@ import { HelpModal } from '@/components/tool-ui/help-modal';
 import { counterURLSerializer, CounterURLState } from './_lib/url-state';
 import { generateShareableURL, copyURLToClipboard } from '@/lib/url-state';
 import helpContent from './HELP.md';
+import { ResolutionGuard } from "@/components/tool-ui/resolution-guard";
 
 /**
  * Loading fallback component for the counters page.
@@ -36,7 +37,9 @@ function CountersPageLoading() {
 export default function CountersPage() {
     return (
         <Suspense fallback={<CountersPageLoading />}>
-            <CountersPageContent />
+            <ResolutionGuard>
+                <CountersPageContent />
+            </ResolutionGuard>
         </Suspense>
     );
 }
