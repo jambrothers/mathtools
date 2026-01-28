@@ -79,7 +79,8 @@ function CountersPageContent() {
         handleDragStart,
         handleDragMove,
         deleteSelected,
-        clearSelection
+        clearSelection,
+        handleMarqueeSelect
     } = useCounters();
 
     const searchParams = useSearchParams();
@@ -358,6 +359,7 @@ function CountersPageContent() {
                     onDrop={handleDropOnCanvas}
                     onDragOver={handleDragOver}
                     onClick={() => clearSelection()}
+                    onSelectionEnd={handleMarqueeSelect}
                 >
                     {/* Stats Overlay */}
                     {showStats && (
@@ -374,35 +376,33 @@ function CountersPageContent() {
                     )}
 
                     {/* Counters Area */}
-                    <div className="w-full h-full overflow-y-auto relative">
-                        {counters.length === 0 && (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 pointer-events-none">
-                                <div className="w-24 h-24 mb-6 rounded-full bg-white dark:bg-slate-900 border-4 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center shadow-sm">
-                                    <span className="text-4xl font-light text-slate-300 dark:text-slate-600">0</span>
-                                </div>
-                                <h3 className="text-lg font-medium text-slate-600 dark:text-slate-400">The board is empty</h3>
-                                <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">Add counters using the sidebar</p>
+                    {counters.length === 0 && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 pointer-events-none">
+                            <div className="w-24 h-24 mb-6 rounded-full bg-white dark:bg-slate-900 border-4 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center shadow-sm">
+                                <span className="text-4xl font-light text-slate-300 dark:text-slate-600">0</span>
                             </div>
-                        )}
+                            <h3 className="text-lg font-medium text-slate-600 dark:text-slate-400">The board is empty</h3>
+                            <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">Add counters using the sidebar</p>
+                        </div>
+                    )}
 
-                        {counters.map((counter) => (
-                            <DraggableCounter
-                                key={counter.id}
-                                counter={counter}
-                                counterType={counterType}
+                    {counters.map((counter) => (
+                        <DraggableCounter
+                            key={counter.id}
+                            counter={counter}
+                            counterType={counterType}
 
-                                isAnimating={isAnimating}
-                                isBreathing={highlightedPair.includes(counter.id)}
-                                isSelected={selectedIds.has(counter.id)}
-                                onRemove={removeCounter}
-                                onSelect={handleSelect}
-                                onFlip={flipCounter}
-                                onDragStart={handleDragStart}
-                                onDragMove={handleCounterDragMove}
-                                onDragEnd={handleCounterDragEnd}
-                            />
-                        ))}
-                    </div>
+                            isAnimating={isAnimating}
+                            isBreathing={highlightedPair.includes(counter.id)}
+                            isSelected={selectedIds.has(counter.id)}
+                            onRemove={removeCounter}
+                            onSelect={handleSelect}
+                            onFlip={flipCounter}
+                            onDragStart={handleDragStart}
+                            onDragMove={handleCounterDragMove}
+                            onDragEnd={handleCounterDragEnd}
+                        />
+                    ))}
 
                     <TrashZone ref={trashRef} isHovered={isTrashHovered} />
 

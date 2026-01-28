@@ -136,6 +136,33 @@ export function useCounters() {
         setSelectedIds(new Set());
     }, [isAnimating, selectedIds, pushCounters]);
 
+    const handleMarqueeSelect = useCallback((rect: DOMRect) => {
+        const newSelection = new Set<number>();
+
+        counters.forEach(counter => {
+            // Counter rect (relative to canvas)
+            const cL = counter.x;
+            const cR = counter.x + COUNTER_SIZE;
+            const cT = counter.y;
+            const cB = counter.y + COUNTER_SIZE;
+
+            // Marquee rect
+            const mL = rect.x;
+            const mR = rect.x + rect.width;
+            const mT = rect.y;
+            const mB = rect.y + rect.height;
+
+            // Check overlap
+            const intersects = !(cR < mL || cL > mR || cB < mT || cT > mB);
+
+            if (intersects) {
+                newSelection.add(counter.id);
+            }
+        });
+
+        setSelectedIds(newSelection);
+    }, [counters]);
+
     // --- Actions ---
 
     const addCounter = useCallback((value: number, count = 1, showNumberLine = false) => {
@@ -400,7 +427,7 @@ export function useCounters() {
                 await wait(animSpeed * 0.6);
                 if (abortAnimationRef.current) break;
 
-                updateCountersImmediate(counters.map(c =>
+                updateCountersImmediate(prev => prev.map(c =>
                     (c.id === posId || c.id === negId) ? { ...c, isLeaving: true } : c
                 ));
                 setHighlightedPair([]);
@@ -415,7 +442,7 @@ export function useCounters() {
         // BATCH MODE
         else {
             const allIdsToRemove = new Set(pairs.flat());
-            updateCountersImmediate(counters.map(c =>
+            updateCountersImmediate(prev => prev.map(c =>
                 allIdsToRemove.has(c.id) ? { ...c, isLeaving: true } : c
             ));
             await wait(600);
@@ -497,6 +524,7 @@ export function useCounters() {
         clearBoard,
         setCountersFromState,
         undo,
-        canUndo
+        canUndo,
+        handleMarqueeSelect
     };
 }
