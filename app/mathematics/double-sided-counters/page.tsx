@@ -8,6 +8,7 @@ import { CountersToolbar } from './_components/counters-toolbar';
 import { SummaryStats } from './_components/summary-stats';
 import { NumberLine } from './_components/number-line';
 import { DraggableCounter } from './_components/draggable-counter';
+import { TrashZone } from '@/components/tool-ui/trash-zone';
 import { getSidebarLabel, getSidebarTitle } from './_components/counter-type-select';
 import { Sidebar, SidebarSection, SidebarButton } from "@/components/tool-ui/sidebar";
 import { DraggableSidebarItem } from "@/components/tool-ui/draggable-sidebar-item";
@@ -71,7 +72,14 @@ function CountersPageContent() {
         setAnimSpeed,
         setCountersFromState,
         undo,
-        canUndo
+        canUndo,
+        // Selection
+        selectedIds,
+        handleSelect,
+        handleDragStart,
+        handleDragMove,
+        deleteSelected,
+        clearSelection
     } = useCounters();
 
     const searchParams = useSearchParams();
@@ -80,7 +88,9 @@ function CountersPageContent() {
     const [counterType, setCounterType] = useState<CounterType>('numeric');
     const [hasInitialized, setHasInitialized] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
+    const [isTrashHovered, setIsTrashHovered] = useState(false);
     const canvasRef = useRef<HTMLDivElement>(null);
+    const trashRef = useRef<HTMLDivElement>(null);
 
     // Initialize from URL on mount
     useEffect(() => {
@@ -208,19 +218,62 @@ function CountersPageContent() {
         e.dataTransfer.dropEffect = 'copy';
     }, []);
 
+    const handleCounterDragMove = useCallback((id: number, delta: { x: number, y: number }, position: { x: number, y: number }) => {
+        handleDragMove(id, delta);
+
+        if (trashRef.current && canvasRef.current) {
+            const trashRect = trashRef.current.getBoundingClientRect();
+            const canvasRect = canvasRef.current.getBoundingClientRect();
+
+            // Convert trash rect to canvas coordinates
+            const trashL = trashRect.left - canvasRect.left;
+            const trashT = trashRect.top - canvasRect.top;
+
+            // Check collision (using center of counter)
+            const centerX = position.x + 40; // Approx half size (80px)
+            const centerY = position.y + 40;
+
+            const isOver = centerX > trashL && centerY > trashT;
+            if (isOver !== isTrashHovered) {
+                setIsTrashHovered(isOver);
+            }
+        }
+    }, [handleDragMove, isTrashHovered]);
+
+    const handleCounterDragEnd = useCallback((id: number, x: number, y: number) => {
+        if (isTrashHovered) {
+            // Delete if hovered
+            if (selectedIds.has(id)) {
+                deleteSelected();
+            } else {
+                removeCounter(id);
+            }
+            setIsTrashHovered(false);
+        } else {
+            updateCounterPosition(id, x, y);
+        }
+    }, [isTrashHovered, selectedIds, deleteSelected, removeCounter, updateCounterPosition]);
+
     // Keyboard shortcut for undo (Ctrl+Z / Cmd+Z)
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
                 e.preventDefault();
                 if (canUndo && !isAnimating) {
-                    undo();
+                    if (canUndo && !isAnimating) {
+                        undo();
+                    }
+                }
+            } else if (e.key === 'Delete' || e.key === 'Backspace') {
+                if (!isAnimating && selectedIds.size > 0) {
+                    e.preventDefault();
+                    deleteSelected();
                 }
             }
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [canUndo, isAnimating, undo]);
+    }, [canUndo, isAnimating, undo, selectedIds, deleteSelected]);
 
     return (
         <div className="flex flex-col h-[calc(100vh-81px)] w-full bg-slate-50 dark:bg-slate-950 overflow-hidden">
@@ -304,6 +357,7 @@ function CountersPageContent() {
                     data-testid="counter-canvas"
                     onDrop={handleDropOnCanvas}
                     onDragOver={handleDragOver}
+                    onClick={() => clearSelection()}
                 >
                     {/* Stats Overlay */}
                     {showStats && (
@@ -336,14 +390,21 @@ function CountersPageContent() {
                                 key={counter.id}
                                 counter={counter}
                                 counterType={counterType}
+
                                 isAnimating={isAnimating}
                                 isBreathing={highlightedPair.includes(counter.id)}
+                                isSelected={selectedIds.has(counter.id)}
                                 onRemove={removeCounter}
+                                onSelect={handleSelect}
                                 onFlip={flipCounter}
-                                onDragEnd={updateCounterPosition}
+                                onDragStart={handleDragStart}
+                                onDragMove={handleCounterDragMove}
+                                onDragEnd={handleCounterDragEnd}
                             />
                         ))}
                     </div>
+
+                    <TrashZone ref={trashRef} isHovered={isTrashHovered} />
 
                     {/* Floating Number Line */}
                     {showNumberLine && (

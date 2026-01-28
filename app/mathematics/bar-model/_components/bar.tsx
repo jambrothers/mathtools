@@ -122,7 +122,7 @@ export function Bar({
     const handleResizePointerDown = (e: React.PointerEvent) => {
         e.stopPropagation();
         e.preventDefault();
-        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
         setIsResizing(true);
 
         resizeRef.current = {
@@ -143,7 +143,8 @@ export function Bar({
     const handleResizePointerUp = (e: React.PointerEvent) => {
         resizeRef.current = null;
         setIsResizing(false);
-        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+        setIsResizing(false);
+        (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
     };
 
     return (
@@ -155,7 +156,9 @@ export function Bar({
                 color.bg, color.border, color.text,
                 color.bgDark, color.borderDark, color.textDark,
                 isSelected && "ring-2 ring-blue-500 ring-offset-1 z-10",
-                isDragging && "opacity-80"
+                isSelected && "ring-2 ring-blue-500 ring-offset-1 z-10",
+                isDragging && "opacity-80",
+                "touch-none"
             )}
             style={{
                 left: bar.x,

@@ -11,13 +11,17 @@ interface DraggableCounterProps {
     counterType: CounterType
     isAnimating: boolean
     isBreathing: boolean
+    isSelected: boolean
     onRemove: (id: number) => void
+    onSelect: (id: number, multi: boolean) => void
     onFlip: (id: number) => void
+    onDragStart: (id: number) => void
+
+    onDragMove: (id: number, delta: { x: number, y: number }, position: Position) => void
     onDragEnd: (id: number, x: number, y: number) => void
 }
 
-const CLICK_DELAY_MS = 250 // Delay before single-click removal to allow double-click
-const DOUBLE_CLICK_COOLDOWN_MS = 100 // Ignore clicks after double-click for this duration
+// CLICK_DELAY_MS and DOUBLE_CLICK_COOLDOWN_MS removed as they are no longer used
 
 /**
  * A draggable counter component.
@@ -30,13 +34,16 @@ export function DraggableCounter({
     counterType,
     isAnimating,
     isBreathing,
-    onRemove,
+    isSelected,
+    onRemove, // eslint-disable-line @typescript-eslint/no-unused-vars
+    onSelect,
     onFlip,
+    onDragStart,
+    onDragMove,
     onDragEnd
 }: DraggableCounterProps) {
     const didDragRef = React.useRef(false)
-    const clickTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
-    const doubleClickedAtRef = React.useRef<number>(0)
+    // Removed complex timeout refs for click-to-delete as we now select on click
 
     const { position, isDragging, handlePointerDown } = useDraggable(
         String(counter.id),
@@ -45,11 +52,10 @@ export function DraggableCounter({
             disabled: isAnimating,
             onDragStart: () => {
                 didDragRef.current = true
-                // Cancel pending click if we start dragging
-                if (clickTimeoutRef.current) {
-                    clearTimeout(clickTimeoutRef.current)
-                    clickTimeoutRef.current = null
-                }
+                onDragStart(counter.id)
+            },
+            onDragMove: (id: string, newPos: Position, delta: Position) => {
+                onDragMove(counter.id, delta, newPos)
             },
             onDragEnd: (id: string, pos: Position) => {
                 onDragEnd(counter.id, pos.x, pos.y)
@@ -57,35 +63,13 @@ export function DraggableCounter({
         }
     )
 
-    // Cleanup timeout on unmount
-    React.useEffect(() => {
-        return () => {
-            if (clickTimeoutRef.current) {
-                clearTimeout(clickTimeoutRef.current)
-            }
-        }
-    }, [])
+    // Removed cleanup effect for clickTimeout
 
     const handleClick = (e: React.MouseEvent) => {
         e.stopPropagation()
-
-        // Ignore clicks during cooldown after double-click
-        const timeSinceDoubleClick = Date.now() - doubleClickedAtRef.current
-        if (timeSinceDoubleClick < DOUBLE_CLICK_COOLDOWN_MS) {
-            return
-        }
-
-        // Only schedule removal if we didn't just drag
+        // If we didn't drag, treat as select
         if (!didDragRef.current && !isAnimating) {
-            // Cancel any existing timeout first
-            if (clickTimeoutRef.current) {
-                clearTimeout(clickTimeoutRef.current)
-            }
-            // Schedule removal after delay (will be cancelled if double-click occurs)
-            clickTimeoutRef.current = setTimeout(() => {
-                onRemove(counter.id)
-                clickTimeoutRef.current = null
-            }, CLICK_DELAY_MS)
+            onSelect(counter.id, e.shiftKey || e.metaKey || e.ctrlKey);
         }
     }
 
@@ -93,14 +77,6 @@ export function DraggableCounter({
         e.stopPropagation()
         e.preventDefault()
 
-        // Record when we double-clicked to create a cooldown period
-        doubleClickedAtRef.current = Date.now()
-
-        // Cancel pending single-click removal
-        if (clickTimeoutRef.current) {
-            clearTimeout(clickTimeoutRef.current)
-            clickTimeoutRef.current = null
-        }
         if (!isAnimating) {
             onFlip(counter.id)
         }
@@ -108,6 +84,20 @@ export function DraggableCounter({
 
     const handlePointerDownWrapper = (e: React.PointerEvent) => {
         didDragRef.current = false
+        // Select on down if not already selected (for immediate drag of unselected item)
+        // If shift key is held, we want to toggle, but usually drag start handles movement.
+        // If we select here, we might deselect other items.
+        // Best approach: If not selected, select it (exclusive). If selected, do nothing (wait for drag or click in handleClick)
+        if (!isSelected && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
+            onSelect(counter.id, false);
+        }
+        else if (e.shiftKey || e.metaKey || e.ctrlKey) {
+            // Don't toggle selection on down, wait for click, UNLESS we drag.
+            // But if we drag, we want it to be part of the group.
+            // Common pattern: Toggle on click, but ensure it's selected on drag start?
+            // Actually, let logic in handleClick handle toggle.
+        }
+
         handlePointerDown(e)
     }
 
@@ -139,6 +129,8 @@ export function DraggableCounter({
                 ${counter.isNew ? 'scale-0 opacity-0' : ''}
                 ${counter.isLeaving ? 'scale-0 opacity-0' : ''}
                 ${isBreathing ? 'shadow-[0_0_20px_rgba(59,130,246,0.5)] ring-4 ring-blue-400 ring-opacity-60 z-20' : ''}
+                ${isSelected ? 'ring-4 ring-blue-500 ring-opacity-100 z-30' : ''}
+                touch-none
             `}
             style={{
                 left: 0,

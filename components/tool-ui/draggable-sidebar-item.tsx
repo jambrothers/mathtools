@@ -136,7 +136,7 @@ export function DraggableSidebarItem({
                 onPointerCancel={handlePointerCancel}
                 onClick={onClick}
                 className={cn(
-                    "flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left cursor-grab active:cursor-grabbing disabled:opacity-50 disabled:cursor-not-allowed",
+                    "flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left cursor-grab active:cursor-grabbing disabled:opacity-50 disabled:cursor-not-allowed touch-none",
                     className
                 )}
                 {...props}

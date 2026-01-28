@@ -76,6 +76,8 @@ export function useCounters() {
         clearHistory
     } = useHistory<Counter[]>([]);
 
+    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+
     const [sortState, setSortState] = useState<SortState>('none');
     const [isOrdered, setIsOrdered] = useState(true);
 
@@ -91,6 +93,9 @@ export function useCounters() {
     const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
     const abortAnimationRef = useRef(false);
 
+    // Track start state for clean undo during drag
+    const dragStartRef = useRef<Counter[] | null>(null);
+
     // --- Helpers ---
     const wait = (ms: number) => new Promise(resolve => {
         const id = setTimeout(resolve, ms);
@@ -101,6 +106,35 @@ export function useCounters() {
         timeoutsRef.current.forEach(clearTimeout);
         timeoutsRef.current = [];
     };
+
+    // --- Selection Actions ---
+
+    const handleSelect = useCallback((id: number, multi: boolean) => {
+        if (multi) {
+            setSelectedIds(prev => {
+                const next = new Set(prev);
+                if (next.has(id)) next.delete(id);
+                else next.add(id);
+                return next;
+            });
+        } else {
+            // Check if already selected to avoid clearing multi-selection on drag start
+            // If dragging, we handle this in drag start
+            if (!selectedIds.has(id)) {
+                setSelectedIds(new Set([id]));
+            }
+        }
+    }, [selectedIds]);
+
+    const clearSelection = useCallback(() => {
+        setSelectedIds(new Set());
+    }, []);
+
+    const deleteSelected = useCallback(() => {
+        if (isAnimating || selectedIds.size === 0) return;
+        pushCounters((prev: Counter[]) => prev.filter(c => !selectedIds.has(c.id)));
+        setSelectedIds(new Set());
+    }, [isAnimating, selectedIds, pushCounters]);
 
     // --- Actions ---
 
@@ -230,17 +264,61 @@ export function useCounters() {
         if (isAnimating) return;
         // Simply filter out the counter - do NOT recalculate positions
         pushCounters((prev: Counter[]) => prev.filter(c => c.id !== id));
-    }, [isAnimating, pushCounters]);
+        // Remove from selection if present
+        if (selectedIds.has(id)) {
+            setSelectedIds(prev => {
+                const next = new Set(prev);
+                next.delete(id);
+                return next;
+            });
+        }
+    }, [isAnimating, pushCounters, selectedIds]);
 
-    const updateCounterPosition = useCallback((id: number, x: number, y: number) => {
+    const handleDragStart = useCallback(() => {
+        dragStartRef.current = counters;
+    }, [counters]);
+
+    const handleDragMove = useCallback((id: number, delta: { x: number, y: number }) => {
+        // If draggable is selected, move ALL selected counters.
+        // If not selected, it should have been selected on pointer down, so move it (and technically any others if logic falls through, but usually single)
+        const isSelected = selectedIds.has(id);
+        const idsToMove = isSelected ? selectedIds : new Set([id]);
+
+        const newCounters = counters.map(c => {
+            if (idsToMove.has(c.id)) {
+                return { ...c, x: c.x + delta.x, y: c.y + delta.y };
+            }
+            return c;
+        });
+
+        updateCountersImmediate(newCounters);
+    }, [counters, selectedIds, updateCountersImmediate]);
+
+    const updateCounterPosition = useCallback((_id: number, _x: number, _y: number) => {
         if (isAnimating) return;
-        // Use updateCountersImmediate to avoid polluting history with drag positions
-        updateCountersImmediate((prev: Counter[]) => prev.map(c =>
-            c.id === id ? { ...c, x, y } : c
-        ));
-        // Moving a counter manually disables ordered mode
+
+        // This is called on drag end. We need to commit the final state to history.
+        // If we were dragging multiple items, their positions are already updated in 'counters' (via handleDragMove/updateCountersImmediate)
+        // BUT 'counters' is the visual state. 'pushCounters' expects us to return the new state derived from PREVIOUS state.
+
+        // However, useHistory's pushState(setStateAction) implementation usually takes the *current* state 
+        // if passed a function, or we can just pass the new counters array directly if we know it's latest.
+        // To be safe and support undo properly, we should use the state we tracked in dragStartRef as 'base' 
+        // equivalent if we were doing complex diffs, but here we can just commit the current visual state 
+        // (which has been updated nicely by handleDragMove) as the next history entry.
+
+        // The issue is `updateCountersImmediate` updates the *current* pointer. 
+        // We want to push that current state as a new history node.
+
+        // Let's just push the current 'counters' state to history
+        // Pass dragStartRef.current as the "previous" state for the undo stack calculation if needed, 
+        // though our useHistory might auto-handle it. 
+        // Based on typical implementation: 
+        pushCounters(counters, dragStartRef.current || undefined);
+        dragStartRef.current = null;
+
         setIsOrdered(false);
-    }, [isAnimating, updateCountersImmediate]);
+    }, [isAnimating, counters, pushCounters]);
 
     const snapToOrder = useCallback(() => {
         pushCounters((prev: Counter[]) => {
@@ -403,8 +481,15 @@ export function useCounters() {
         addCounterAtPosition,
         addZeroPair,
         flipCounter,
+
         removeCounter,
         updateCounterPosition,
+        handleDragStart,
+        handleDragMove,
+        handleSelect,
+        clearSelection,
+        deleteSelected,
+        selectedIds,
         snapToOrder,
         flipAll,
         organize,
