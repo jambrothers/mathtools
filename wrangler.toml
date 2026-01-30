@@ -1,5 +1,0 @@
-name = "teachmaths-net"
-compatibility_date = "2025-01-30"
-
-[site]
-bucket = "./web/out"
