@@ -61,11 +61,23 @@ We follow a strict [Design System](DESIGN.md) to ensure consistency and accessib
 
 ## Project Structure
 
-This project follows a standard Next.js App Router structure with a separation of concerns between pages (`app/`) and reusable UI components (`components/`).
+This project uses a **monorepo structure** to support both the frontend (Next.js) and future backend (Python/FastAPI on Cloudflare Workers).
 
 ### Directory Overview
 
-- **`app/`**: Contains the route segments and page definitions.
+```
+mathtools/
+├── web/                    # Next.js frontend (Cloudflare Pages)
+│   ├── app/               # Route segments and pages
+│   ├── components/        # Shared UI components
+│   ├── lib/               # Utilities and hooks
+│   ├── public/            # Static assets
+│   └── ...
+├── api/                    # Future: FastAPI backend (Cloudflare Workers)
+└── README.md
+```
+
+- **`web/app/`**: Contains the route segments and page definitions.
   - **`mathematics/`**: Dedicated section for the interactive mathematics tools.
     - **`[tool-name]/`**: Each tool (e.g., `algebra-tiles`) has its own subdirectory containing its page, `HELP.md`, and tool-specific local components.
 - **`components/`**: Shared reusable components.
@@ -93,6 +105,7 @@ Most tools follow a similar pattern:
 First, install the dependencies:
 
 ```bash
+cd web
 npm install
 ```
 
@@ -103,6 +116,19 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Deployment
+
+This project is deployed to **Cloudflare Pages** as a static site.
+
+### Build for Production
+
+```bash
+cd web
+npm run build
+```
+
+This generates a static export in `web/out/` which is deployed to Cloudflare Pages.
 
 ## Development Guidelines
 
