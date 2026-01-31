@@ -39,6 +39,18 @@ export default function ToolsPage() {
                                 gradient="from-amber-500 to-orange-500"
                                 icon={<Grid2x2 className="w-8 h-8 text-amber-500" />}
                             />
+                            <ToolCard
+                                title="Linear Equations"
+                                description="Explore y = mx + c by adjusting gradient and y-intercept. Visualize slope triangles, intercepts, and equation labels."
+                                href="/mathematics/linear-equations"
+                                gradient="from-indigo-500 to-blue-500"
+                                icon={<Calculator className="w-8 h-8 text-indigo-500" />}
+                            // Note: Icon reused from existing imports or new one? 
+                            // Used Calculator from lucide-react (already imported) to avoid new imports if possible, 
+                            // but TrendingUp was in plan. Let's see if TrendingUp is better. 
+                            // Actually, TrendingUp is not imported. I'll use Calculator or add TrendingUp import.
+                            // Let's add TrendingUp import to be clearer.
+                            />
                         </div>
                     </div>
 
