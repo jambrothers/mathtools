@@ -98,6 +98,7 @@ function LinearEquationsContent() {
             <SetPageTitle title="Linear Equations" />
 
             <InteractiveToolLayout
+                sidebarWidth={400}
                 sidebar={
                     <LinearEquationsSidebar
                         lines={lines}
@@ -164,10 +165,8 @@ function LinearEquationsContent() {
                 }
             >
                 {/* Main Graph Area */}
-                <div className="w-full h-full flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-950 relative overflow-hidden">
-                    <div className="w-full max-w-4xl aspect-[3/2] bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden relative">
-
-
+                <div className="w-full h-full flex bg-white dark:bg-slate-950 relative overflow-hidden">
+                    <div className="flex-1 relative overflow-hidden">
                         <GraphSVG
                             lines={lines}
                             showEquation={showEquation}

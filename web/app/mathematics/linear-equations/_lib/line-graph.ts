@@ -1,87 +1,93 @@
 import { Point, GRAPH_WIDTH, GRAPH_HEIGHT } from "../constants"
 
 // Viewport definition (graph coordinate system)
-// For a standard -10 to 10 grid on 600x400 canvas
-export const VIEWPORT = {
+export interface Viewport {
+    xMin: number
+    xMax: number
+    yMin: number
+    yMax: number
+}
+
+// Default standard -10 to 10 grid
+export const DEFAULT_VIEWPORT: Viewport = {
     xMin: -10,
     xMax: 10,
-    yMin: -6.67, // Aspect ratio approx 3:2, so if width is 20 units, height is 13.33 units (-6.67 to 6.67)
-    yMax: 6.67
+    yMin: -10,
+    yMax: 10
 }
+
+export const VIEWPORT = DEFAULT_VIEWPORT // Keep for backward compatibility
 
 /**
  * Maps a graph coordinate to an SVG pixel coordinate
  */
-export function toPixel(point: Point): Point {
-    const xRange = VIEWPORT.xMax - VIEWPORT.xMin
-    const yRange = VIEWPORT.yMax - VIEWPORT.yMin
+export function toPixel(point: Point, viewport: Viewport = VIEWPORT, canvasWidth: number = GRAPH_WIDTH, canvasHeight: number = GRAPH_HEIGHT): Point {
+    const xRange = viewport.xMax - viewport.xMin
+    const yRange = viewport.yMax - viewport.yMin
 
     return {
-        x: ((point.x - VIEWPORT.xMin) / xRange) * GRAPH_WIDTH,
-        y: GRAPH_HEIGHT - ((point.y - VIEWPORT.yMin) / yRange) * GRAPH_HEIGHT // Invert Y for SVG
+        x: ((point.x - viewport.xMin) / xRange) * canvasWidth,
+        y: canvasHeight - ((point.y - viewport.yMin) / yRange) * canvasHeight // Invert Y for SVG
     }
 }
 
 /**
  * Maps an SVG pixel coordinate to a graph coordinate
  */
-export function toGraph(pixel: Point): Point {
-    const xRange = VIEWPORT.xMax - VIEWPORT.xMin
-    const yRange = VIEWPORT.yMax - VIEWPORT.yMin
+export function toGraph(pixel: Point, viewport: Viewport = VIEWPORT, canvasWidth: number = GRAPH_WIDTH, canvasHeight: number = GRAPH_HEIGHT): Point {
+    const xRange = viewport.xMax - viewport.xMin
+    const yRange = viewport.yMax - viewport.yMin
 
     return {
-        x: VIEWPORT.xMin + (pixel.x / GRAPH_WIDTH) * xRange,
-        y: VIEWPORT.yMin + ((GRAPH_HEIGHT - pixel.y) / GRAPH_HEIGHT) * yRange
+        x: viewport.xMin + (pixel.x / canvasWidth) * xRange,
+        y: viewport.yMin + ((canvasHeight - pixel.y) / canvasHeight) * yRange
     }
 }
 
 /**
  * Calculates the start and end points of the line within the viewport
  */
-export function calculateLineEndpoints(m: number, c: number): [Point, Point] {
+export function calculateLineEndpoints(m: number, c: number, viewport: Viewport = VIEWPORT): [Point, Point] {
     // We need to find the intersections with the viewport boundaries
     const points: Point[] = []
 
     // y = mx + c
 
     // Check intersection with x = xMin
-    const yAtXMin = m * VIEWPORT.xMin + c
-    if (yAtXMin >= VIEWPORT.yMin && yAtXMin <= VIEWPORT.yMax) {
-        points.push({ x: VIEWPORT.xMin, y: yAtXMin })
+    const yAtXMin = m * viewport.xMin + c
+    if (yAtXMin >= viewport.yMin && yAtXMin <= viewport.yMax) {
+        points.push({ x: viewport.xMin, y: yAtXMin })
     }
 
     // Check intersection with x = xMax
-    const yAtXMax = m * VIEWPORT.xMax + c
-    if (yAtXMax >= VIEWPORT.yMin && yAtXMax <= VIEWPORT.yMax) {
-        points.push({ x: VIEWPORT.xMax, y: yAtXMax })
+    const yAtXMax = m * viewport.xMax + c
+    if (yAtXMax >= viewport.yMin && yAtXMax <= viewport.yMax) {
+        points.push({ x: viewport.xMax, y: yAtXMax })
     }
 
     // Check intersection with y = yMin  =>  yMin = mx + c  =>  x = (yMin - c) / m
     if (m !== 0) { // Avoid division by zero
-        const xAtYMin = (VIEWPORT.yMin - c) / m
-        if (xAtYMin > VIEWPORT.xMin && xAtYMin < VIEWPORT.xMax) { // Strict inequality to avoid duplicates with corners handled above
-            points.push({ x: xAtYMin, y: VIEWPORT.yMin })
+        const xAtYMin = (viewport.yMin - c) / m
+        if (xAtYMin > viewport.xMin && xAtYMin < viewport.xMax) { // Strict inequality to avoid duplicates with corners handled above
+            points.push({ x: xAtYMin, y: viewport.yMin })
         }
 
         // Check intersection with y = yMax
-        const xAtYMax = (VIEWPORT.yMax - c) / m
-        if (xAtYMax > VIEWPORT.xMin && xAtYMax < VIEWPORT.xMax) {
-            points.push({ x: xAtYMax, y: VIEWPORT.yMax })
+        const xAtYMax = (viewport.yMax - c) / m
+        if (xAtYMax > viewport.xMin && xAtYMax < viewport.xMax) {
+            points.push({ x: xAtYMax, y: viewport.yMax })
         }
     } else {
         // Horizontal line y = c. 
-        // If c is within viewport, we essentially already covered it with xMin/xMax logic or need specific points
-        if (c >= VIEWPORT.yMin && c <= VIEWPORT.yMax) {
-            // Already added by xMin/xMax checks? 
-            // xMin check adds (-10, c), xMax check adds (10, c)
-            // So points array should have 2 items.
+        if (c >= viewport.yMin && c <= viewport.yMax) {
+            // Already handled by xMin/xMax
         }
     }
 
     // Return first two unique points (should be exactly 2 for a line crossing the box)
     // Fallback for edge cases (shouldn't happen with valid math)
     if (points.length < 2) {
-        return [{ x: -10, y: m * -10 + c }, { x: 10, y: m * 10 + c }]
+        return [{ x: viewport.xMin, y: m * viewport.xMin + c }, { x: viewport.xMax, y: m * viewport.xMax + c }]
     }
 
     return [points[0], points[1]]
