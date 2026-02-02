@@ -16,6 +16,7 @@ export function useLinearEquations() {
     const [showIntercepts, setShowIntercepts] = useState(true)
     const [showSlopeTriangle, setShowSlopeTriangle] = useState(true)
     const [showGrid, setShowGrid] = useState(true)
+    const [interactionMode, setInteractionMode] = useState<'none' | 'move' | 'rotate'>('none')
     const [isInitialized, setIsInitialized] = useState(false)
 
     // Load state on mount
@@ -164,6 +165,7 @@ export function useLinearEquations() {
         setShowIntercepts(true)
         setShowSlopeTriangle(true)
         setShowGrid(true)
+        setInteractionMode('none')
     }, [])
 
     return {
@@ -178,6 +180,8 @@ export function useLinearEquations() {
         setShowSlopeTriangle,
         showGrid,
         setShowGrid,
+        interactionMode,
+        setInteractionMode,
         addLine,
         removeLine,
         updateLine,

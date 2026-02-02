@@ -5,6 +5,8 @@ import { ControlSection, ControlSlider, ControlToggle, ControlPresetButton } fro
 // Mock Lucide icons
 jest.mock('lucide-react', () => ({
     ChevronDown: () => <div data-testid="chevron-down" />,
+    Minus: () => <div data-testid="minus" />,
+    Plus: () => <div data-testid="plus" />,
 }));
 // Helper to wrap component in a mocked class context if needed, but not strictly required for these
 

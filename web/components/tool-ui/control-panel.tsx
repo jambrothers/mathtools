@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { ChevronDown, Sliders, Eye, BookMarked, Settings2 } from "lucide-react"
+import { ChevronDown, Minus, Plus } from "lucide-react"
 
 // ============================================================================
 // Control Section (Collapsible)
@@ -39,7 +39,7 @@ export function ControlSection({
                     </h3>
                 </div>
                 <div className="flex items-center gap-2 text-slate-400">
-                    {icon && React.cloneElement(icon as React.ReactElement, { size: 16 })}
+                    {icon && React.isValidElement(icon) && React.cloneElement(icon as React.ReactElement<{ size?: number }>, { size: 16 })}
                     <ChevronDown
                         size={16}
                         className={cn("transition-transform duration-300", isOpen ? "rotate-180" : "")}
@@ -72,6 +72,7 @@ interface ControlSliderProps extends React.InputHTMLAttributes<HTMLInputElement>
     max: number
     step?: number
     displayValue?: React.ReactNode // Custom formatted value display
+    onValueChange?: (value: number) => void // Direct value callback for steppers
 }
 
 export function ControlSlider({
@@ -80,37 +81,70 @@ export function ControlSlider({
     min,
     max,
     step = 1,
+    disabled = false,
     displayValue,
-    className,
-    disabled,
+    onValueChange,
     ...props
 }: ControlSliderProps) {
+    const id = React.useId()
+
     return (
-        <div className={cn("space-y-3", className)}>
-            <div className="flex justify-between items-center">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+        <div className="w-full">
+            <div className="flex justify-between items-center mb-1">
+                <label htmlFor={id} className="text-sm font-medium text-slate-700 dark:text-slate-300">
                     {label}
                 </label>
-                <span className={cn(
-                    "font-mono text-sm font-bold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 px-2 py-0.5 rounded min-w-[3rem] text-center",
-                    disabled && "opacity-50 grayscale"
-                )}>
+                <span className="text-xs text-slate-500 font-mono">
                     {displayValue !== undefined ? displayValue : value}
                 </span>
             </div>
-            <div className="relative flex items-center pt-1 pb-2">
-                <span className="text-xs text-slate-400 absolute left-0 -bottom-4">{min}</span>
-                <input
-                    type="range"
-                    className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                    min={min}
-                    max={max}
-                    step={step}
-                    value={value}
-                    disabled={disabled}
-                    {...props}
-                />
-                <span className="text-xs text-slate-400 absolute right-0 -bottom-4">{max}</span>
+            <div className="relative flex items-center gap-3 pt-1 pb-2">
+                <button
+                    type="button"
+                    onClick={() => {
+                        const newValue = Math.max(min, value - step);
+                        if (onValueChange) {
+                            onValueChange(newValue)
+                        }
+                    }}
+                    className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors disabled:opacity-50"
+                    disabled={disabled || value <= min}
+                    aria-label={`Decrease ${label}`}
+                >
+                    <Minus size={16} />
+                </button>
+
+                <div className="relative flex-1">
+                    <span className="text-xs text-slate-400 absolute left-0 -bottom-4">{min}</span>
+                    <input
+                        id={id}
+                        data-testid={`slider-${label.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`}
+                        type="range"
+                        className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        min={min}
+                        max={max}
+                        step={step}
+                        value={value}
+                        disabled={disabled}
+                        {...props}
+                    />
+                    <span className="text-xs text-slate-400 absolute right-0 -bottom-4">{max}</span>
+                </div>
+
+                <button
+                    type="button"
+                    onClick={() => {
+                        const newValue = Math.min(max, value + step);
+                        if (onValueChange) {
+                            onValueChange(newValue)
+                        }
+                    }}
+                    className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors disabled:opacity-50"
+                    disabled={disabled || value >= max}
+                    aria-label={`Increase ${label}`}
+                >
+                    <Plus size={16} />
+                </button>
             </div>
         </div>
     )

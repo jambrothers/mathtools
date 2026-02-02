@@ -8,9 +8,10 @@ import { GraphSVG } from "./_components/graph-svg"
 import { LinearEquationsSidebar } from "./_components/linear-equations-sidebar"
 import { useLinearEquations } from "./_hooks/use-linear-equations"
 import { copyURLToClipboard } from "@/lib/url-state"
-import { Link2, Image as ImageIcon, FileCode } from "lucide-react"
+import { Image as ImageIcon, FileCode, Pointer, MoveVertical, RotateCw } from "lucide-react"
+import { cn } from "@/lib/utils"
 
-export default function LinearEquationsPage() {
+function LinearEquationsContent() {
     const {
         lines,
         activeLineId,
@@ -29,7 +30,9 @@ export default function LinearEquationsPage() {
         applyPreset,
         reset,
         getShareableURL,
-        isInitialized
+        isInitialized,
+        interactionMode,
+        setInteractionMode
     } = useLinearEquations()
 
     // Export Modal State
@@ -86,8 +89,6 @@ export default function LinearEquationsPage() {
 
     const handleCopyLink = () => {
         copyURLToClipboard(getShareableURL())
-        // Show toast? relying on button feedback normally but here we have a floating action?
-        // Let's add simple feedback if possible, or just copy.
     }
 
     if (!isInitialized) return null // Or loading spinner
@@ -116,23 +117,57 @@ export default function LinearEquationsPage() {
                         onApplyPreset={applyPreset}
                         onReset={reset}
                         onExport={() => setIsExportMenuOpen(true)}
+                        onCopyLink={handleCopyLink}
                     />
                 }
                 toolbarOverlay={
-                    <div className="flex flex-col gap-2">
+                    <div className="flex bg-white dark:bg-slate-800 rounded-full shadow-lg border border-slate-200 dark:border-slate-700 p-1 gap-1">
                         <button
-                            onClick={handleCopyLink}
-                            className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors"
-                            title="Copy Link"
+                            onClick={() => setInteractionMode('none')}
+                            className={cn(
+                                "px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-2",
+                                interactionMode === 'none'
+                                    ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-200"
+                                    : "text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-700"
+                            )}
                         >
-                            <Link2 size={20} />
+                            <Pointer size={14} />
+                            Select
+                        </button>
+                        <button
+                            onClick={() => setInteractionMode('move')}
+                            className={cn(
+                                "px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-2",
+                                interactionMode === 'move'
+                                    ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-200"
+                                    : "text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-700"
+                            )}
+                            title="Drag line to change Y-intercept"
+                        >
+                            <MoveVertical size={14} />
+                            Move (c)
+                        </button>
+                        <button
+                            onClick={() => setInteractionMode('rotate')}
+                            className={cn(
+                                "px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-2",
+                                interactionMode === 'rotate'
+                                    ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-200"
+                                    : "text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-700"
+                            )}
+                            title="Drag line to change Gradient"
+                        >
+                            <RotateCw size={14} />
+                            Rotate (m)
                         </button>
                     </div>
                 }
             >
                 {/* Main Graph Area */}
-                <div className="w-full h-full flex items-center justify-center p-4 md:p-8 bg-slate-50 dark:bg-slate-950 relative">
+                <div className="w-full h-full flex items-center justify-center p-4 bg-slate-50 dark:bg-slate-950 relative overflow-hidden">
                     <div className="w-full max-w-4xl aspect-[3/2] bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden relative">
+
+
                         <GraphSVG
                             lines={lines}
                             showEquation={showEquation}
@@ -140,7 +175,9 @@ export default function LinearEquationsPage() {
                             showSlopeTriangle={showSlopeTriangle}
                             showGrid={showGrid}
                             activeLineId={activeLineId}
-                            onLineClick={setActiveLineId}
+                            onLineSelect={setActiveLineId}
+                            interactionMode={interactionMode}
+                            onParameterChange={updateLine}
                         />
                     </div>
 
@@ -177,5 +214,13 @@ export default function LinearEquationsPage() {
                 </div>
             </InteractiveToolLayout>
         </ResolutionGuard>
+    )
+}
+
+export default function LinearEquationsPage() {
+    return (
+        <React.Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+            <LinearEquationsContent />
+        </React.Suspense>
     )
 }

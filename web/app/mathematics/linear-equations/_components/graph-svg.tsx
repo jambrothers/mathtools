@@ -1,251 +1,288 @@
 "use client"
 
 import * as React from "react"
+import { LineConfig } from "../constants"
+import { cn } from "@/lib/utils"
+// Import helpers directly since they are exported
 import {
-    Point, GRAPH_WIDTH, GRAPH_HEIGHT, LINE_COLORS, LineConfig
-} from "../constants"
-import {
-    toPixel, calculateLineEndpoints, calculateXIntercept,
-    calculateSlopeTriangle, VIEWPORT
+    calculateLineEndpoints,
+    calculateSlopeTriangle,
+    calculateXIntercept,
+    formatEquation,
+    VIEWPORT
 } from "../_lib/line-graph"
+
+function toPixel(point: { x: number, y: number }) {
+    // Map graph coordinates to SVG pixel coordinates
+    // Width: 460, Height: 300
+    const xRange = VIEWPORT.xMax - VIEWPORT.xMin
+    const yRange = VIEWPORT.yMax - VIEWPORT.yMin
+
+    // Pixel Dimensions
+    const width = 460
+    const height = 300
+
+    const x = ((point.x - VIEWPORT.xMin) / xRange) * width
+    const y = height - ((point.y - VIEWPORT.yMin) / yRange) * height // Invert Y
+
+    return { x, y }
+}
+
+function mapX(x: number) {
+    return toPixel({ x, y: 0 }).x
+}
+
+function mapY(y: number) {
+    return toPixel({ x: 0, y }).y
+}
 
 interface GraphSVGProps {
     lines: LineConfig[]
     showEquation: boolean
     showIntercepts: boolean
-    showSlopeTriangle: boolean
-    showGrid: boolean
-    activeLineId?: string
-    onLineClick?: (id: string) => void
+    showSlopeTriangle?: boolean
+    showGrid?: boolean
+    activeLineId: string
+    onLineSelect?: (id: string) => void
+    interactionMode?: 'none' | 'move' | 'rotate'
+    onParameterChange?: (id: string, updates: Partial<LineConfig>) => void
 }
 
 export function GraphSVG({
     lines,
     showEquation,
     showIntercepts,
-    showSlopeTriangle,
-    showGrid,
+    showSlopeTriangle = true,
+    showGrid = true,
     activeLineId,
-    onLineClick
+    onLineSelect,
+    interactionMode = 'none',
+    onParameterChange
 }: GraphSVGProps) {
-    // Generate Grid Lines
-    const renderGrid = () => {
-        if (!showGrid) return null
+    const svgRef = React.useRef<SVGSVGElement>(null)
+    const [isDragging, setIsDragging] = React.useState(false)
 
-        const gridLines = []
-        // Vertical lines (x = -10 to 10)
-        for (let x = Math.ceil(VIEWPORT.xMin); x <= Math.floor(VIEWPORT.xMax); x++) {
-            if (x === 0) continue // Axis handled separately
-            const start = toPixel({ x, y: VIEWPORT.yMin })
-            const end = toPixel({ x, y: VIEWPORT.yMax })
-            gridLines.push(
-                <line
-                    key={`v-${x}`}
-                    x1={start.x} y1={start.y}
-                    x2={end.x} y2={end.y}
-                    className="stroke-slate-200 dark:stroke-slate-800"
-                    strokeWidth="1"
-                />
-            )
-        }
-        // Horizontal lines (y = -6 to 6)
-        for (let y = Math.ceil(VIEWPORT.yMin); y <= Math.floor(VIEWPORT.yMax); y++) {
-            if (y === 0) continue // Axis handled separately
-            const start = toPixel({ x: VIEWPORT.xMin, y })
-            const end = toPixel({ x: VIEWPORT.xMax, y })
-            gridLines.push(
-                <line
-                    key={`h-${y}`}
-                    x1={start.x} y1={start.y}
-                    x2={end.x} y2={end.y}
-                    className="stroke-slate-200 dark:stroke-slate-800"
-                    strokeWidth="1"
-                />
-            )
-        }
-        return <g className="grid-system">{gridLines}</g>
+    // Helper to get graph coordinates from pointer event
+    const getGraphCoordinates = (e: React.PointerEvent) => {
+        if (!svgRef.current) return { x: 0, y: 0 }
+        const rect = svgRef.current.getBoundingClientRect()
+        const xPercent = (e.clientX - rect.left) / rect.width
+        const yPercent = (e.clientY - rect.top) / rect.height
+
+        const x = VIEWPORT.xMin + xPercent * (VIEWPORT.xMax - VIEWPORT.xMin)
+        const y = VIEWPORT.yMax - yPercent * (VIEWPORT.yMax - VIEWPORT.yMin) // Inverted Y axis
+        return { x, y }
     }
 
-    const renderAxes = () => {
-        const origin = toPixel({ x: 0, y: 0 })
-        const xStart = toPixel({ x: VIEWPORT.xMin, y: 0 })
-        const xEnd = toPixel({ x: VIEWPORT.xMax, y: 0 })
-        const yStart = toPixel({ x: 0, y: VIEWPORT.yMin })
-        const yEnd = toPixel({ x: 0, y: VIEWPORT.yMax })
+    const handlePointerDown = (e: React.PointerEvent, lineId: string) => {
+        // Always select the line on click
+        onLineSelect?.(lineId)
 
-        return (
-            <g className="axes">
-                {/* X Axis */}
-                <line
-                    x1={xStart.x} y1={origin.y}
-                    x2={xEnd.x} y2={origin.y}
-                    className="stroke-slate-800 dark:stroke-slate-300"
-                    strokeWidth="1.5"
-                    markerEnd="url(#arrow)"
-                />
-                <text x={xEnd.x - 10} y={origin.y + 20} className="text-xs fill-slate-600 dark:fill-slate-400 font-bold font-sans">x</text>
-
-                {/* Y Axis */}
-                <line
-                    x1={origin.x} y1={yStart.y}
-                    x2={origin.x} y2={yEnd.y}
-                    className="stroke-slate-800 dark:stroke-slate-300"
-                    strokeWidth="1.5"
-                    markerEnd="url(#arrow)"
-                />
-                <text x={origin.x + 10} y={yEnd.y + 20} className="text-xs fill-slate-600 dark:fill-slate-400 font-bold font-sans">y</text>
-
-                {/* Origin Label */}
-                <text x={origin.x - 15} y={origin.y + 15} className="text-xs fill-slate-500 font-sans">0</text>
-            </g>
-        )
-    }
-
-    // Helper to render a specific line and its decorations
-    const renderLine = (line: LineConfig) => {
-        if (!line.visible) return null
-
-        const [start, end] = calculateLineEndpoints(line.m, line.c)
-        const p1 = toPixel(start)
-        const p2 = toPixel(end)
-
-        const isActive = line.id === activeLineId
-
-        return (
-            <g key={line.id} onClick={() => onLineClick?.(line.id)} className="cursor-pointer">
-                {/* Main Line */}
-                {/* Hit area (thicker transparent line for easier selection) */}
-                <line
-                    x1={p1.x} y1={p1.y}
-                    x2={p2.x} y2={p2.y}
-                    stroke="transparent"
-                    strokeWidth="20"
-                />
-                <line
-                    x1={p1.x} y1={p1.y}
-                    x2={p2.x} y2={p2.y}
-                    stroke={line.color}
-                    strokeWidth={isActive ? 4 : 2}
-                    className="transition-all duration-200"
-                    fill="none" // Ensure no fill
-                />
-
-                {isActive && showSlopeTriangle && renderSlopeTriangle(line)}
-                {isActive && showIntercepts && renderIntercepts(line)}
-                {isActive && showEquation && renderEquationLabel(line, p1, p2)}
-            </g>
-        )
-    }
-
-    const renderSlopeTriangle = (line: LineConfig) => {
-        const triangle = calculateSlopeTriangle(line.m, line.c)
-        if (!triangle) return null
-
-        const p1 = toPixel(triangle.runStart)
-        const p2 = toPixel(triangle.runEnd)
-        const p3 = toPixel(triangle.riseEnd)
-
-        return (
-            <g className="slope-triangle">
-                <path
-                    d={`M${p1.x} ${p1.y} L${p2.x} ${p2.y} L${p3.x} ${p3.y}`}
-                    fill={`${line.color}20`} // 20% opacity using hex alpha
-                    stroke={line.color}
-                    strokeDasharray="4,2"
-                    strokeWidth="1"
-                />
-                <text x={(p1.x + p2.x) / 2} y={p1.y + 15} className="text-[10px] fill-slate-600 dark:fill-slate-300 font-medium font-sans text-center" textAnchor="middle">1</text>
-                <text x={p2.x + 5} y={(p2.y + p3.y) / 2} className="text-[10px] fill-slate-600 dark:fill-slate-300 font-medium font-sans" dominantBaseline="middle">{line.m}</text>
-            </g>
-        )
-    }
-
-    const renderIntercepts = (line: LineConfig) => {
-        const xInt = calculateXIntercept(line.m, line.c)
-        const yInt = { x: 0, y: line.c } // Always (0, c)
-
-        const elements = []
-
-        // Y-Intercept
-        const pY = toPixel(yInt)
-        // Check if visible in viewport
-        if (yInt.y >= VIEWPORT.yMin && yInt.y <= VIEWPORT.yMax) {
-            elements.push(
-                <g key="y-int" className="hover:scale-125 transition-transform origin-center">
-                    <circle cx={pY.x} cy={pY.y} r="5" fill="#EF4444" stroke="white" strokeWidth="2" className="dark:stroke-slate-800" />
-                    <rect x={pY.x + 10} y={pY.y - 12} width="44" height="24" rx="4" fill="rgba(255,255,255,0.9)" className="dark:fill-slate-700" />
-                    <text x={pY.x + 32} y={pY.y + 4} textAnchor="middle" className="text-xs fill-slate-800 dark:fill-slate-200 font-bold font-sans">
-                        (0, {line.c})
-                    </text>
-                </g>
-            )
+        if (interactionMode === 'none') {
+            return
         }
 
-        // X-Intercept
-        if (xInt && xInt.x >= VIEWPORT.xMin && xInt.x <= VIEWPORT.xMax) {
-            const pX = toPixel(xInt)
-            elements.push(
-                <g key="x-int" className="hover:scale-125 transition-transform origin-center">
-                    <circle cx={pX.x} cy={pX.y} r="5" fill="#10B981" stroke="white" strokeWidth="2" className="dark:stroke-slate-800" />
-                    <rect x={pX.x - 22} y={pX.y + 10} width="44" height="24" rx="4" fill="rgba(255,255,255,0.9)" className="dark:fill-slate-700" />
-                    <text x={pX.x} y={pX.y + 26} textAnchor="middle" className="text-xs fill-slate-800 dark:fill-slate-200 font-bold font-sans">
-                        ({Number(xInt.x.toFixed(1))}, 0)
-                    </text>
-                </g>
-            )
-        }
+        // Start dragging
+        setIsDragging(true)
 
-        return <g>{elements}</g>
+        // Capture pointer for smooth dragging even outside SVG
+        // Note: casting to Element for TS check
+        const target = e.target as Element;
+        if (target && target.setPointerCapture) {
+            target.setPointerCapture(e.pointerId)
+        }
     }
 
-    const renderEquationLabel = (line: LineConfig, p1: Point, p2: Point) => {
-        // Place label somewhat along the line
-        // Simple heuristic: 75% of the way from left to right (or p1 to p2)
-        const labelX = p1.x + (p2.x - p1.x) * 0.75
-        const labelY = p1.y + (p2.y - p1.y) * 0.75
+    const handlePointerMove = (e: React.PointerEvent) => {
+        if (!isDragging || interactionMode === 'none' || !onParameterChange || !activeLineId) return
 
-        // Don't render if out of bounds
-        if (labelX < 0 || labelX > GRAPH_WIDTH || labelY < 0 || labelY > GRAPH_HEIGHT) return null
+        const { x, y } = getGraphCoordinates(e)
+        // Prevent default touch behaviors like scrolling
+        e.preventDefault()
 
-        const mStr = Math.abs(line.m) === 1 ? (line.m < 0 ? "-" : "") + "x" : line.m + "x"
-        // Cleanup 0.5x, -0.5x etc
+        if (interactionMode === 'move') {
+            // Moving Y-intercept (c)
+            // Just move the line vertically to match Y at the current X? 
+            // Or move the line such that it passes through (x, y) keeping 'm' constant.
+            // y = mx + c  =>  c = y - mx
+            const activeLine = lines.find(l => l.id === activeLineId)
+            if (activeLine) {
+                const newC = y - activeLine.m * x
+                const roundedC = Math.round(newC * 10) / 10
+                onParameterChange(activeLineId, { c: roundedC })
+            }
+        } else if (interactionMode === 'rotate') {
+            // Changing Gradient (m)
+            // Pivot around Y-intercept (0, c)
+            // y = mx + c => m = (y - c) / x
+            const activeLine = lines.find(l => l.id === activeLineId)
+            if (activeLine) {
+                // Avoid crazy jumps when near the pivot point
+                if (Math.abs(x) > 0.5) {
+                    const newM = (y - activeLine.c) / x
+                    // Clamp and round
+                    const roundedM = Math.round(newM * 10) / 10
+                    const clampedM = Math.max(Math.min(roundedM, 20), -20)
+                    onParameterChange(activeLineId, { m: clampedM })
+                }
+            }
+        }
+    }
 
-        let label = `y = ${line.m}x`
-        if (line.c > 0) label += ` + ${line.c}`
-        if (line.c < 0) label += ` - ${Math.abs(line.c)}`
-        // Handle m=0 or m=1 cases strictly? formatEquation function handles it better broadly
-        // Re-use logic or just simplfy here for display
-
-        return (
-            <g transform={`translate(${labelX}, ${labelY - 20})`}>
-                <rect x="-10" y="-20" width="100" height="30" rx="6" fill="white" stroke={line.color} strokeWidth="1" className="dark:fill-slate-800 drop-shadow-md" />
-                <text x="40" y="0" textAnchor="middle" className="text-sm font-bold font-display" fill={line.color}>
-                    {label}
-                </text>
-            </g>
-        )
+    const handlePointerUp = (e: React.PointerEvent) => {
+        setIsDragging(false)
+        const target = e.target as Element;
+        if (target && target.releasePointerCapture && target.hasPointerCapture(e.pointerId)) {
+            target.releasePointerCapture(e.pointerId)
+        }
     }
 
     return (
         <svg
-            viewBox={`0 0 ${GRAPH_WIDTH} ${GRAPH_HEIGHT}`}
-            className="w-full h-full drop-shadow-xl select-none"
-            preserveAspectRatio="xMidYMid meet"
+            ref={svgRef}
+            viewBox="0 0 460 300"
+            className="w-full h-full bg-white dark:bg-slate-900 touch-none select-none rounded-lg"
+            preserveAspectRatio="xMidYMid slice"
+            xmlns="http://www.w3.org/2000/svg"
         >
             <defs>
-                <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-                    <path d="M0,0 L8,4 L0,8" fill="#4B5563" className="dark:fill-slate-400" />
-                </marker>
+                <pattern id="grid" width="23" height="15" patternUnits="userSpaceOnUse">
+                    <path d="M 23 0 L 0 0 0 15" fill="none" stroke="currentColor" className="text-slate-200 dark:text-slate-800" strokeWidth="1" />
+                </pattern>
             </defs>
-
-            {/* Background (Grid) */}
-            {renderGrid()}
+            {showGrid && <rect width="100%" height="100%" fill="url(#grid)" />}
 
             {/* Axes */}
-            {renderAxes()}
+            <line x1="230" y1="0" x2="230" y2="300" stroke="currentColor" className="text-slate-800 dark:text-slate-200" strokeWidth="2" />
+            <line x1="0" y1="150" x2="460" y2="150" stroke="currentColor" className="text-slate-800 dark:text-slate-200" strokeWidth="2" />
 
-            {/* Lines */}
-            {lines.map(line => renderLine(line))}
-        </svg>
+            {/* Axis Labels */}
+            <text x="450" y="170" textAnchor="end" className="fill-slate-600 dark:fill-slate-400 font-bold" style={{ fontSize: '14px' }}>x</text>
+            <text x="240" y="20" textAnchor="start" className="fill-slate-600 dark:fill-slate-400 font-bold" style={{ fontSize: '14px' }}>y</text>
+
+            <g>
+                {lines.map((line) => {
+                    const isActive = line.id === activeLineId;
+                    const [start, end] = calculateLineEndpoints(line.m, line.c);
+                    const x1 = start.x;
+                    const y1 = start.y;
+                    const x2 = end.x;
+                    const y2 = end.y; // Standardizing to x1, y1 for rest of code
+
+                    // Use opacity to indicate non-selected lines if in interaction mode
+                    const isFaded = interactionMode !== 'none' && !isActive;
+
+                    return (
+                        <g key={line.id}
+                            className={cn("transition-opacity duration-200", {
+                                "opacity-40": isFaded,
+                                "cursor-move": interactionMode === 'move',
+                                "cursor-crosshair": interactionMode === 'rotate',
+                                "cursor-pointer": interactionMode === 'none'
+                            })}
+                            onPointerDown={(e) => handlePointerDown(e, line.id)}
+                            onPointerMove={handlePointerMove}
+                            onPointerUp={handlePointerUp}
+                            style={{ pointerEvents: 'stroke' }}
+                        >
+                            {/* Invisible Hit Area (wider) */}
+                            <line
+                                x1={mapX(x1)} y1={mapY(y1)}
+                                x2={mapX(x2)} y2={mapY(y2)}
+                                stroke="transparent"
+                                strokeWidth="30"
+                            />
+
+                            {/* Visible Line */}
+                            <line
+                                x1={mapX(x1)} y1={mapY(y1)}
+                                x2={mapX(x2)} y2={mapY(y2)}
+                                stroke={line.color}
+                                strokeWidth={isActive ? 4 : 3}
+                                strokeLinecap="round"
+                            />
+
+                            {/* Slope Triangle */}
+                            {isActive && showSlopeTriangle && (() => {
+                                const triangle = calculateSlopeTriangle(line.m, line.c);
+                                if (!triangle) return null;
+                                const p1 = toPixel(triangle.runStart);
+                                const p2 = toPixel(triangle.runEnd);
+                                const p3 = toPixel(triangle.riseEnd);
+                                return (
+                                    <g className="slope-triangle">
+                                        <path
+                                            d={`M${p1.x} ${p1.y} L${p2.x} ${p2.y} L${p3.x} ${p3.y}`}
+                                            fill={`${line.color}20`}
+                                            stroke={line.color}
+                                            strokeDasharray="4,2"
+                                            strokeWidth="1"
+                                            pointerEvents="none"
+                                        />
+                                        <text x={(p1.x + p2.x) / 2} y={p1.y + 15} className="text-[10px] fill-slate-600 dark:fill-slate-300 font-medium font-sans text-center" textAnchor="middle">1</text>
+                                        <text x={p2.x + 5} y={(p2.y + p3.y) / 2} className="text-[10px] fill-slate-600 dark:fill-slate-300 font-medium font-sans" dominantBaseline="middle">{line.m}</text>
+                                    </g>
+                                );
+                            })()}
+
+                            {/* Intercepts */}
+                            {isActive && showIntercepts && (() => {
+                                const xInt = calculateXIntercept(line.m, line.c);
+                                const yInt = { x: 0, y: line.c };
+                                const pY = toPixel(yInt);
+                                const elements = [];
+
+                                // Y-Intercept
+                                if (yInt.y >= VIEWPORT.yMin && yInt.y <= VIEWPORT.yMax) {
+                                    elements.push(
+                                        <g key="y-int" className="hover:scale-125 transition-transform origin-center">
+                                            <circle cx={pY.x} cy={pY.y} r="5" fill="#EF4444" stroke="white" strokeWidth="2" className="dark:stroke-slate-800" />
+                                            {interactionMode === 'none' && (
+                                                <text x={pY.x + 10} y={pY.y} textAnchor="start" dominantBaseline="middle" className="text-xs fill-slate-800 dark:fill-slate-200 font-bold font-sans drop-shadow-sm px-1">
+                                                    (0, {line.c})
+                                                </text>
+                                            )}
+                                        </g>
+                                    );
+                                }
+
+                                // X-Intercept
+                                if (xInt && xInt.x >= VIEWPORT.xMin && xInt.x <= VIEWPORT.xMax) {
+                                    const pX = toPixel(xInt);
+                                    elements.push(
+                                        <g key="x-int" className="hover:scale-125 transition-transform origin-center">
+                                            <circle cx={pX.x} cy={pX.y} r="5" fill="#10B981" stroke="white" strokeWidth="2" className="dark:stroke-slate-800" />
+                                            {interactionMode === 'none' && (
+                                                <text x={pX.x} y={pX.y + 20} textAnchor="middle" className="text-xs fill-slate-800 dark:fill-slate-200 font-bold font-sans drop-shadow-sm">
+                                                    ({Number(xInt.x.toFixed(1))}, 0)
+                                                </text>
+                                            )}
+                                        </g>
+                                    );
+                                }
+                                return elements;
+                            })()}
+
+                            {/* Label */}
+                            {isActive && showEquation && (
+                                <foreignObject
+                                    x={Math.max(0, Math.min(460 - 100, mapX(0) + 10))}
+                                    y={Math.max(0, Math.min(300 - 40, mapY(line.c) - 40))}
+                                    width="100" height="40"
+                                    className="overflow-visible pointer-events-none"
+                                >
+                                    <div className={cn("inline-block px-2 py-1 rounded shadow-sm border text-sm font-bold bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 whitespace-nowrap")}
+                                        style={{ borderColor: line.color, color: line.color }}
+                                    >
+                                        {formatEquation(line.m, line.c)}
+                                    </div>
+                                </foreignObject>
+                            )}
+                        </g>
+                    );
+                })}
+            </g>
+        </svg >
     )
 }
+

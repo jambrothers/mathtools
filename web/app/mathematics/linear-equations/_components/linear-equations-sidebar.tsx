@@ -26,6 +26,7 @@ interface LinearEquationsSidebarProps {
     onApplyPreset: (type: 'parallel' | 'perpendicular' | 'proportional') => void
     onReset: () => void
     onExport: () => void
+    onCopyLink: () => void
 }
 
 export function LinearEquationsSidebar({
@@ -45,7 +46,8 @@ export function LinearEquationsSidebar({
     setShowGrid,
     onApplyPreset,
     onReset,
-    onExport
+    onExport,
+    onCopyLink
 }: LinearEquationsSidebarProps) {
     const activeLine = lines.find(l => l.id === activeLineId) || lines[0]
 
@@ -106,14 +108,16 @@ export function LinearEquationsSidebar({
                             max={M_MAX}
                             step={0.1}
                             onChange={(e) => onUpdateLine(activeLine.id, { m: parseFloat(e.target.value) })}
+                            onValueChange={(val) => onUpdateLine(activeLine.id, { m: val })}
                         />
                         <ControlSlider
                             label="Y-Intercept (c)"
                             value={activeLine.c}
                             min={C_MIN}
                             max={C_MAX}
-                            step={0.1}
+                            step={0.5}
                             onChange={(e) => onUpdateLine(activeLine.id, { c: parseFloat(e.target.value) })}
+                            onValueChange={(val) => onUpdateLine(activeLine.id, { c: val })}
                         />
 
                         {/* Delete Line Button */}
@@ -186,19 +190,28 @@ export function LinearEquationsSidebar({
 
             {/* Footer */}
             <div className="p-6 mt-auto bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shrink-0">
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3">
                     <button
                         onClick={onReset}
-                        className="flex-1 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                        className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                     >
-                        Reset
+                        Reset Tool
                     </button>
-                    <button
-                        onClick={onExport}
-                        className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium shadow-md transition-colors flex items-center justify-center gap-2"
-                    >
-                        Export
-                    </button>
+                    <div className="flex gap-3">
+                        <button
+                            onClick={onCopyLink}
+                            className="flex-1 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-md text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors flex items-center justify-center gap-2"
+                            title="Copy Link to Clipboard"
+                        >
+                            Copy Link
+                        </button>
+                        <button
+                            onClick={onExport}
+                            className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium shadow-md transition-colors flex items-center justify-center gap-2"
+                        >
+                            Export
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

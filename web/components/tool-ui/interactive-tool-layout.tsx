@@ -22,13 +22,11 @@ export function InteractiveToolLayout({
     footerOverlay
 }: InteractiveToolLayoutProps) {
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(true)
-    const [isSmallScreen, setIsSmallScreen] = React.useState(false)
 
     React.useEffect(() => {
         const checkWidth = () => {
             const width = window.innerWidth
             const small = width < 1024 // lg breakpoint
-            setIsSmallScreen(small)
             if (small) {
                 setIsSidebarOpen(false)
             } else {
@@ -44,7 +42,7 @@ export function InteractiveToolLayout({
     }, [])
 
     return (
-        <div className={cn("flex flex-1 overflow-hidden relative h-[calc(100vh-81px)]", className)}>
+        <div className={cn("flex flex-1 overflow-hidden relative h-[calc(100vh-64px)]", className)}>
             {/* Main Content Area */}
             <main className="flex-1 relative flex flex-col min-w-0 bg-slate-50 dark:bg-slate-900">
                 {/* Canvas Area */}
@@ -70,19 +68,23 @@ export function InteractiveToolLayout({
                     )}
                 </div>
 
-                {/* Sidebar Toggle Button (floating on edge of sidebar) */}
+                {/* Sidebar Toggle Button */}
                 {sidebar && (
                     <button
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                         className={cn(
-                            "absolute top-1/2 z-40 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-md rounded-full p-1.5 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-300 transform -translate-y-1/2",
-                            isSidebarOpen
-                                ? "right-[calc(384px-16px)]" // Positioned on the edge of the open sidebar
-                                : "right-0 translate-x-1/2"  // Positioned on the edge of the screen
+                            "absolute top-1/2 z-40 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-md rounded-full p-1.5 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-300",
+                            // Position: Always stuck to the right edge of Main. 
+                            // When Sidebar is open, Main ends at Sidebar start.
+                            // When Sidebar is closed, Main ends at screen edge.
+                            "right-0 translate-x-1/2" // Center on the edge
                         )}
                         style={{
-                            right: isSidebarOpen ? `${sidebarWidth - 16}px` : undefined,
-                            transition: 'right 0.3s ease-in-out'
+                            transform: 'translateY(-50%) translateX(50%)',
+                            marginRight: isSidebarOpen ? '0px' : '24px' // Add spacing when closed so it's not half-off screen? No, actually...
+                            // If closed, right-0 is screen edge. translate-x-1/2 puts it half OFF screen.
+                            // We want it visible.
+                            // Rewriting logic below in a cleaner way.
                         }}
                         title={isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
                     >
