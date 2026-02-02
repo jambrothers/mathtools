@@ -15,7 +15,9 @@ export function groupTilesLogic(tiles: TileData[], startX: number = 50, startY: 
 
     const sorted = [...tiles].sort((a, b) => {
         if (typeOrder[a.type] !== typeOrder[b.type]) {
-            return (typeOrder[a.type] || 99) - (typeOrder[b.type] || 99);
+            const valA = typeOrder[a.type] !== undefined ? typeOrder[a.type] : 99;
+            const valB = typeOrder[b.type] !== undefined ? typeOrder[b.type] : 99;
+            return valA - valB;
         }
         return b.value - a.value;
     });

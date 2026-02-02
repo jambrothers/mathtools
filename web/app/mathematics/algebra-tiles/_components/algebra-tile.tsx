@@ -126,6 +126,9 @@ export const AlgebraTile = React.memo(function AlgebraTile({
                 width: def.width,
                 height: def.height
             }}
+            data-testid="tile"
+            data-tile-type={type}
+            data-tile-value={value}
         >
             {showLabels && (
                 <span className="pointer-events-none select-none drop-shadow-md">

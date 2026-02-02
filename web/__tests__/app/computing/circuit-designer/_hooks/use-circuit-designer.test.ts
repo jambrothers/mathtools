@@ -124,4 +124,105 @@ describe('useCircuitDesigner - Undo Functionality', () => {
     // Note: Testing connections requires simulating mouse events or calling internal handlers
     // which might be harder to test if they depend on specific event structures.
     // For now, testing basic state mutations via exposed methods is sufficient.
+    describe('Simulation Logic', () => {
+        it('should evaluate NOT gate correctly', () => {
+            const { result } = renderHook(() => useCircuitDesigner());
+
+            // Create: Input -> NOT -> Output
+            act(() => {
+                result.current.loadDemo('NOT');
+            });
+
+            // Find parts
+            const input = result.current.nodes.find(n => n.type === 'INPUT')!;
+            const output = result.current.nodes.find(n => n.type === 'OUTPUT')!;
+
+            // Initial state: Input False -> NOT -> Output True
+            expect(result.current.activeSimulation[input.id]).toBe(false);
+            expect(result.current.activeSimulation[output.id]).toBe(true);
+
+            // Toggle Input
+            act(() => {
+                const event = { stopPropagation: jest.fn() } as any;
+                result.current.toggleInput(event, input.id);
+            });
+
+            // Input True -> NOT -> Output False
+            expect(result.current.activeSimulation[input.id]).toBe(true);
+            expect(result.current.activeSimulation[output.id]).toBe(false);
+        });
+
+        it('should evaluate AND gate correctly', () => {
+            const { result } = renderHook(() => useCircuitDesigner());
+            act(() => { result.current.loadDemo('AND'); });
+
+            const inputs = result.current.nodes.filter(n => n.type === 'INPUT');
+            const output = result.current.nodes.find(n => n.type === 'OUTPUT')!;
+            const idA = inputs[0].id;
+            const idB = inputs[1].id;
+
+            // 0 AND 0 = 0
+            expect(result.current.activeSimulation[output.id]).toBe(false);
+
+            // 1 AND 0 = 0
+            act(() => { result.current.toggleInput({ stopPropagation: jest.fn() } as any, idA); });
+            expect(result.current.activeSimulation[output.id]).toBe(false);
+
+            // 1 AND 1 = 1
+            act(() => { result.current.toggleInput({ stopPropagation: jest.fn() } as any, idB); });
+            expect(result.current.activeSimulation[output.id]).toBe(true);
+        });
+    });
+
+    describe('Wiring', () => {
+        it('should create connection between nodes', () => {
+            const { result } = renderHook(() => useCircuitDesigner());
+
+            act(() => {
+                result.current.addNode('INPUT');
+                result.current.addNode('OUTPUT');
+            });
+            const inputId = result.current.nodes[0].id; // INPUT
+            const outputId = result.current.nodes[1].id; // OUTPUT
+
+            // Start wiring from Input
+            act(() => {
+                const event = { stopPropagation: jest.fn() } as any;
+                result.current.startWiring(event, inputId);
+            });
+
+            expect(result.current.wiring).toEqual({ nodeId: inputId, portType: 'output' });
+
+            // Complete wiring to Output
+            act(() => {
+                const event = { stopPropagation: jest.fn() } as any;
+                result.current.completeWiring(event, outputId, 0); // Input index 0
+            });
+
+            expect(result.current.connections).toHaveLength(1);
+            expect(result.current.connections[0]).toMatchObject({
+                from: inputId,
+                to: outputId,
+                inputIndex: 0
+            });
+            expect(result.current.wiring).toBeNull();
+        });
+    });
+
+    describe('Truth Table', () => {
+        it('should generate truth table for simple circuit', () => {
+            const { result } = renderHook(() => useCircuitDesigner());
+            act(() => { result.current.loadDemo('AND'); });
+
+            act(() => {
+                result.current.generateTruthTable();
+            });
+
+            expect(result.current.truthTable).not.toBeNull();
+            // AND gate: 4 rows
+            expect(result.current.truthTable!.rows).toHaveLength(4);
+            // 1, 1 -> 1 (Last row usually if sorted binary)
+            // 0, 0 -> 0
+        });
+    });
 });

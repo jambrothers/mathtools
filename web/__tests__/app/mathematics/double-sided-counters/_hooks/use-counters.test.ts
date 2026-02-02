@@ -35,7 +35,7 @@ describe('useCounters - Undo functionality', () => {
             const { result } = renderHook(() => useCounters());
 
             act(() => {
-                result.current.addZeroPair(false);
+                result.current.addZeroPair();
                 jest.runAllTimers();
             });
 
@@ -69,7 +69,7 @@ describe('useCounters - Undo functionality', () => {
 
             // Add a zero pair
             act(() => {
-                result.current.addZeroPair(false);
+                result.current.addZeroPair();
                 jest.runAllTimers();
             });
 
@@ -149,6 +149,9 @@ describe('useCounters - Undo functionality', () => {
 
             // Move one counter to a custom position
             const counterId = result.current.counters[0].id;
+            act(() => {
+                result.current.handleDragMove(counterId, { x: 468, y: 468 }); // Move by +468 to get to ~500 (32+468)
+            });
             act(() => {
                 result.current.updateCounterPosition(counterId, 500, 500);
             });
@@ -276,7 +279,7 @@ describe('useCounters - Undo functionality', () => {
             // Simulate many drag moves (these should use updateState, not pushState)
             act(() => {
                 for (let i = 0; i < 50; i++) {
-                    result.current.updateCounterPosition(counterId, i * 10, i * 10);
+                    result.current.handleDragMove(counterId, { x: 10, y: 10 });
                 }
             });
 
@@ -286,6 +289,146 @@ describe('useCounters - Undo functionality', () => {
             });
 
             // Counter should be removed (undoing the add)
+            expect(result.current.counters).toHaveLength(0);
+        });
+    });
+    describe('Addition', () => {
+        it('should add counter at specific position', () => {
+            const { result } = renderHook(() => useCounters());
+
+            act(() => {
+                result.current.addCounterAtPosition(1, 100, 200);
+                jest.runAllTimers();
+            });
+
+            expect(result.current.counters).toHaveLength(1);
+            expect(result.current.counters[0]).toMatchObject({
+                value: 1,
+                x: 100,
+                y: 200
+            });
+        });
+    });
+
+    describe('Selection', () => {
+        it('should select single counter', () => {
+            const { result } = renderHook(() => useCounters());
+            act(() => {
+                result.current.addCounter(1, 1, false);
+                jest.runAllTimers();
+            });
+            const id = result.current.counters[0].id;
+
+            act(() => {
+                result.current.handleSelect(id, false);
+            });
+
+            expect(result.current.selectedIds.has(id)).toBe(true);
+            expect(result.current.selectedIds.size).toBe(1);
+        });
+
+        it('should handle multi-selection', () => {
+            const { result } = renderHook(() => useCounters());
+            act(() => {
+                result.current.addCounter(1, 2, false);
+                jest.runAllTimers();
+            });
+            const id1 = result.current.counters[0].id;
+            const id2 = result.current.counters[1].id;
+
+            act(() => {
+                result.current.handleSelect(id1, true);
+                result.current.handleSelect(id2, true);
+            });
+
+            expect(result.current.selectedIds.size).toBe(2);
+            expect(result.current.selectedIds.has(id1)).toBe(true);
+            expect(result.current.selectedIds.has(id2)).toBe(true);
+        });
+
+        it('should delete selected counters', () => {
+            const { result } = renderHook(() => useCounters());
+            act(() => {
+                result.current.addCounter(1, 2, false);
+                jest.runAllTimers();
+            });
+            const id1 = result.current.counters[0].id;
+
+            act(() => {
+                result.current.handleSelect(id1, false);
+            });
+
+            act(() => {
+                result.current.deleteSelected();
+            });
+
+            expect(result.current.counters).toHaveLength(1);
+            expect(result.current.counters[0].id).not.toBe(id1);
+            expect(result.current.selectedIds.size).toBe(0);
+        });
+    });
+
+    describe('Board Operations', () => {
+        it('should flip all counters', () => {
+            const { result } = renderHook(() => useCounters());
+            act(() => {
+                result.current.addCounter(1, 1, false);
+                result.current.addCounter(-1, 1, false);
+                jest.runAllTimers();
+            });
+
+            act(() => {
+                result.current.flipAll();
+            });
+
+            expect(result.current.counters[0].value).toBe(-1);
+            expect(result.current.counters[1].value).toBe(1);
+        });
+
+        it('should snap to order', () => {
+            const { result } = renderHook(() => useCounters());
+            act(() => {
+                result.current.addCounter(1, 1, false);
+                jest.runAllTimers();
+            });
+
+            // Move it away
+            const id = result.current.counters[0].id;
+            act(() => {
+                result.current.updateCounterPosition(id, 999, 999);
+            });
+
+            act(() => {
+                result.current.snapToOrder();
+            });
+
+            // Should be back at grid position
+            expect(result.current.counters[0].x).not.toBe(999);
+            expect(result.current.isOrdered).toBe(true);
+        });
+
+        it('should cancel zero pairs (immediate update verification)', async () => {
+            const { result } = renderHook(() => useCounters());
+
+            act(() => {
+                result.current.addCounter(1, 1, false);
+                result.current.addCounter(-1, 1, false);
+                jest.runAllTimers();
+            });
+
+            expect(result.current.counters).toHaveLength(2);
+
+            let promise: Promise<void>;
+            act(() => {
+                promise = result.current.cancelZeroPairs();
+            });
+
+            // Fast-forward animation
+            await act(async () => {
+                jest.runAllTimers();
+                await promise;
+            });
+
             expect(result.current.counters).toHaveLength(0);
         });
     });

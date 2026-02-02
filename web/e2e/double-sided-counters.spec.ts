@@ -269,4 +269,45 @@ test.describe('Double Sided Counters - Counter Interactions', () => {
         const undoButton = page.locator('button:has-text("Undo")');
         await expect(undoButton).toBeDisabled();
     });
+
+    test('should change color when flipped', async ({ page }) => {
+        await page.goto(BASE_URL);
+        await page.waitForSelector('text=The board is empty');
+
+        // Add positive (+1) -> Yellow
+        await page.click('text=Add +1');
+        await page.waitForTimeout(300);
+
+        const counter = page.locator('[data-testid="counter"]').first();
+        // Check yellow class presence
+        await expect(counter).toHaveClass(/bg-yellow-400/);
+
+        // Flip it
+        await counter.dblclick();
+        await page.waitForTimeout(500);
+
+        // Check red class
+        await expect(counter).toHaveClass(/bg-red-500/);
+    });
+
+    test('should delete selected counter via keyboard', async ({ page }) => {
+        await page.goto(BASE_URL);
+        await page.waitForSelector('text=The board is empty');
+
+        await page.click('text=Add +1');
+        await page.waitForTimeout(200);
+
+        const counter = page.locator('[data-testid="counter"]').first();
+        await counter.click(); // Select
+        await page.waitForTimeout(200);
+
+        // Verify selection ring (visual check or class check)
+        await expect(counter).toHaveClass(/ring-blue-500/);
+
+        // Press Delete
+        await page.keyboard.press('Delete');
+        await page.waitForTimeout(300);
+
+        await expect(page.locator('[data-testid="counter"]')).toHaveCount(0);
+    });
 });
