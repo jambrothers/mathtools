@@ -93,9 +93,9 @@ export const linearEquationsSerializer: URLStateSerializer<LinearEquationsState>
         return {
             lines,
             activeLineId,
-            showEquation: deserializeBool(params.get('eq'), true),
-            showIntercepts: deserializeBool(params.get('int'), true),
-            showSlopeTriangle: deserializeBool(params.get('tri'), true),
+            showEquation: deserializeBool(params.get('eq'), false),
+            showIntercepts: deserializeBool(params.get('int'), false),
+            showSlopeTriangle: deserializeBool(params.get('tri'), false),
             slopeTriangleSize: params.get('triSize') ? parseFloat(params.get('triSize')!) : 1,
             showGradientCalculation: deserializeBool(params.get('triCalc'), false),
             showGrid: deserializeBool(params.get('grid'), true)
