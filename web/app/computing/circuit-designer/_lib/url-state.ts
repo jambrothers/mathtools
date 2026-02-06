@@ -27,7 +27,9 @@ export function serializeNodes(nodes: CircuitNode[]): string {
         const stateVal = node.type === 'INPUT' ? (node.state ? '1' : '0') : '';
 
         // Compact format: type:id:x,y:label(:state)
-        let part = `${typeCode}:${node.id}:${x},${y}:${node.label}`;
+        // Encode label to prevent delimiter injection
+        const encodedLabel = encodeURIComponent(node.label);
+        let part = `${typeCode}:${node.id}:${x},${y}:${encodedLabel}`;
         if (stateVal) part += `:${stateVal}`;
         return part;
     }).join(';');
@@ -51,7 +53,7 @@ export function parseNodeString(str: string): CircuitNode[] {
         const typeCode = sections[0];
         const id = sections[1];
         const pos = sections[2].split(',');
-        const label = sections[3];
+        const encodedLabel = sections[3];
         const stateStr = sections[4]; // optional
 
         const x = parseInt(pos[0] || '0');
@@ -66,7 +68,7 @@ export function parseNodeString(str: string): CircuitNode[] {
                 type,
                 x,
                 y,
-                label
+                label: decodeURIComponent(encodedLabel)
             };
             if (stateStr !== undefined && stateStr !== '') {
                 node.state = stateStr === '1';
