@@ -240,7 +240,7 @@ export function GraphSVG({
                                 if (yInt.y >= currentViewport.yMin && yInt.y <= currentViewport.yMax) {
                                     const pY = toPixel(yInt, currentViewport, dimensions.width, dimensions.height);
                                     elements.push(
-                                        <g key="y-int" className="hover:scale-125 transition-transform origin-center">
+                                        <g key="y-int">
                                             <circle cx={pY.x} cy={pY.y} r="6" fill="#EF4444" stroke="white" strokeWidth="2" className="dark:stroke-slate-800" />
                                             {interactionMode === 'none' && (
                                                 <text x={pY.x + 12} y={pY.y} textAnchor="start" dominantBaseline="middle" className="text-sm fill-slate-800 dark:fill-slate-200 font-bold font-sans drop-shadow-sm px-1">
@@ -255,7 +255,7 @@ export function GraphSVG({
                                 if (xIntArr && xIntArr.x >= currentViewport.xMin && xIntArr.x <= currentViewport.xMax) {
                                     const pX = toPixel(xIntArr, currentViewport, dimensions.width, dimensions.height);
                                     elements.push(
-                                        <g key="x-int" className="hover:scale-125 transition-transform origin-center">
+                                        <g key="x-int">
                                             <circle cx={pX.x} cy={pX.y} r="6" fill="#10B981" stroke="white" strokeWidth="2" className="dark:stroke-slate-800" />
                                             {interactionMode === 'none' && (
                                                 <text x={pX.x} y={pX.y + 25} textAnchor="middle" className="text-sm fill-slate-800 dark:fill-slate-200 font-bold font-sans drop-shadow-sm">
@@ -281,7 +281,9 @@ export function GraphSVG({
 }
 
 function SlopeTriangle({ line, viewport, canvasSize }: { line: LineConfig, viewport: Viewport, canvasSize: { width: number, height: number } }) {
-    const triangle = calculateSlopeTriangle(line.m, line.c);
+    // Position triangle further right to avoid crowding (x=3), but keep within viewport
+    const startX = Math.min(3, viewport.xMax - 2);
+    const triangle = calculateSlopeTriangle(line.m, line.c, startX);
     if (!triangle) return null;
     const t1 = toPixel(triangle.runStart, viewport, canvasSize.width, canvasSize.height);
     const t2 = toPixel(triangle.runEnd, viewport, canvasSize.width, canvasSize.height);
@@ -303,7 +305,8 @@ function SlopeTriangle({ line, viewport, canvasSize }: { line: LineConfig, viewp
 }
 
 function EquationLabel({ line, viewport, canvasSize }: { line: LineConfig, viewport: Viewport, canvasSize: { width: number, height: number } }) {
-    const labelX = (viewport.xMax + viewport.xMin) / 4;
+    // Position equation label further right (x=6), to avoid crowding triangle and intercepts
+    const labelX = Math.min(6, viewport.xMax - 3);
     let labelY = line.m * labelX + line.c;
 
     // Keep label in viewport
