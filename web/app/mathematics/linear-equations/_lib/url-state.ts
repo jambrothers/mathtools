@@ -10,6 +10,8 @@ export interface LinearEquationsState {
     showEquation: boolean
     showIntercepts: boolean
     showSlopeTriangle: boolean
+    slopeTriangleSize: number
+    showGradientCalculation: boolean
     showGrid: boolean
 }
 
@@ -74,6 +76,8 @@ export const linearEquationsSerializer: URLStateSerializer<LinearEquationsState>
         params.set('eq', serializeBool(state.showEquation))
         params.set('int', serializeBool(state.showIntercepts))
         params.set('tri', serializeBool(state.showSlopeTriangle))
+        params.set('triSize', state.slopeTriangleSize.toString())
+        params.set('triCalc', serializeBool(state.showGradientCalculation))
         params.set('grid', serializeBool(state.showGrid))
 
         return params
@@ -92,6 +96,8 @@ export const linearEquationsSerializer: URLStateSerializer<LinearEquationsState>
             showEquation: deserializeBool(params.get('eq'), true),
             showIntercepts: deserializeBool(params.get('int'), true),
             showSlopeTriangle: deserializeBool(params.get('tri'), true),
+            slopeTriangleSize: params.get('triSize') ? parseFloat(params.get('triSize')!) : 1,
+            showGradientCalculation: deserializeBool(params.get('triCalc'), false),
             showGrid: deserializeBool(params.get('grid'), true)
         }
     }

@@ -105,16 +105,16 @@ export function calculateXIntercept(m: number, c: number): Point | null {
  * Calculates the slope triangle vertices
  * We'll center it around the y-intercept or a convenient integer point
  */
-export function calculateSlopeTriangle(m: number, c: number, startX: number = 0): { runStart: Point, runEnd: Point, riseEnd: Point } | null {
+export function calculateSlopeTriangle(m: number, c: number, startX: number = 0, step: number = 1): { runStart: Point, runEnd: Point, riseEnd: Point } | null {
     // Start at calculated point on line: (startX, y)
     const startY = m * startX + c
     const p1 = { x: startX, y: startY }
 
-    // Move right by 1 unit (run = 1)
-    const p2 = { x: startX + 1, y: startY }
+    // Move right by step unit (run = step)
+    const p2 = { x: startX + step, y: startY }
 
-    // Move up/down by m (rise = m)
-    const p3 = { x: startX + 1, y: startY + m }
+    // Move up/down by m*step (rise = m*step)
+    const p3 = { x: startX + step, y: startY + m * step }
 
     return {
         runStart: p1,

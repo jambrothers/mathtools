@@ -15,6 +15,8 @@ export function useLinearEquations() {
     const [showEquation, setShowEquation] = useState(true)
     const [showIntercepts, setShowIntercepts] = useState(true)
     const [showSlopeTriangle, setShowSlopeTriangle] = useState(true)
+    const [slopeTriangleSize, setSlopeTriangleSize] = useState(1)
+    const [showGradientCalculation, setShowGradientCalculation] = useState(false)
     const [showGrid, setShowGrid] = useState(true)
     const [interactionMode, setInteractionMode] = useState<'none' | 'move' | 'rotate'>('none')
     const [isInitialized, setIsInitialized] = useState(false)
@@ -28,6 +30,8 @@ export function useLinearEquations() {
             setShowEquation(state.showEquation)
             setShowIntercepts(state.showIntercepts)
             setShowSlopeTriangle(state.showSlopeTriangle)
+            setSlopeTriangleSize(state.slopeTriangleSize)
+            setShowGradientCalculation(state.showGradientCalculation)
             setShowGrid(state.showGrid)
         }
         setIsInitialized(true)
@@ -164,6 +168,8 @@ export function useLinearEquations() {
         setShowEquation(true)
         setShowIntercepts(true)
         setShowSlopeTriangle(true)
+        setSlopeTriangleSize(1)
+        setShowGradientCalculation(false)
         setShowGrid(true)
         setInteractionMode('none')
     }, [])
@@ -178,6 +184,10 @@ export function useLinearEquations() {
         setShowIntercepts,
         showSlopeTriangle,
         setShowSlopeTriangle,
+        slopeTriangleSize,
+        setSlopeTriangleSize,
+        showGradientCalculation,
+        setShowGradientCalculation,
         showGrid,
         setShowGrid,
         interactionMode,
@@ -190,7 +200,7 @@ export function useLinearEquations() {
         reset,
         isInitialized,
         getShareableURL: () => generateShareableURL(linearEquationsSerializer, {
-            lines, activeLineId, showEquation, showIntercepts, showSlopeTriangle, showGrid
+            lines, activeLineId, showEquation, showIntercepts, showSlopeTriangle, slopeTriangleSize, showGradientCalculation, showGrid
         }, pathname)
     }
 }

@@ -18,6 +18,8 @@ interface GraphSVGProps {
     showEquation: boolean
     showIntercepts: boolean
     showSlopeTriangle?: boolean
+    slopeTriangleSize?: number
+    showGradientCalculation?: boolean
     showGrid?: boolean
     activeLineId: string
     onLineSelect?: (id: string) => void
@@ -30,6 +32,8 @@ export function GraphSVG({
     showEquation,
     showIntercepts,
     showSlopeTriangle = true,
+    slopeTriangleSize = 1,
+    showGradientCalculation = false,
     showGrid = true,
     activeLineId,
     onLineSelect,
@@ -227,7 +231,13 @@ export function GraphSVG({
 
                             {/* Slope Triangle */}
                             {isActive && showSlopeTriangle && (
-                                <SlopeTriangle line={line} viewport={currentViewport} canvasSize={dimensions} />
+                                <SlopeTriangle
+                                    line={line}
+                                    viewport={currentViewport}
+                                    canvasSize={dimensions}
+                                    step={slopeTriangleSize}
+                                    showCalculation={showGradientCalculation}
+                                />
                             )}
 
                             {/* Intercepts */}
@@ -280,14 +290,28 @@ export function GraphSVG({
     )
 }
 
-function SlopeTriangle({ line, viewport, canvasSize }: { line: LineConfig, viewport: Viewport, canvasSize: { width: number, height: number } }) {
+function SlopeTriangle({ line, viewport, canvasSize, step = 1, showCalculation = false }: {
+    line: LineConfig,
+    viewport: Viewport,
+    canvasSize: { width: number, height: number },
+    step?: number,
+    showCalculation?: boolean
+}) {
     // Position triangle further right to avoid crowding (x=3), but keep within viewport
-    const startX = Math.min(3, viewport.xMax - 2);
-    const triangle = calculateSlopeTriangle(line.m, line.c, startX);
+    // If showing calculation, we need more space on the right (approx 4 units for label + spacing)
+    const rightBuffer = showCalculation ? 5.5 : 2;
+    const startX = Math.min(3, viewport.xMax - step - rightBuffer); // Adjust for step size and label
+    const triangle = calculateSlopeTriangle(line.m, line.c, startX, step);
     if (!triangle) return null;
     const t1 = toPixel(triangle.runStart, viewport, canvasSize.width, canvasSize.height);
     const t2 = toPixel(triangle.runEnd, viewport, canvasSize.width, canvasSize.height);
     const t3 = toPixel(triangle.riseEnd, viewport, canvasSize.width, canvasSize.height);
+
+    const rise = line.m * step
+    const run = step
+
+
+
     return (
         <g className="slope-triangle">
             <path
@@ -298,8 +322,33 @@ function SlopeTriangle({ line, viewport, canvasSize }: { line: LineConfig, viewp
                 strokeWidth="2"
                 pointerEvents="none"
             />
-            <text x={(t1.x + t2.x) / 2} y={t1.y + 20} className="text-[14px] fill-slate-700 dark:fill-slate-200 font-bold font-sans text-center" textAnchor="middle">1</text>
-            <text x={t2.x + 8} y={(t2.y + t3.y) / 2} className="text-[14px] fill-slate-700 dark:fill-slate-200 font-bold font-sans" dominantBaseline="middle">{line.m.toFixed(1)}</text>
+            {/* Run Label */}
+            <text x={(t1.x + t2.x) / 2} y={t1.y + 20} className="text-[14px] fill-slate-700 dark:fill-slate-200 font-bold font-sans text-center" textAnchor="middle">{run}</text>
+
+            {/* Rise Label */}
+            <text x={t2.x + 8} y={(t2.y + t3.y) / 2} className="text-[14px] fill-slate-700 dark:fill-slate-200 font-bold font-sans" dominantBaseline="middle">{rise.toFixed(1)}</text>
+
+            {/* Calculation Display */}
+            {showCalculation && (
+                <foreignObject
+                    x={t2.x + 55}
+                    y={(t2.y + t3.y) / 2 - 24}
+                    width="120"
+                    height="50"
+                    className="overflow-visible pointer-events-none"
+                >
+                    <div className="inline-flex items-center gap-2 px-3 py-2 bg-white/95 dark:bg-slate-900/95 rounded-lg border border-slate-200 dark:border-slate-700 shadow-md text-sm font-sans text-slate-700 dark:text-slate-200 backdrop-blur-sm">
+                        <span className="italic font-medium text-slate-500 dark:text-slate-400">m</span>
+                        <span>=</span>
+                        <div className="flex flex-col items-center leading-none">
+                            <span className="border-b border-slate-400 dark:border-slate-500 w-full text-center pb-0.5 mb-0.5">{rise.toFixed(1)}</span>
+                            <span>{run}</span>
+                        </div>
+                        <span>=</span>
+                        <span className="font-bold">{line.m.toFixed(2)}</span>
+                    </div>
+                </foreignObject>
+            )}
         </g>
     );
 }

@@ -1,4 +1,4 @@
-import { calculateLineEndpoints, calculateXIntercept, formatEquation, VIEWPORT } from './line-graph';
+import { calculateLineEndpoints, calculateXIntercept, formatEquation, calculateSlopeTriangle, VIEWPORT } from './line-graph';
 
 describe('line-graph math', () => {
     describe('formatEquation', () => {
@@ -39,5 +39,32 @@ describe('line-graph math', () => {
         });
     });
 
-    // Add more tests for viewport clipping if needed, but the basic logic is standard math
+    describe('calculateSlopeTriangle', () => {
+        it('calculates standard triangle with step 1', () => {
+            const result = calculateSlopeTriangle(2, 1, 0, 1);
+            expect(result).toEqual({
+                runStart: { x: 0, y: 1 },
+                runEnd: { x: 1, y: 1 },
+                riseEnd: { x: 1, y: 3 }
+            });
+        });
+
+        it('calculates larger triangle with step 2', () => {
+            const result = calculateSlopeTriangle(2, 1, 0, 2);
+            expect(result).toEqual({
+                runStart: { x: 0, y: 1 },
+                runEnd: { x: 2, y: 1 },
+                riseEnd: { x: 2, y: 5 }
+            });
+        });
+
+        it('calculates fractional step', () => {
+            const result = calculateSlopeTriangle(4, 0, 0, 0.5);
+            expect(result).toEqual({
+                runStart: { x: 0, y: 0 },
+                runEnd: { x: 0.5, y: 0 },
+                riseEnd: { x: 0.5, y: 2 }
+            });
+        });
+    });
 });

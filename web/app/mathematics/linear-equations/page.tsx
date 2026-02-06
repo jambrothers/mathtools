@@ -22,6 +22,11 @@ function LinearEquationsContent() {
         setShowIntercepts,
         showSlopeTriangle,
         setShowSlopeTriangle,
+
+        slopeTriangleSize,
+        setSlopeTriangleSize,
+        showGradientCalculation,
+        setShowGradientCalculation,
         showGrid,
         setShowGrid,
         addLine,
@@ -113,6 +118,11 @@ function LinearEquationsContent() {
                         setShowIntercepts={setShowIntercepts}
                         showSlopeTriangle={showSlopeTriangle}
                         setShowSlopeTriangle={setShowSlopeTriangle}
+
+                        slopeTriangleSize={slopeTriangleSize}
+                        setSlopeTriangleSize={setSlopeTriangleSize}
+                        showGradientCalculation={showGradientCalculation}
+                        setShowGradientCalculation={setShowGradientCalculation}
                         showGrid={showGrid}
                         setShowGrid={setShowGrid}
                         onApplyPreset={applyPreset}
@@ -171,8 +181,12 @@ function LinearEquationsContent() {
                             lines={lines}
                             showEquation={showEquation}
                             showIntercepts={showIntercepts}
+
                             showSlopeTriangle={showSlopeTriangle}
+                            slopeTriangleSize={slopeTriangleSize}
+                            showGradientCalculation={showGradientCalculation}
                             showGrid={showGrid}
+
                             activeLineId={activeLineId}
                             onLineSelect={setActiveLineId}
                             interactionMode={interactionMode}

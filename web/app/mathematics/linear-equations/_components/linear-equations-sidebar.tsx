@@ -21,6 +21,10 @@ interface LinearEquationsSidebarProps {
     setShowIntercepts: (v: boolean) => void
     showSlopeTriangle: boolean
     setShowSlopeTriangle: (v: boolean) => void
+    slopeTriangleSize: number
+    setSlopeTriangleSize: (v: number) => void
+    showGradientCalculation: boolean
+    setShowGradientCalculation: (v: boolean) => void
     showGrid: boolean
     setShowGrid: (v: boolean) => void
     onApplyPreset: (type: 'parallel' | 'perpendicular' | 'proportional') => void
@@ -42,6 +46,10 @@ export function LinearEquationsSidebar({
     setShowIntercepts,
     showSlopeTriangle,
     setShowSlopeTriangle,
+    slopeTriangleSize,
+    setSlopeTriangleSize,
+    showGradientCalculation,
+    setShowGradientCalculation,
     showGrid,
     setShowGrid,
     onApplyPreset,
@@ -151,6 +159,24 @@ export function LinearEquationsSidebar({
                             checked={showSlopeTriangle}
                             onChange={(e) => setShowSlopeTriangle(e.target.checked)}
                         />
+                        {showSlopeTriangle && (
+                            <div className="pl-4 space-y-3 pb-2">
+                                <ControlSlider
+                                    label="Triangle Size"
+                                    value={slopeTriangleSize}
+                                    min={0.5}
+                                    max={4}
+                                    step={0.5}
+                                    onChange={(e) => setSlopeTriangleSize(parseFloat(e.target.value))}
+                                    onValueChange={setSlopeTriangleSize}
+                                />
+                                <ControlToggle
+                                    label="Show Calculation"
+                                    checked={showGradientCalculation}
+                                    onChange={(e) => setShowGradientCalculation(e.target.checked)}
+                                />
+                            </div>
+                        )}
                         <ControlToggle
                             label="Show Grid"
                             checked={showGrid}
