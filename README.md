@@ -28,7 +28,23 @@ A tool for teaching integer operations using positive (yellow) and negative (red
 - **Shareable URLs**: Generate links to share exact counter configurations
 *Status: Architecture aligned with project standards. URL state sharing implemented.*
 
-### 3. Circuit Designer
+### 3. Bar Model
+A visualization tool for problem-solving using proportional bars.
+- **Operations**: Split (halves, thirds, fifths), Join, Clone.
+- **Features**:
+    - Comparison braces (Totals).
+    - Relative and custom labeling.
+    - Drag-and-drop interface.
+*Status: Stable. Core functionality implemented.*
+
+### 4. Linear Equations
+An interactive graph for exploring linear relationships ($y = mx + c$).
+- **Interaction Modes**: Move ($c$), Rotate ($m$), and Select.
+- **Visual Aids**: Slope triangles, intercepts, and equation display.
+- **Export**: Save graphs as PNG or SVG.
+*Status: Stable. Export and interaction modes available.*
+
+### 5. Circuit Designer
 A logic gate simulator for Computer Science students.
 - **Components**: Switches, Bulbs, AND, OR, NOT, XOR gates.
 - **Features**:
