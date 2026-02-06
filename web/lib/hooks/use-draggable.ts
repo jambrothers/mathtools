@@ -18,8 +18,6 @@ export function useDraggable(
     initialPos: Position,
     options: UseDraggableOptions = {}
 ) {
-    const { threshold = 5 } = options;
-
     // keeping track of local visual position during drag to avoid jank
     const [position, setPosition] = useState(initialPos);
     // Track if we are actively dragging (passed threshold)
@@ -31,6 +29,15 @@ export function useDraggable(
     const [startPos, setStartPos] = useState<Position | null>(null);
     const prevPointerRef = React.useRef<Position | null>(null);
 
+    // Refs to avoid re-attaching listeners on every render/move
+    const optionsRef = React.useRef(options);
+    optionsRef.current = options;
+
+    const positionRef = React.useRef(position);
+    React.useEffect(() => {
+        positionRef.current = position;
+    }, [position]);
+
     // Sync visual position if external reset happens (e.g. undo)
     useEffect(() => {
         if (!isDragging && (position.x !== initialPos.x || position.y !== initialPos.y)) {
@@ -40,24 +47,26 @@ export function useDraggable(
     }, [initialPos, isDragging, position.x, position.y]);
 
     const handlePointerDown = useCallback((e: React.PointerEvent) => {
-        if (options.disabled) return;
+        if (optionsRef.current.disabled) return;
 
         // Capture pointer for reliable tracking across element boundaries
         e.currentTarget.setPointerCapture(e.pointerId);
 
         setIsPointerDown(true);
-        setStartPos(position);
+        setStartPos(positionRef.current);
         setDragStartPointer({ x: e.clientX, y: e.clientY });
         prevPointerRef.current = { x: e.clientX, y: e.clientY };
 
         // Do NOT set isDragging yet, wait for threshold
-    }, [position, options]);
+    }, []);
 
     useEffect(() => {
         if (!isPointerDown || !startPos || !dragStartPointer) return;
 
         const handlePointerMove = (e: PointerEvent) => {
-            const scale = options.scale || 1;
+            const currentOptions = optionsRef.current;
+            const scale = currentOptions.scale || 1;
+            const threshold = currentOptions.threshold ?? 5;
 
             // Check threshold if not yet dragging
             if (!isDragging) {
@@ -70,7 +79,7 @@ export function useDraggable(
 
                 // Threshold crossed, start drag
                 setIsDragging(true);
-                options.onDragStart?.(id, startPos);
+                currentOptions.onDragStart?.(id, startPos);
             }
 
             // Calculate incremental delta for external consumers
@@ -85,20 +94,22 @@ export function useDraggable(
             let newX = startPos.x + dx;
             let newY = startPos.y + dy;
 
-            if (options.gridSize) {
-                newX = Math.round(newX / options.gridSize) * options.gridSize;
-                newY = Math.round(newY / options.gridSize) * options.gridSize;
+            if (currentOptions.gridSize) {
+                newX = Math.round(newX / currentOptions.gridSize) * currentOptions.gridSize;
+                newY = Math.round(newY / currentOptions.gridSize) * currentOptions.gridSize;
             }
 
             const newPos = { x: newX, y: newY };
             setPosition(newPos);
+            positionRef.current = newPos; // Update ref immediately so handlers see it
 
-            options.onDragMove?.(id, newPos, { x: movementX, y: movementY });
+            currentOptions.onDragMove?.(id, newPos, { x: movementX, y: movementY });
         };
 
         const handlePointerUp = () => {
+            const currentOptions = optionsRef.current;
             if (isDragging) {
-                options.onDragEnd?.(id, position);
+                currentOptions.onDragEnd?.(id, positionRef.current);
             }
 
             setIsPointerDown(false);
@@ -118,7 +129,7 @@ export function useDraggable(
             window.removeEventListener('pointerup', handlePointerUp);
             window.removeEventListener('pointercancel', handlePointerUp);
         };
-    }, [isPointerDown, isDragging, startPos, dragStartPointer, id, options, position, threshold]);
+    }, [isPointerDown, isDragging, startPos, dragStartPointer, id]);
 
     // Keep backwards-compatible alias for handleMouseDown during migration
     return {
