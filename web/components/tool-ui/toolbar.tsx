@@ -64,6 +64,10 @@ export function ToolbarButton({ icon, label, active, variant = 'default', classN
         success: "bg-emerald-600 hover:bg-emerald-700 text-white border-transparent"
     };
 
+    // Auto-generate accessible names if not provided
+    const ariaLabel = props['aria-label'] || label;
+    const title = props.title || label;
+
     return (
         <button
             type="button"
@@ -72,6 +76,8 @@ export function ToolbarButton({ icon, label, active, variant = 'default', classN
                 variants[variant],
                 className
             )}
+            aria-label={ariaLabel}
+            title={title}
             {...props}
         >
             {icon}
