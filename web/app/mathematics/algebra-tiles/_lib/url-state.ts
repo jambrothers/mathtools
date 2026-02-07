@@ -28,14 +28,17 @@ const PARAM_SNAP = 'sn';
 
 /**
  * Serialize tiles to compact string format.
- * Format: "type:value,x,y;type:value,x,y;..."
+ *
+ * Format: `type:value,x,y;...`
+ *
+ * - Delimiters:
+ *   - `;` separates individual tiles.
+ *   - `:` separates the type from the properties.
+ *   - `,` separates the numeric properties (value, x, y).
  * 
  * @example
- * serializeTiles([
- *   { id: 'abc', type: 'x', value: 1, x: 100, y: 150 },
- *   { id: 'def', type: 'x2', value: -1, x: 200, y: 200 }
- * ])
- * // Returns: "x:1,100,150;x2:-1,200,200"
+ * // x tile (val=1) at 100,150; negative x^2 tile (val=-1) at 200,200
+ * "x:1,100,150;x2:-1,200,200"
  */
 export function serializeTiles(tiles: TileData[]): string {
     if (tiles.length === 0) return '';
@@ -48,10 +51,15 @@ export function serializeTiles(tiles: TileData[]): string {
 
 /**
  * Parse compact tile string back to TileData array.
- * Creates new IDs for each tile.
  * 
- * @param str - The compact tile string (e.g., "x:1,100,150;x2:-1,200,200")
- * @returns Array of TileData objects with generated IDs
+ * Uses regex `^([a-z0-9_]+):(-?\d+),(-?\d+),(-?\d+)$` to validate each segment.
+ * - Group 1: Type (alphanumeric + underscore)
+ * - Group 2: Value (integer)
+ * - Group 3: X position (integer)
+ * - Group 4: Y position (integer)
+ *
+ * @param str - The compact tile string.
+ * @returns Array of TileData objects with newly generated unique IDs.
  */
 export function parseTileString(str: string): TileData[] {
     if (!str || str.trim() === '') return [];

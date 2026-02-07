@@ -1,12 +1,25 @@
 /**
  * Generic URL state serialization utilities.
- * Can be extended by any tool to add URL state persistence.
+ *
+ * Architecture:
+ * This module provides a standardized way to persist tool state in the URL query parameters.
+ * It uses a "Compact String" strategy to minimize URL length, which is critical for sharing.
+ *
+ * Serialization Format:
+ * - State is compressed into short strings using delimiters like `:`, `;`, and `,`.
+ * - Example: `type:value,x,y;type:value,x,y`
+ *
+ * SECURITY WARNING:
+ * When serializing user-generated content (like labels or text inputs) into these delimited strings,
+ * you MUST use `encodeURIComponent()` to prevent delimiter injection attacks.
+ * If a user enters a label containing a delimiter (e.g., "Label:1"), it could break the parsing logic
+ * or be malicious.
  * 
  * Usage:
- * 1. Define a state interface for your tool
- * 2. Implement URLStateSerializer<YourState>
- * 3. Use generateShareableURL() to create shareable links
- * 4. Use your serializer.deserialize() to restore state from URL
+ * 1. Define a state interface for your tool.
+ * 2. Implement `URLStateSerializer<YourState>`.
+ * 3. Use `generateShareableURL()` to create shareable links.
+ * 4. Use your serializer's `deserialize()` method to restore state on load.
  */
 
 /**

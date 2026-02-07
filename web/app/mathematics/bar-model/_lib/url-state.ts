@@ -22,10 +22,15 @@ export interface BarModelURLState {
 
 /**
  * Serialize bars to a compact string format.
- * Format: "colorIndex:label,x,y,width;colorIndex:label,x,y,width"
  *
- * @param bars - Array of bar data to serialize
- * @returns Compact string representation
+ * Format: `colorIndex:label,x,y,width;...`
+ *
+ * Important:
+ * - Labels are `encodeURIComponent`'d to prevent delimiter conflicts (e.g. if label contains `,` or `;`).
+ * - Coordinates are rounded to integers to save space.
+ *
+ * @param bars - Array of bar data to serialize.
+ * @returns Compact string representation using `;` as the item delimiter.
  */
 export function serializeBars(bars: BarData[]): string {
     if (bars.length === 0) return '';
@@ -39,8 +44,14 @@ export function serializeBars(bars: BarData[]): string {
 /**
  * Parse a bar string back to BarData array.
  *
- * @param str - The serialized bar string
- * @returns Array of BarData (with generated IDs)
+ * Logic:
+ * - Splits string by `;` to get individual bar segments.
+ * - Parses each segment using the `colorIndex:label,x,y,width` schema.
+ * - Decodes the label using `decodeURIComponent`.
+ * - Generates a new unique ID for each bar to avoid collisions on reload.
+ *
+ * @param str - The serialized bar string.
+ * @returns Array of BarData objects.
  */
 export function parseBarsString(str: string): BarData[] {
     if (!str || str.trim() === '') return [];

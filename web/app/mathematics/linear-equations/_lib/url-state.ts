@@ -16,20 +16,33 @@ export interface LinearEquationsState {
 }
 
 /**
- * Serializer for LineConfig array
- * Format: "m,c,color|m,c,color"
- * Color is stored as index if standard, or hex? Let's just store m,c for simplicity and auto-assign colors on load based on index?
- * Or serialize active state too?
- * Let's serialize: "m,c" pairs separated by "|". We will reconstruct IDs and colors on load (deterministic).
- * Actually, to support deleting/adding effectively, we might just want minimal state.
+ * Serializer for LineConfig array.
  * 
- * Compact format:
- * lines: "0.5,1|2,0"  (line 1: m=0.5, c=1; line 2: m=2, c=0)
+ * Format: `m,c|m,c|...`
+ *
+ * Strategy:
+ * - Only stores slope (m) and y-intercept (c) for each line.
+ * - Uses `|` as the line separator and `,` as the property separator.
+ * - Colors and IDs are not stored; they are deterministically regenerated upon deserialization
+ *   based on the line's index in the array.
+ *
+ * @param lines - The list of lines to serialize.
+ * @returns Compact string representation.
  */
 function serializeLines(lines: LineConfig[]): string {
     return lines.map(line => `${Number(line.m.toFixed(2))},${Number(line.c.toFixed(2))}`).join('|')
 }
 
+/**
+ * Deserializer for LineConfig array.
+ *
+ * - Reconstructs lines from `m,c` pairs.
+ * - Assigns deterministic IDs (`line-1`, `line-2`, etc.) and colors based on order.
+ * - Falls back to a default line if the input string is invalid or empty.
+ *
+ * @param value - The serialized line string.
+ * @returns Reconstructed array of LineConfig objects.
+ */
 function deserializeLines(value: string | null): LineConfig[] {
     if (!value) {
         return [{

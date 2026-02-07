@@ -38,17 +38,17 @@ const PARAM_COUNTER_TYPE = 'ct';
 
 /**
  * Serialize counters to compact string format.
- * Format: "p:x,y;n:x,y;p:x,y;..."
- * Where p = positive (+1), n = negative (-1)
+ *
+ * Format: `type:x,y;...`
+ *
+ * Legend:
+ * - `p`: Positive counter (+1)
+ * - `n`: Negative counter (-1)
+ * - `x,y`: Integer coordinates
  * 
  * @example
  * // Two positive counters and one negative
- * serializeCounters([
- *   { id: 0, value: 1, x: 32, y: 32 },
- *   { id: 1, value: 1, x: 128, y: 32 },
- *   { id: 2, value: -1, x: 224, y: 32 }
- * ])
- * // Returns: "p:32,32;p:128,32;n:224,32"
+ * "p:32,32;p:128,32;n:224,32"
  */
 export function serializeCounters(counters: Counter[]): string {
     if (counters.length === 0) return '';

@@ -3,14 +3,33 @@
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 
+/**
+ * Props for the ToolCard component.
+ */
 interface ToolCardProps {
+    /** The title of the tool. */
     title: string
+    /** A short description of what the tool does. */
     description: string
+    /** The URL to navigate to when the card is clicked. */
     href: string
+    /**
+     * @deprecated Currently unused in the design.
+     * Original intent was for gradient backgrounds, but design now favors solid colors.
+     */
     gradient: string
+    /** Optional icon component (Lucide Icon) to display. */
     icon?: React.ReactNode
 }
 
+/**
+ * A card component used to display a link to a specific tool.
+ *
+ * Design Adherence:
+ * - Uses `rounded-xl` and `shadow-sm` as per DESIGN.md specifications for cards.
+ * - Interactive states include `hover:shadow-md` and subtle transforms.
+ * - Typography uses the designated `--font-heading` for titles and muted text for descriptions.
+ */
 export function ToolCard({ title, description, href, icon }: ToolCardProps) {
     return (
         <Link
