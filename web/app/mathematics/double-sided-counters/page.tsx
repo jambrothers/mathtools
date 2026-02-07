@@ -20,6 +20,8 @@ import { counterURLSerializer, CounterURLState } from './_lib/url-state';
 import { generateShareableURL, copyURLToClipboard } from '@/lib/url-state';
 import helpContent from './HELP.md';
 import { ResolutionGuard } from "@/components/tool-ui/resolution-guard";
+import { ExportModal } from '@/components/tool-ui/export-modal';
+import { exportCanvasContent } from '@/lib/export/canvas-export';
 
 /**
  * Loading fallback component for the counters page.
@@ -89,6 +91,7 @@ function CountersPageContent() {
     const [counterType, setCounterType] = useState<CounterType>('numeric');
     const [hasInitialized, setHasInitialized] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
+    const [isExportOpen, setIsExportOpen] = useState(false);
     const [isTrashHovered, setIsTrashHovered] = useState(false);
     const canvasRef = useRef<HTMLDivElement>(null);
     const trashRef = useRef<HTMLDivElement>(null);
@@ -140,6 +143,26 @@ function CountersPageContent() {
             });
         }
     };
+
+    const handleExport = useCallback(async (format: 'png' | 'svg') => {
+        if (!canvasRef.current) return;
+
+        // Select all counter elements
+        const counterElements = Array.from(
+            canvasRef.current.querySelectorAll('[data-testid^="counter-"]')
+        ) as HTMLElement[];
+
+        if (counterElements.length === 0) return;
+
+        await exportCanvasContent({
+            elements: counterElements,
+            format,
+            filename: 'double-sided-counters',
+            backgroundColor: 'transparent',
+            padding: 20
+        });
+        setIsExportOpen(false);
+    }, []);
 
     /**
      * Generate a shareable URL with the current state and copy to clipboard.
@@ -299,6 +322,7 @@ function CountersPageContent() {
                 onCounterTypeChange={setCounterType}
                 onUndo={undo}
                 canUndo={canUndo}
+                onExport={() => setIsExportOpen(true)}
             />
 
             <div className="flex flex-1 overflow-hidden relative">
@@ -425,6 +449,14 @@ function CountersPageContent() {
             {showHelp && (
                 <HelpModal content={helpContent} onClose={() => setShowHelp(false)} />
             )}
+
+            {/* Export Modal */}
+            <ExportModal
+                isOpen={isExportOpen}
+                onClose={() => setIsExportOpen(false)}
+                onExport={handleExport}
+                title="Export Counters"
+            />
         </div>
     );
 }

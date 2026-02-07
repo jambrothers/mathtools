@@ -26,7 +26,7 @@ import { BarModelToolbar } from './_components/bar-model-toolbar';
 import { GRID_SIZE, BAR_HEIGHT } from './constants';
 import { barModelURLSerializer, BarModelURLState } from './_lib/url-state';
 import helpContent from './HELP.md';
-import { exportHTMLElement } from '@/lib/export/canvas-export';
+import { exportCanvasContent } from '@/lib/export/canvas-export';
 import { ExportModal } from '@/components/tool-ui/export-modal';
 
 // =============================================================================
@@ -386,10 +386,20 @@ function BarModelPageContent() {
     const handleExport = useCallback(async (format: 'png' | 'svg') => {
         if (!canvasRef.current) return;
 
-        await exportHTMLElement(canvasRef.current, {
+        const barElements = Array.from(
+            canvasRef.current.querySelectorAll('[data-testid^="bar-"]')
+        ) as HTMLElement[];
+
+        // If no bars, fallback to exporting the whole canvas (which will show "Drag bars here" text)
+        // or just return. Let's return for now as "content only" implies content.
+        if (barElements.length === 0) return;
+
+        await exportCanvasContent({
+            elements: barElements,
             format,
             filename: 'bar-model',
             backgroundColor: 'transparent',
+            padding: 20
         });
         setIsExportOpen(false);
     }, []);

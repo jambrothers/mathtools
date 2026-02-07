@@ -31,6 +31,9 @@ interface CountersToolbarProps {
     // Undo
     onUndo: () => void
     canUndo: boolean
+
+    // Export
+    onExport: () => void
 }
 
 export function CountersToolbar({
@@ -45,7 +48,8 @@ export function CountersToolbar({
     onGenerateLink,
     isSequentialMode, setIsSequentialMode,
     counterType, onCounterTypeChange,
-    onUndo, canUndo
+    onUndo, canUndo,
+    onExport
 }: CountersToolbarProps) {
     const [input, setInput] = React.useState("")
 
@@ -156,6 +160,11 @@ export function CountersToolbar({
 
                 <ToolbarGroup>
                     <CopyLinkButton onCopyLink={onGenerateLink} />
+                    <ToolbarButton
+                        icon={<ArrowUpDown className="rotate-90" size={16} />}
+                        label="Export"
+                        onClick={onExport}
+                    />
                 </ToolbarGroup>
             </div>
         </Toolbar>

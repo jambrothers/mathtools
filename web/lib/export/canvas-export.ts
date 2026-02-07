@@ -200,3 +200,125 @@ export function triggerDownload(blob: Blob, filename: string): void {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 }
+
+export interface ContentExportOptions extends ExportOptions {
+    /** Elements to include in the export */
+    elements: HTMLElement[];
+    /** Padding around the content in pixels. Default: 20 */
+    padding?: number;
+}
+
+/**
+ * Export specific canvas elements by cloning them into a temporary container.
+ * This allows exporting only the content (e.g. bars, counters) without the grid background,
+ * and with a tight bounding box around the content.
+ */
+export async function exportCanvasContent(options: ContentExportOptions): Promise<void> {
+    const { elements, padding = 20, ...exportOptions } = options;
+
+    if (!elements || elements.length === 0) {
+        console.warn('No elements to export');
+        return;
+    }
+
+    // Ensure all elements share the same parent for this strategy
+    const parent = elements[0].parentElement;
+    if (!parent || !elements.every(el => el.parentElement === parent)) {
+        console.warn('All exported elements must share the same parent');
+        return;
+    }
+
+    // 1. Mark elements to keep
+    const marker = `export-keep-${Date.now()}`;
+    elements.forEach(el => el.setAttribute('data-export-keep', marker));
+
+    try {
+        // 2. Compute bounding box of content (in screen coords)
+        let minX = Infinity;
+        let minY = Infinity;
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+
+        const visibleElements = elements.filter(el => {
+            const style = window.getComputedStyle(el);
+            return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+        });
+
+        if (visibleElements.length === 0) return;
+
+        visibleElements.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+                minX = Math.min(minX, rect.left);
+                minY = Math.min(minY, rect.top);
+                maxX = Math.max(maxX, rect.right);
+                maxY = Math.max(maxY, rect.bottom);
+            }
+        });
+
+        if (minX === Infinity) return;
+
+        const width = maxX - minX + (padding * 2);
+        const height = maxY - minY + (padding * 2);
+
+        // 3. Clone parent
+        const parentClone = parent.cloneNode(true) as HTMLElement;
+
+        // 4. Remove unwanted children from clone
+        const children = Array.from(parentClone.children) as HTMLElement[];
+        children.forEach(child => {
+            if (child.getAttribute('data-export-keep') !== marker) {
+                child.remove();
+            } else {
+                child.removeAttribute('data-export-keep');
+            }
+        });
+
+        // 5. Setup wrapper
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'fixed';
+        wrapper.style.left = '0';
+        wrapper.style.top = '0';
+        wrapper.style.zIndex = '-9999';
+        wrapper.style.width = `${width}px`;
+        wrapper.style.height = `${height}px`;
+        wrapper.style.backgroundColor = exportOptions.backgroundColor || 'transparent';
+        wrapper.style.overflow = 'hidden';
+
+        // 6. Position parent clone inside wrapper to trim
+        const parentRect = parent.getBoundingClientRect();
+
+        // Offset of content relative to parent
+        const contentLeftRel = minX - parentRect.left;
+        const contentTopRel = minY - parentRect.top;
+
+        // Shift parentClone
+        parentClone.style.position = 'absolute';
+        parentClone.style.left = `${padding - contentLeftRel}px`;
+        parentClone.style.top = `${padding - contentTopRel}px`;
+        // Ensure parent has dimensions
+        parentClone.style.width = `${parentRect.width}px`;
+        parentClone.style.height = `${parentRect.height}px`;
+        parentClone.style.margin = '0';
+        parentClone.style.transform = 'none';
+
+        // Ensure background of parent clone is transparent
+        parentClone.style.background = 'transparent';
+        parentClone.style.backgroundImage = 'none';
+
+        wrapper.appendChild(parentClone);
+        document.body.appendChild(wrapper);
+
+        try {
+            await exportHTMLElement(wrapper, exportOptions);
+        } finally {
+            if (document.body.contains(wrapper)) {
+                document.body.removeChild(wrapper);
+            }
+        }
+
+    } finally {
+        // Cleanup marker
+        elements.forEach(el => el.removeAttribute('data-export-keep'));
+    }
+}

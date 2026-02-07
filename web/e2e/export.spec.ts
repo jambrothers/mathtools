@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import fs from 'fs';
 
 test.describe('Export Functionality', () => {
     test('Bar Model export should work in Firefox', async ({ page }) => {
@@ -31,7 +32,6 @@ test.describe('Export Functionality', () => {
 
         // Verify download size > 0
         const path = await download.path();
-        const fs = require('fs');
         const stats = fs.statSync(path);
         expect(stats.size).toBeGreaterThan(0);
     });
@@ -50,5 +50,39 @@ test.describe('Export Functionality', () => {
 
         const download = await downloadPromise;
         expect(download.suggestedFilename()).toMatch(/bar-model-\d+\.svg/);
+    });
+
+    test('Double Sided Counters export should work', async ({ page }) => {
+        await page.goto('/mathematics/double-sided-counters');
+
+        // Add a counter by clicking the +1 sidebar item (if it's clickable) or dragging
+        // Actually, clicking the sidebar item adds it in current implementation
+        const plusOne = page.getByText('+1').first();
+        await plusOne.click();
+
+        // Wait for counter to appear using the new data-testid format
+        await page.waitForSelector('[data-testid^="counter-"]');
+
+        // Click Export button in toolbar
+        const exportButton = page.getByRole('button', { name: 'Export' });
+        await exportButton.click();
+
+        // Wait for modal to appear
+        await expect(page.getByText('Export Counters')).toBeVisible();
+
+        // Setup download listener
+        const downloadPromise = page.waitForEvent('download');
+
+        // Click PNG Image export
+        await page.getByText('PNG Image').click();
+
+        // Wait for download
+        const download = await downloadPromise;
+        expect(download.suggestedFilename()).toMatch(/double-sided-counters-\d+\.png/);
+
+        // Check size
+        const path = await download.path();
+        const stats = fs.statSync(path);
+        expect(stats.size).toBeGreaterThan(0);
     });
 });

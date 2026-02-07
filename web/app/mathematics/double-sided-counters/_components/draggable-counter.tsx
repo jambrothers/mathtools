@@ -111,7 +111,7 @@ export function DraggableCounter({
 
     return (
         <div
-            data-testid="counter"
+            data-testid={`counter-${counter.id}`}
             onClick={handleClick}
             onDoubleClick={handleDoubleClick}
             onPointerDown={handlePointerDownWrapper}
