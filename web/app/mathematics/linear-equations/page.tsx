@@ -103,6 +103,7 @@ function LinearEquationsContent() {
             <SetPageTitle title="Linear Equations" />
 
             <InteractiveToolLayout
+                dataTestId="linear-equations-page"
                 sidebarWidth={400}
                 sidebar={
                     <LinearEquationsSidebar

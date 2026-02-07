@@ -21,7 +21,7 @@ export const DEFAULT_BAR_WIDTH = 100;
 export const MIN_BAR_WIDTH = 20;
 
 /** Quick label types for labeling bars */
-export type QuickLabelType = 'x' | 'y' | '?' | 'units';
+export type QuickLabelType = 'x' | 'y' | '?' | 'units' | 'relative';
 
 /** Valid parts for splitting bars */
 export const SPLIT_PARTS = [2, 3, 5] as const;

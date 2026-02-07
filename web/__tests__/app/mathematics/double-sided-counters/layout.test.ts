@@ -111,7 +111,7 @@ describe('Two-Row Counter Layout', () => {
             const { result } = renderHook(() => useCounters());
 
             act(() => {
-                result.current.addZeroPair(false);
+                result.current.addZeroPair();
             });
 
             expect(result.current.counters).toHaveLength(2);
@@ -129,9 +129,9 @@ describe('Two-Row Counter Layout', () => {
             const { result } = renderHook(() => useCounters());
 
             act(() => {
-                result.current.addZeroPair(false);
-                result.current.addZeroPair(false);
-                result.current.addZeroPair(false);
+                result.current.addZeroPair();
+                result.current.addZeroPair();
+                result.current.addZeroPair();
             });
 
             expect(result.current.counters).toHaveLength(6);
@@ -397,7 +397,7 @@ describe('Counter layout enhancements', () => {
 
 
             act(() => {
-                result.current.addZeroPair(false);
+                result.current.addZeroPair();
             });
 
             expect(result.current.counters).toHaveLength(2);

@@ -33,6 +33,17 @@ export function useLinearEquations() {
             setSlopeTriangleSize(state.slopeTriangleSize)
             setShowGradientCalculation(state.showGradientCalculation)
             setShowGrid(state.showGrid)
+        } else {
+            // Initialize with default line if no state in URL
+            const defaultLine: LineConfig = {
+                id: 'line-1',
+                m: DEFAULT_M,
+                c: DEFAULT_C,
+                color: LINE_COLORS[0],
+                visible: true
+            }
+            setLines([defaultLine])
+            setActiveLineId(defaultLine.id)
         }
         setIsInitialized(true)
     }, [searchParams])
@@ -64,38 +75,29 @@ export function useLinearEquations() {
 
     // Methods
     const addLine = useCallback(() => {
-        setLines(prev => {
-            if (prev.length >= MAX_LINES) return prev
-            const nextIndex = prev.length
-            const newLine: LineConfig = {
-                id: `line-${Date.now()}`, // Simple unique ID
-                m: 1,
-                c: 0,
-                color: LINE_COLORS[nextIndex % LINE_COLORS.length],
-                visible: true
-            }
-            const newLines = [...prev, newLine]
-            setActiveLineId(newLine.id)
-            return newLines
-        })
-    }, [])
+        if (lines.length >= MAX_LINES) return
+        const nextIndex = lines.length
+        const newLine: LineConfig = {
+            id: `line-${Date.now()}`, // Simple unique ID
+            m: 1,
+            c: 0,
+            color: LINE_COLORS[nextIndex % LINE_COLORS.length],
+            visible: true
+        }
+        setLines(prev => [...prev, newLine])
+        setActiveLineId(newLine.id)
+    }, [lines.length])
 
     const removeLine = useCallback((id: string) => {
-        setLines(current => {
-            if (current.length <= 1) return current
-            const remaining = current.filter(l => l.id !== id)
-            // Side effect: update active ID if needed
-            if (id === activeLineId) {
-                // We need to schedule this update to occur after render or ideally batch it.
-                // Accessing `remaining` here is safe.
-                const nextId = remaining[remaining.length - 1].id
-                // Use a timeout to update state "after" the current update is processed? 
-                // Or just fire it. React 18 batches these usually.
-                setTimeout(() => setActiveLineId(nextId), 0)
-            }
-            return remaining
-        })
-    }, [activeLineId])
+        if (lines.length <= 1) return
+        const remaining = lines.filter(l => l.id !== id)
+        setLines(remaining)
+
+        if (id === activeLineId) {
+            const nextId = remaining[remaining.length - 1].id
+            setActiveLineId(nextId)
+        }
+    }, [activeLineId, lines])
 
 
     const updateLine = useCallback((id: string, updates: Partial<LineConfig>) => {
@@ -140,19 +142,17 @@ export function useLinearEquations() {
         }
 
         // For parallel/perpendicular, we add a NEW line
-        setLines(prev => {
-            if (prev.length >= MAX_LINES) return prev
-            const nextIndex = prev.length
-            const newLine: LineConfig = {
-                id: `line-${Date.now()}`,
-                m: newM,
-                c: newC,
-                color: LINE_COLORS[nextIndex % LINE_COLORS.length],
-                visible: true
-            }
-            setActiveLineId(newLine.id)
-            return [...prev, newLine]
-        })
+        if (lines.length >= MAX_LINES) return
+        const nextIndex = lines.length
+        const newLine: LineConfig = {
+            id: `line-${Date.now()}`,
+            m: newM,
+            c: newC,
+            color: LINE_COLORS[nextIndex % LINE_COLORS.length],
+            visible: true
+        }
+        setLines(prev => [...prev, newLine])
+        setActiveLineId(newLine.id)
 
     }, [activeLineId, lines, updateLine])
 

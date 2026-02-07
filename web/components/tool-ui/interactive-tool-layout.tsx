@@ -11,6 +11,7 @@ interface InteractiveToolLayoutProps {
     className?: string
     toolbarOverlay?: React.ReactNode
     footerOverlay?: React.ReactNode
+    dataTestId?: string
 }
 
 export function InteractiveToolLayout({
@@ -19,7 +20,8 @@ export function InteractiveToolLayout({
     sidebarWidth = 384, // w-96 = 24rem = 384px
     className,
     toolbarOverlay,
-    footerOverlay
+    footerOverlay,
+    dataTestId = "interactive-tool-layout"
 }: InteractiveToolLayoutProps) {
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(true)
 
@@ -42,7 +44,10 @@ export function InteractiveToolLayout({
     }, [])
 
     return (
-        <div className={cn("fixed inset-0 top-[81px] overflow-hidden flex bg-[var(--theme-page)] z-[40]", className)}>
+        <div
+            className={cn("fixed inset-0 top-[81px] overflow-hidden flex bg-[var(--theme-page)] z-[40]", className)}
+            data-testid={dataTestId}
+        >
             {/* Main Content Area */}
             <main className="flex-1 relative flex flex-col min-w-0 bg-slate-50 dark:bg-slate-900 overflow-hidden h-full">
                 {/* Canvas Area - No Scroll */}
@@ -81,6 +86,7 @@ export function InteractiveToolLayout({
                     }}
                     title={isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
                     aria-label={isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
+                    data-testid="sidebar-toggle-button"
                 >
                     <ChevronRight
                         className={cn(

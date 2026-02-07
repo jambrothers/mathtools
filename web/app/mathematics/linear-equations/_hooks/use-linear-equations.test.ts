@@ -3,8 +3,9 @@ import { useLinearEquations } from './use-linear-equations';
 import { MAX_LINES, DEFAULT_M } from '../constants';
 
 // Mock Next.js hooks
+const mockSearchParams = new URLSearchParams();
 jest.mock('next/navigation', () => ({
-    useSearchParams: () => new URLSearchParams(),
+    useSearchParams: () => mockSearchParams,
     useRouter: () => ({ replace: jest.fn() }),
     usePathname: () => '/mathematics/linear-equations',
 }));
@@ -94,5 +95,34 @@ describe('useLinearEquations', () => {
         expect(result.current.lines[1].m).toBe(result.current.lines[0].m);
         // Should have different c
         expect(result.current.lines[1].c).not.toBe(result.current.lines[0].c);
+    });
+
+    it('regression: adding a line sets it as active correctly', () => {
+        const { result } = renderHook(() => useLinearEquations());
+
+        act(() => {
+            result.current.addLine();
+        });
+
+        const newId = result.current.lines[1].id;
+        expect(result.current.activeLineId).toBe(newId);
+    });
+
+    it('regression: removing the active line switches to another line', () => {
+        const { result } = renderHook(() => useLinearEquations());
+
+        act(() => {
+            result.current.addLine();
+        });
+
+        const line2Id = result.current.activeLineId;
+        const line1Id = result.current.lines[0].id;
+
+        act(() => {
+            result.current.removeLine(line2Id);
+        });
+
+        expect(result.current.lines).toHaveLength(1);
+        expect(result.current.activeLineId).toBe(line1Id);
     });
 });

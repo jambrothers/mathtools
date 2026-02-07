@@ -140,6 +140,7 @@ export function GraphSVG({
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             xmlns="http://www.w3.org/2000/svg"
+            data-testid="graph-svg"
         >
             <defs>
                 <pattern id="grid"
@@ -155,7 +156,7 @@ export function GraphSVG({
             </defs>
 
             {/* Grid */}
-            {showGrid && <rect width="100%" height="100%" fill="url(#grid)" />}
+            {showGrid && <rect data-testid="graph-grid" width="100%" height="100%" fill="url(#grid)" />}
 
             {/* Axes */}
             <g className="text-slate-400 dark:text-slate-600">
@@ -218,6 +219,7 @@ export function GraphSVG({
                                 x2={p2Pixel.x} y2={p2Pixel.y}
                                 stroke="transparent"
                                 strokeWidth="40"
+                                data-testid={`function-line-hit-area-${line.id}`}
                             />
 
                             {/* Visible Line */}
@@ -227,6 +229,7 @@ export function GraphSVG({
                                 stroke={line.color}
                                 strokeWidth={isActive ? 5 : 3}
                                 strokeLinecap="round"
+                                data-testid={`function-line-${line.id}`}
                             />
 
                             {/* Slope Triangle */}
@@ -371,7 +374,7 @@ function EquationLabel({ line, viewport, canvasSize }: { line: LineConfig, viewp
             width="140" height="40"
             className="overflow-visible pointer-events-none"
         >
-            <div className={cn("inline-block px-3 py-1.5 rounded shadow-sm border text-sm font-bold bg-white dark:bg-slate-800 whitespace-nowrap")}
+            <div className={cn("equation-label inline-block px-3 py-1.5 rounded shadow-sm border text-sm font-bold bg-white dark:bg-slate-800 whitespace-nowrap")}
                 style={{ borderColor: line.color, color: line.color }}
             >
                 {formatEquation(line.m, line.c)}

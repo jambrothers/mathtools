@@ -321,31 +321,16 @@ export function useCounters() {
         updateCountersImmediate(newCounters);
     }, [counters, selectedIds, updateCountersImmediate]);
 
-    const updateCounterPosition = useCallback((_id: number, _x: number, _y: number) => {
+    const updateCounterPosition = useCallback((id: number, x: number, y: number) => {
         if (isAnimating) return;
 
-        // This is called on drag end. We need to commit the final state to history.
-        // If we were dragging multiple items, their positions are already updated in 'counters' (via handleDragMove/updateCountersImmediate)
-        // BUT 'counters' is the visual state. 'pushCounters' expects us to return the new state derived from PREVIOUS state.
+        pushCounters((prev: Counter[]) => prev.map(c =>
+            c.id === id ? { ...c, x, y } : c
+        ), dragStartRef.current || undefined);
 
-        // However, useHistory's pushState(setStateAction) implementation usually takes the *current* state 
-        // if passed a function, or we can just pass the new counters array directly if we know it's latest.
-        // To be safe and support undo properly, we should use the state we tracked in dragStartRef as 'base' 
-        // equivalent if we were doing complex diffs, but here we can just commit the current visual state 
-        // (which has been updated nicely by handleDragMove) as the next history entry.
-
-        // The issue is `updateCountersImmediate` updates the *current* pointer. 
-        // We want to push that current state as a new history node.
-
-        // Let's just push the current 'counters' state to history
-        // Pass dragStartRef.current as the "previous" state for the undo stack calculation if needed, 
-        // though our useHistory might auto-handle it. 
-        // Based on typical implementation: 
-        pushCounters(counters, dragStartRef.current || undefined);
         dragStartRef.current = null;
-
         setIsOrdered(false);
-    }, [isAnimating, counters, pushCounters]);
+    }, [isAnimating, pushCounters]);
 
     const snapToOrder = useCallback(() => {
         pushCounters((prev: Counter[]) => {

@@ -58,7 +58,16 @@ class MockDOMRect {
 
 jest.mock('next/image', () => ({
     __esModule: true,
-    default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => {
+    default: ({
+        priority,
+        unoptimized,
+        fill,
+        loader,
+        quality,
+        placeholder,
+        blurDataURL,
+        ...props
+    }: any) => {
         return React.createElement('img', props)
     },
 }))

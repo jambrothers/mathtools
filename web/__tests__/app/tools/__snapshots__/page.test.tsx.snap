@@ -97,7 +97,7 @@ exports[`Tools Page matches snapshot 1`] = `
                 <div
                   class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
                 >
-                  Launch Tool 
+                  Launch Tool
                   <svg
                     aria-hidden="true"
                     class="lucide lucide-arrow-right ml-2 w-4 h-4"
@@ -203,7 +203,7 @@ exports[`Tools Page matches snapshot 1`] = `
                 <div
                   class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
                 >
-                  Launch Tool 
+                  Launch Tool
                   <svg
                     aria-hidden="true"
                     class="lucide lucide-arrow-right ml-2 w-4 h-4"
@@ -282,7 +282,7 @@ exports[`Tools Page matches snapshot 1`] = `
                 <div
                   class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
                 >
-                  Launch Tool 
+                  Launch Tool
                   <svg
                     aria-hidden="true"
                     class="lucide lucide-arrow-right ml-2 w-4 h-4"
@@ -518,7 +518,7 @@ exports[`Tools Page matches snapshot 1`] = `
                 <div
                   class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
                 >
-                  Launch Tool 
+                  Launch Tool
                   <svg
                     aria-hidden="true"
                     class="lucide lucide-arrow-right ml-2 w-4 h-4"

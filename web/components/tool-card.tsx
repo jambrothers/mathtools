@@ -32,7 +32,7 @@ export function ToolCard({ title, description, href, icon }: ToolCardProps) {
                 </div>
 
                 <div className="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform">
-                    Launch Tool <ArrowRight className="ml-2 w-4 h-4" />
+                    Launch Tool<ArrowRight className="ml-2 w-4 h-4" />
                 </div>
             </div>
         </Link>

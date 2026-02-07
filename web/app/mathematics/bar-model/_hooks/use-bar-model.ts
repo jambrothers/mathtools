@@ -15,7 +15,6 @@ import {
     MIN_BAR_WIDTH,
     BAR_HEIGHT,
     QuickLabelType,
-    SPLIT_PARTS,
     SplitPart,
 } from "../constants"
 
@@ -424,6 +423,18 @@ export function useBarModel(): UseBarModelReturn {
                     // Label with width in grid units
                     newLabel = String(Math.round(bar.width / GRID_SIZE));
                     break;
+                case 'relative': {
+                    const totalBar = prev.find(b => b.isTotal);
+                    if (!totalBar) {
+                        newLabel = bar.label;
+                    } else {
+                        const common = gcd(bar.width, totalBar.width);
+                        const num = Math.round(bar.width / common);
+                        const den = Math.round(totalBar.width / common);
+                        newLabel = den === 1 ? String(num) : `${num}/${den}`;
+                    }
+                    break;
+                }
                 default:
                     newLabel = bar.label;
             }

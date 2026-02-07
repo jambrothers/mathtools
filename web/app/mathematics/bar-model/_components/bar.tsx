@@ -168,6 +168,19 @@ export function Bar({
                 transform: isSelected ? 'translateY(-2px)' : 'none',
             }}
             onPointerDown={handlePointerDown}
+            onPointerUp={(e) => {
+                if (isEditing) return;
+                // If it was a click (not a drag), and was already selected,
+                // select ONLY this one to allow breaking out of multi-selection.
+                // We check if event was likely a click by looking at move distance? 
+                // Or just if drag didn't start. 
+                // Actually, the requirement in the plan was:
+                // "if a user clicks (down then up without dragging) an already selected bar"
+                // The onPointerUp here fires after the global pointermove might have happened.
+                if (isSelected && !isDragging && !e.shiftKey) {
+                    onSelect(bar.id, false);
+                }
+            }}
             onDoubleClick={handleDoubleClick}
         >
             {/* Drag indicator for selected bars */}
