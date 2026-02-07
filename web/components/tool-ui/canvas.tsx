@@ -18,9 +18,18 @@ interface ManipulativeCanvasProps extends React.HTMLAttributes<HTMLDivElement> {
  */
 export const Canvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
     ({ className, gridSize, children, onSelectionEnd, onClick, ...props }, ref) => {
-        const [selectionBox, setSelectionBox] = React.useState<{ start: { x: number, y: number }, current: { x: number, y: number } } | null>(null)
+        const selectionStartRef = React.useRef<{ x: number, y: number } | null>(null)
+        const currentPosRef = React.useRef<{ x: number, y: number } | null>(null)
+        const marqueeRef = React.useRef<HTMLDivElement>(null)
         const internalRef = React.useRef<HTMLDivElement>(null)
         const ignoreClickRef = React.useRef(false)
+
+        // Ensure marquee is hidden on mount (for JSDOM/tests where CSS classes aren't applied)
+        React.useEffect(() => {
+            if (marqueeRef.current) {
+                marqueeRef.current.style.display = 'none';
+            }
+        }, []);
 
         // Merge refs
         React.useImperativeHandle(ref, () => internalRef.current as HTMLDivElement)
@@ -35,29 +44,62 @@ export const Canvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
-            setSelectionBox({ start: { x, y }, current: { x, y } });
+            selectionStartRef.current = { x, y };
+            currentPosRef.current = { x, y };
+
+            if (marqueeRef.current) {
+                marqueeRef.current.style.display = 'block';
+                marqueeRef.current.style.left = `${x}px`;
+                marqueeRef.current.style.top = `${y}px`;
+                marqueeRef.current.style.width = '0px';
+                marqueeRef.current.style.height = '0px';
+            }
         };
 
         // Track movement for marquee selection box resize
 
         const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-            if (!selectionBox) return;
+            if (!selectionStartRef.current) return;
             const rect = internalRef.current?.getBoundingClientRect();
             if (!rect) return;
 
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
-            setSelectionBox(prev => prev ? { ...prev, current: { x, y } } : null);
+            currentPosRef.current = { x, y };
+
+            if (marqueeRef.current) {
+                const start = selectionStartRef.current;
+                const left = Math.min(start.x, x);
+                const top = Math.min(start.y, y);
+                const width = Math.abs(x - start.x);
+                const height = Math.abs(y - start.y);
+
+                marqueeRef.current.style.left = `${left}px`;
+                marqueeRef.current.style.top = `${top}px`;
+                marqueeRef.current.style.width = `${width}px`;
+                marqueeRef.current.style.height = `${height}px`;
+            }
         };
 
+        const resetSelection = () => {
+            if (marqueeRef.current) {
+                marqueeRef.current.style.display = 'none';
+            }
+            selectionStartRef.current = null;
+            currentPosRef.current = null;
+        }
+
         const handlePointerUp = () => {
-            if (selectionBox && onSelectionEnd) {
+            if (selectionStartRef.current && currentPosRef.current && onSelectionEnd) {
                 // Calculate rect
-                const x = Math.min(selectionBox.start.x, selectionBox.current.x);
-                const y = Math.min(selectionBox.start.y, selectionBox.current.y);
-                const width = Math.abs(selectionBox.current.x - selectionBox.start.x);
-                const height = Math.abs(selectionBox.current.y - selectionBox.start.y);
+                const start = selectionStartRef.current;
+                const current = currentPosRef.current;
+
+                const x = Math.min(start.x, current.x);
+                const y = Math.min(start.y, current.y);
+                const width = Math.abs(current.x - start.x);
+                const height = Math.abs(current.y - start.y);
 
                 // Only consider it a selection if moved slightly (avoid clicking clearing selection twice)
                 if (width > 5 || height > 5) {
@@ -68,7 +110,7 @@ export const Canvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
                     setTimeout(() => { ignoreClickRef.current = false; }, 50);
                 }
             }
-            setSelectionBox(null);
+            resetSelection();
         };
 
         const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -89,8 +131,8 @@ export const Canvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
-                onPointerLeave={() => setSelectionBox(null)}
-                onPointerCancel={() => setSelectionBox(null)}
+                onPointerLeave={resetSelection}
+                onPointerCancel={resetSelection}
                 onClick={handleContainerClick}
                 {...props}
             >
@@ -107,17 +149,10 @@ export const Canvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
                 {children}
 
                 {/* Marquee Box */}
-                {selectionBox && (
-                    <div
-                        className="absolute bg-indigo-500/20 border border-indigo-500 z-50 pointer-events-none"
-                        style={{
-                            left: Math.min(selectionBox.start.x, selectionBox.current.x),
-                            top: Math.min(selectionBox.start.y, selectionBox.current.y),
-                            width: Math.abs(selectionBox.current.x - selectionBox.start.x),
-                            height: Math.abs(selectionBox.current.y - selectionBox.start.y),
-                        }}
-                    />
-                )}
+                <div
+                    ref={marqueeRef}
+                    className="absolute bg-indigo-500/20 border border-indigo-500 z-50 pointer-events-none hidden"
+                />
             </div>
         )
     }
