@@ -6,8 +6,6 @@ import { CircuitNode } from '@/app/computing/circuit-designer/constants';
 
 describe('Circuit Designer URL State Security', () => {
     it('should correctly encode/decode special characters to prevent injection', () => {
-        // A node with a label containing ";" which is the node separator
-        // and content that looks like another node
         const maliciousNode: CircuitNode = {
             id: 'n1',
             type: 'AND',
@@ -17,16 +15,10 @@ describe('Circuit Designer URL State Security', () => {
         };
 
         const serialized = serializeNodes([maliciousNode]);
-
-        // It should be encoded now, so ";" is "%3B"
-        // And it should not produce multiple parts in the split
-
         const parsed = parseNodeString(serialized);
 
-        // It should parse as exactly 1 node
         expect(parsed.length).toBe(1);
         expect(parsed[0].id).toBe('n1');
-        // The label should be preserved exactly as is
         expect(parsed[0].label).toBe('Normal;I:fake:200,200:Injected');
     });
 
@@ -44,5 +36,20 @@ describe('Circuit Designer URL State Security', () => {
 
         expect(parsed.length).toBe(1);
         expect(parsed[0].label).toBe('Hello:World');
+    });
+
+    it('should gracefully handle legacy URLs with unencoded %', () => {
+        // A label "50%" in the old format would be stored directly.
+        // The parser receives "50%" and tries to decode it.
+        // decodeURIComponent("50%") throws URIError.
+        // It should catch this and return "50%".
+
+        // Construct a legacy serialized string manually
+        const legacyString = "I:n3:100,100:50%";
+
+        const parsed = parseNodeString(legacyString);
+
+        expect(parsed.length).toBe(1);
+        expect(parsed[0].label).toBe('50%');
     });
 });

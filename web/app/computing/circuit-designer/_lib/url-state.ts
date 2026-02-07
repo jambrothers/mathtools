@@ -63,12 +63,20 @@ export function parseNodeString(str: string): CircuitNode[] {
         if (!type) continue;
 
         if (type) {
+            let label = encodedLabel;
+            try {
+                label = decodeURIComponent(encodedLabel);
+            } catch {
+                // Fallback for legacy URLs or malformed encoding
+                label = encodedLabel;
+            }
+
             const node: CircuitNode = {
                 id,
                 type,
                 x,
                 y,
-                label: decodeURIComponent(encodedLabel)
+                label
             };
             if (stateStr !== undefined && stateStr !== '') {
                 node.state = stateStr === '1';
