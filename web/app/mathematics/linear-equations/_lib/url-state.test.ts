@@ -9,6 +9,8 @@ describe('Linear Equations URL State', () => {
             showEquation: true,
             showIntercepts: true,
             showSlopeTriangle: true,
+            slopeTriangleSize: 1,
+            showGradientCalculation: true,
             showGrid: true
         };
 
@@ -29,6 +31,8 @@ describe('Linear Equations URL State', () => {
             showEquation: false,
             showIntercepts: false,
             showSlopeTriangle: false,
+            slopeTriangleSize: 1,
+            showGradientCalculation: false,
             showGrid: false
         };
 
