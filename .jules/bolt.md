@@ -1,0 +1,3 @@
+## 2025-02-19 - Excessive Event Listener Re-attachment in Custom Hooks
+**Learning:** Custom hooks that manage event listeners (like `useDraggable`) must be careful about dependency arrays. Including state that updates frequently (like `position` during a drag) or unstable objects (like `options` passed from parent) in the `useEffect` dependency array causes event listeners to be removed and added on every frame.
+**Action:** Use `useRef` to hold the latest values of state/props needed inside event handlers, allowing them to be removed from the `useEffect` dependency array. This keeps the effect stable and prevents listener churn.
