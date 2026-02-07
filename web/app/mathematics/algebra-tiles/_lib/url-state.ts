@@ -22,6 +22,7 @@ export interface AlgebraTilesURLState {
 
 // URL Parameter Keys (kept short for compact URLs)
 const PARAM_TILES = 't';
+const MAX_TILES = 500; // Security limit to prevent DoS
 const PARAM_LABELS = 'lb';
 const PARAM_SHOW_Y = 'y';
 const PARAM_SNAP = 'sn';
@@ -60,6 +61,8 @@ export function parseTileString(str: string): TileData[] {
     const parts = str.split(';');
 
     for (let i = 0; i < parts.length; i++) {
+        if (tiles.length >= MAX_TILES) break;
+
         const part = parts[i].trim();
         if (!part) continue;
 
