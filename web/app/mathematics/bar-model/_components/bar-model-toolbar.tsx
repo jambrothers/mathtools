@@ -17,6 +17,7 @@ import {
     Undo2,
     ChevronDown,
     Sigma,
+    Download,
 } from "lucide-react"
 import {
     Toolbar,
@@ -64,6 +65,8 @@ interface BarModelToolbarProps {
     onUndo: () => void;
     /** Callback for copy link */
     onCopyLink: () => void;
+    /** Callback for export */
+    onExport: () => void;
 }
 
 export function BarModelToolbar({
@@ -83,6 +86,7 @@ export function BarModelToolbar({
     onClear,
     onUndo,
     onCopyLink,
+    onExport,
 }: BarModelToolbarProps) {
     const [showQuickLabel, setShowQuickLabel] = useState(false);
     const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number } | null>(null);
@@ -249,6 +253,14 @@ export function BarModelToolbar({
                 />
 
                 <ToolbarSeparator />
+
+                {/* Export */}
+                <ToolbarButton
+                    icon={<Download size={18} />}
+                    label="Export"
+                    onClick={onExport}
+                    title="Export as PNG or SVG"
+                />
 
                 {/* Copy link */}
                 <CopyLinkButton onCopyLink={onCopyLink} />

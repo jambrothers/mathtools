@@ -26,6 +26,8 @@ import { BarModelToolbar } from './_components/bar-model-toolbar';
 import { GRID_SIZE, BAR_HEIGHT } from './constants';
 import { barModelURLSerializer, BarModelURLState } from './_lib/url-state';
 import helpContent from './HELP.md';
+import { exportHTMLElement } from '@/lib/export/canvas-export';
+import { ExportModal } from '@/components/tool-ui/export-modal';
 
 // =============================================================================
 // Loading Fallback
@@ -111,6 +113,7 @@ function BarModelPageContent() {
     const [draggingId, setDraggingId] = useState<string | null>(null);
     const [isOverTrash, setIsOverTrash] = useState(false);
     const [isHelpOpen, setIsHelpOpen] = useState(false);
+    const [isExportOpen, setIsExportOpen] = useState(false);
     const hasInitialized = useRef(false);
 
     // Drag tracking (mutable ref for performance)
@@ -379,6 +382,18 @@ function BarModelPageContent() {
         clearAll();
     }, [clearAll]);
 
+    // Handle Export
+    const handleExport = useCallback(async (format: 'png' | 'svg') => {
+        if (!canvasRef.current) return;
+
+        await exportHTMLElement(canvasRef.current, {
+            format,
+            filename: 'bar-model',
+            backgroundColor: 'transparent',
+        });
+        setIsExportOpen(false);
+    }, []);
+
     return (
         <div className="flex flex-col h-[calc(100vh-81px)] w-full bg-slate-50 dark:bg-slate-950 overflow-hidden">
             <SetPageTitle title="Bar Model Tool" />
@@ -401,6 +416,7 @@ function BarModelPageContent() {
                 onClear={handleClear}
                 onUndo={undo}
                 onCopyLink={handleCopyLink}
+                onExport={() => setIsExportOpen(true)}
             />
 
             <div className="flex flex-1 overflow-hidden relative">
@@ -469,6 +485,14 @@ function BarModelPageContent() {
                     content={helpContent}
                 />
             )}
+
+            {/* Export Modal */}
+            <ExportModal
+                isOpen={isExportOpen}
+                onClose={() => setIsExportOpen(false)}
+                onExport={handleExport}
+                title="Export Bar Model"
+            />
         </div>
     );
 }

@@ -8,8 +8,10 @@ import { GraphSVG } from "./_components/graph-svg"
 import { LinearEquationsSidebar } from "./_components/linear-equations-sidebar"
 import { useLinearEquations } from "./_hooks/use-linear-equations"
 import { copyURLToClipboard } from "@/lib/url-state"
-import { Image as ImageIcon, FileCode, Pointer, MoveVertical, RotateCw } from "lucide-react"
+import { Pointer, MoveVertical, RotateCw } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { exportSVGElement } from "@/lib/export/canvas-export"
+import { ExportModal } from "@/components/tool-ui/export-modal"
 
 function LinearEquationsContent() {
     const {
@@ -44,51 +46,15 @@ function LinearEquationsContent() {
     const [isExportMenuOpen, setIsExportMenuOpen] = React.useState(false)
 
     // Handle Export
-    const handleExport = (format: 'png' | 'svg') => {
-        const svgElement = document.querySelector('svg')
+    const handleExport = async (format: 'png' | 'svg') => {
+        const svgElement = document.querySelector('[data-testid="graph-svg"]') as SVGSVGElement
         if (!svgElement) return
 
-        if (format === 'svg') {
-            const svgData = new XMLSerializer().serializeToString(svgElement)
-            const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
-            const url = URL.createObjectURL(blob)
-            const link = document.createElement('a')
-            link.href = url
-            link.download = `linear-graph-${Date.now()}.svg`
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
-        } else if (format === 'png') {
-            const svgData = new XMLSerializer().serializeToString(svgElement)
-            const img = new Image()
-            const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
-            const url = URL.createObjectURL(svgBlob)
-
-            img.onload = () => {
-                const canvas = document.createElement('canvas')
-                // Use generic dimensions or actual
-                canvas.width = 600 * 2 // @2x for retina quality
-                canvas.height = 400 * 2
-                const ctx = canvas.getContext('2d')
-                if (!ctx) return
-
-                // Fill white background (transparent by default)
-                ctx.fillStyle = '#ffffff'
-                ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-
-                const pngUrl = canvas.toDataURL('image/png')
-                const link = document.createElement('a')
-                link.href = pngUrl
-                link.download = `linear-graph-${Date.now()}.png`
-                document.body.appendChild(link)
-                link.click()
-                document.body.removeChild(link)
-                URL.revokeObjectURL(url)
-            }
-            img.src = url
-        }
+        await exportSVGElement(svgElement, {
+            format,
+            filename: 'linear-graph',
+            backgroundColor: 'transparent', // Fixed: transparent background instead of white
+        })
         setIsExportMenuOpen(false)
     }
 
@@ -195,36 +161,13 @@ function LinearEquationsContent() {
                         />
                     </div>
 
-                    {/* Export Menu Modal/Popover */}
-                    {isExportMenuOpen && (
-                        <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setIsExportMenuOpen(false)}>
-                            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-6 w-full max-w-sm space-y-4" onClick={e => e.stopPropagation()}>
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Export Graph</h3>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <button
-                                        onClick={() => handleExport('png')}
-                                        className="flex flex-col items-center justify-center gap-2 p-4 rounded-lg border-2 border-slate-100 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all text-slate-600 dark:text-slate-300"
-                                    >
-                                        <ImageIcon size={32} />
-                                        <span className="font-medium">PNG Image</span>
-                                    </button>
-                                    <button
-                                        onClick={() => handleExport('svg')}
-                                        className="flex flex-col items-center justify-center gap-2 p-4 rounded-lg border-2 border-slate-100 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all text-slate-600 dark:text-slate-300"
-                                    >
-                                        <FileCode size={32} />
-                                        <span className="font-medium">SVG Vector</span>
-                                    </button>
-                                </div>
-                                <button
-                                    onClick={() => setIsExportMenuOpen(false)}
-                                    className="w-full py-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-sm"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                    )}
+                    {/* Export Modal */}
+                    <ExportModal
+                        isOpen={isExportMenuOpen}
+                        onClose={() => setIsExportMenuOpen(false)}
+                        onExport={handleExport}
+                        title="Export Graph"
+                    />
                 </div>
             </InteractiveToolLayout>
         </ResolutionGuard>

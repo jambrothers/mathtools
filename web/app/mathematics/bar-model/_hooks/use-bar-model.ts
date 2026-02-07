@@ -389,7 +389,7 @@ export function useBarModel(): UseBarModelReturn {
                     x: currentX,
                     width: Math.max(MIN_BAR_WIDTH, width),
                     label: '', // No label on split
-                    showRelativeLabel: false, // Reset relative label
+                    showRelativeLabel: bar.showRelativeLabel, // Inherit relative label
                     isTotal: false, // Split parts can't be total
                 });
                 currentX += minPartWidth;
