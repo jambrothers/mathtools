@@ -28,6 +28,7 @@ export interface CounterURLState {
 
 // URL Parameter Keys (kept short for compact URLs)
 const PARAM_COUNTERS = 'c';
+const MAX_COUNTERS = 500; // Security limit to prevent DoS
 const PARAM_NUMBER_LINE = 'nl';
 const PARAM_STATS = 'st';
 const PARAM_SLOW_MODE = 'sl';
@@ -74,6 +75,8 @@ export function parseCounterString(str: string): Counter[] {
     const parts = str.split(';');
 
     for (let i = 0; i < parts.length; i++) {
+        if (counters.length >= MAX_COUNTERS) break;
+
         const part = parts[i].trim();
         if (!part) continue;
 

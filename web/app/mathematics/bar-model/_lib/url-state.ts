@@ -16,6 +16,8 @@ export interface BarModelURLState {
     bars: BarData[];
 }
 
+const MAX_BARS = 50; // Security limit to prevent DoS
+
 // =============================================================================
 // Serialization Helpers
 // =============================================================================
@@ -72,6 +74,7 @@ export function parseBarsString(str: string): BarData[] {
     const parts = str.split(';');
 
     for (const part of parts) {
+        if (bars.length >= MAX_BARS) break;
         try {
             // Format: colorIndex:label,x,y,width
             const colonIndex = part.indexOf(':');
