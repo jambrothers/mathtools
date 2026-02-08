@@ -10,8 +10,19 @@ import { usePageTitle } from "./page-title-context"
 
 /**
  * The main application navigation bar.
- * Handles navigation links, theme toggling, and mobile menu state.
- * Visibility is controlled via the PageTitleContext.
+ *
+ * Responsibilities:
+ * - Displays the application logo and title (TeachMaths.net).
+ * - Provides navigation links to main sections (Home, About, Tools).
+ * - Manages the "Tools" dropdown for quick access to tool categories.
+ * - Handles responsive behavior:
+ *   - Collapses into a hamburger menu on mobile (< 768px).
+ *   - Displays a full horizontal menu on desktop.
+ * - Integration with `PageTitleContext`:
+ *   - Displays the current page title dynamically in the center.
+ *   - Supports collapsing/expanding via `toggleNavbar` to maximize workspace.
+ * - Theme Toggling:
+ *   - Switches between light and dark modes using `next-themes`.
  */
 export function Navbar() {
     const [isOpen, setIsOpen] = React.useState(false)

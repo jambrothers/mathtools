@@ -1,6 +1,18 @@
 import { Github, Linkedin, Mail } from "lucide-react"
 import { BlueskyIcon } from "./icons/bluesky-icon"
 
+/**
+ * The application footer.
+ *
+ * Contains:
+ * - Copyright information.
+ * - Social media links (GitHub, LinkedIn, Bluesky).
+ * - Contact email link.
+ *
+ * Design:
+ * - Uses a muted background and border-top for separation.
+ * - Responsive layout: Column on mobile, row on desktop.
+ */
 export function Footer() {
     return (
         <footer className="border-t border-[var(--theme-border)] bg-[var(--theme-page)] min-h-[100px] flex flex-col justify-center mt-auto">

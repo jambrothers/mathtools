@@ -14,8 +14,15 @@ const PARAM_WIRES = 'w';
 
 /**
  * Serialize nodes to compact string.
- * Format: {type}:{id}:{x},{y}:{label}:{state};...
- * Types: I=INPUT, O=OUTPUT, A=AND, R=OR, N=NOT, X=XOR
+ *
+ * Format: `type:id:x,y:label:state;...`
+ *
+ * - Delimiter: `;` for nodes.
+ * - `type`: Single char code (I=Input, O=Output, A=AND, R=OR, N=NOT, X=XOR).
+ * - `id`: Node ID string.
+ * - `x,y`: Integer coordinates.
+ * - `label`: User defined label (URL encoded).
+ * - `state`: Optional boolean state (0/1), mainly for Input nodes.
  */
 export function serializeNodes(nodes: CircuitNode[]): string {
     if (!nodes.length) return '';
@@ -89,7 +96,13 @@ export function parseNodeString(str: string): CircuitNode[] {
 
 /**
  * Serialize connections to compact string.
- * Format: from>to:inputIndex;...
+ *
+ * Format: `fromID>toID:inputIndex;...`
+ *
+ * - Delimiters:
+ *   - `;` separates connections.
+ *   - `>` indicates direction (source to target).
+ *   - `:` separates target ID from input index (for multi-input gates like AND/OR).
  */
 export function serializeConnections(connections: Connection[]): string {
     if (!connections.length) return '';
