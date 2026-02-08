@@ -32,7 +32,19 @@ export function serializeBars(bars: BarData[]): string {
 
     return bars.map(bar => {
         const encodedLabel = encodeURIComponent(bar.label);
-        return `${bar.colorIndex}:${encodedLabel},${Math.round(bar.x)},${Math.round(bar.y)},${Math.round(bar.width)}`;
+
+        let flags = 0;
+        if (bar.isTotal) flags |= 1;
+        if (bar.showRelativeLabel) flags |= 2;
+
+        // If flags is 0, we can omit it to keep URL short (optional, but let's be explicit for now for consistency)
+        // Actually, to keep it backward compatible/cleaner, let's just always append it if > 0, 
+        // or we can append it always. The parsing logic needs to handle optionality.
+        // Let's append it always for simplicity in parsing for now, or use a specific format.
+        // Current format: colorIndex:label,x,y,width
+        // New format: colorIndex:label,x,y,width,flags
+
+        return `${bar.colorIndex}:${encodedLabel},${Math.round(bar.x)},${Math.round(bar.y)},${Math.round(bar.width)},${flags}`;
     }).join(';');
 }
 
@@ -64,12 +76,33 @@ export function parseBarsString(str: string): BarData[] {
             const encodedLabel = rest.substring(0, commaIndex);
             const label = decodeURIComponent(encodedLabel);
 
-            const coords = rest.substring(commaIndex + 1).split(',');
-            if (coords.length !== 3) continue;
+            const coordsAndFlags = rest.substring(commaIndex + 1).split(',');
+            // We expect at least x,y,width. flags is optional.
+            if (coordsAndFlags.length < 3) continue;
 
-            const x = parseInt(coords[0], 10);
-            const y = parseInt(coords[1], 10);
-            const width = parseInt(coords[2], 10);
+            const x = parseInt(coordsAndFlags[0], 10);
+            const y = parseInt(coordsAndFlags[1], 10);
+            const width = parseInt(coordsAndFlags[2], 10);
+
+            let isTotal = false;
+            let showRelativeLabel = false;
+
+            if (coordsAndFlags.length >= 4) {
+                const flags = parseInt(coordsAndFlags[3], 10);
+                if (!isNaN(flags)) {
+                    const hasIsTotal = (flags & 1) !== 0;
+                    const hasShowRelativeLabel = (flags & 2) !== 0;
+
+                    // Handled incompatible flags: if both set, ignore both
+                    if (hasIsTotal && hasShowRelativeLabel) {
+                        isTotal = false;
+                        showRelativeLabel = false;
+                    } else {
+                        isTotal = hasIsTotal;
+                        showRelativeLabel = hasShowRelativeLabel;
+                    }
+                }
+            }
 
             if (isNaN(x) || isNaN(y) || isNaN(width)) continue;
 
@@ -80,6 +113,8 @@ export function parseBarsString(str: string): BarData[] {
                 width,
                 colorIndex,
                 label,
+                isTotal,
+                showRelativeLabel,
             });
         } catch {
             // Skip invalid parts
