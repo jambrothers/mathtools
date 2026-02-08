@@ -154,6 +154,32 @@ test.describe('Bar Model Tool', () => {
         await expect(fifth.getByText('20%')).toBeVisible();
     });
 
+    test('colour dropdown changes bar colour', async ({ page }) => {
+        const canvas = page.locator('[data-testid="bar-model-canvas"]');
+
+        // Add a bar
+        const sidebarButton = page.locator('[data-testid="bar-model-canvas"]').locator('..').locator('button').first();
+        await sidebarButton.dragTo(canvas, { targetPosition: { x: 200, y: 200 } });
+
+        // Select the bar
+        const bar = canvas.locator('[data-testid^="bar-"]').first();
+        await bar.click();
+
+        // Verify bar initially has red background class (Unit/Red is default)
+        await expect(bar).toHaveClass(/bg-red-400/);
+
+        // Open Colour Dropdown
+        const colorBtn = page.getByRole('button', { name: 'Color' });
+        await expect(colorBtn).toBeEnabled();
+        await colorBtn.click();
+
+        // Select "Green"
+        await page.getByRole('button', { name: 'Green' }).click();
+
+        // Verify bar has green background class (emerald-400)
+        await expect(bar).toHaveClass(/bg-emerald-400/);
+    });
+
     test('help button opens modal', async ({ page }) => {
         // Click help button (CircleHelp icon button)
         const helpButton = page.locator('button[aria-label="Help"]');

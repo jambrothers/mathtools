@@ -19,7 +19,7 @@ describe('serializeBars', () => {
         const bars: BarData[] = [
             { id: 'abc', x: 100, y: 150, width: 200, colorIndex: 0, label: '1' }
         ];
-        expect(serializeBars(bars)).toBe('0:1,100,150,200');
+        expect(serializeBars(bars)).toBe('0:1,100,150,200,0');
     });
 
     it('should serialize multiple bars separated by semicolons', () => {
@@ -27,14 +27,14 @@ describe('serializeBars', () => {
             { id: 'a', x: 100, y: 100, width: 100, colorIndex: 0, label: '1' },
             { id: 'b', x: 200, y: 100, width: 150, colorIndex: 1, label: 'x' }
         ];
-        expect(serializeBars(bars)).toBe('0:1,100,100,100;1:x,200,100,150');
+        expect(serializeBars(bars)).toBe('0:1,100,100,100,0;1:x,200,100,150,0');
     });
 
     it('should round positions to integers', () => {
         const bars: BarData[] = [
             { id: 'a', x: 100.7, y: 50.3, width: 99.8, colorIndex: 2, label: 'y' }
         ];
-        expect(serializeBars(bars)).toBe('2:y,101,50,100');
+        expect(serializeBars(bars)).toBe('2:y,101,50,100,0');
     });
 
     it('should URL-encode special characters in labels', () => {
@@ -50,7 +50,7 @@ describe('serializeBars', () => {
         const bars: BarData[] = [
             { id: 'a', x: 100, y: 100, width: 100, colorIndex: 3, label: '' }
         ];
-        expect(serializeBars(bars)).toBe('3:,100,100,100');
+        expect(serializeBars(bars)).toBe('3:,100,100,100,0');
     });
 });
 
@@ -114,7 +114,7 @@ describe('barModelURLSerializer', () => {
                 bars: [{ id: 'a', x: 100, y: 100, width: 100, colorIndex: 0, label: '1' }]
             };
             const params = barModelURLSerializer.serialize(state);
-            expect(params.get('b')).toBe('0:1,100,100,100');
+            expect(params.get('b')).toBe('0:1,100,100,100,0');
         });
     });
 

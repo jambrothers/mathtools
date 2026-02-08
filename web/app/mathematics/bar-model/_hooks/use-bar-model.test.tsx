@@ -159,4 +159,29 @@ describe('useBarModel', () => {
             expect(b.displayFormat).toBe('decimal');
         });
     });
+
+    it('should update colorIndex for selected bars', () => {
+        const { result } = renderHook(() => useBarModel());
+        let barId: string;
+
+        // Add
+        act(() => {
+            const bar = result.current.addBar(0, 0, 0, 'Test Bar');
+            barId = bar.id;
+        });
+
+        // Select
+        act(() => {
+            result.current.selectBars([barId]);
+        });
+
+        // Set Color
+        act(() => {
+            result.current.setColorIndex(2);
+        });
+
+        // Verify
+        const bar = result.current.bars.find(b => b.id === barId);
+        expect(bar?.colorIndex).toBe(2);
+    });
 });

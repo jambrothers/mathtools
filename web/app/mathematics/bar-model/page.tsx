@@ -87,6 +87,7 @@ function BarModelPageContent() {
         toggleTotal,
         toggleRelativeLabel,
         setDisplayFormat,
+        setColorIndex,
         undo,
         canUndo,
         clearAll,
@@ -115,9 +116,12 @@ function BarModelPageContent() {
     // Check if any selected bar has relative label enabled
     const hasRelativeSelected = selectedBars.some(b => b.showRelativeLabel);
 
-    // Get common display format if all selected share it, otherwise undefined
     const commonDisplayFormat = selectedBars.length > 0 && selectedBars.every(b => b.displayFormat === selectedBars[0].displayFormat)
         ? selectedBars[0].displayFormat
+        : undefined;
+
+    const commonColorIndex = selectedBars.length > 0 && selectedBars.every(b => b.colorIndex === selectedBars[0].colorIndex)
+        ? selectedBars[0].colorIndex
         : undefined;
 
     // Local UI State
@@ -437,6 +441,8 @@ function BarModelPageContent() {
                 canToggleRelative={canToggleRelative}
                 displayFormat={commonDisplayFormat}
                 onSetDisplayFormat={setDisplayFormat}
+                currentColorIndex={commonColorIndex}
+                onSetColorIndex={setColorIndex}
                 canSetDisplayFormat={hasRelativeSelected}
                 canSplit={canSplit}
                 onClear={handleClear}

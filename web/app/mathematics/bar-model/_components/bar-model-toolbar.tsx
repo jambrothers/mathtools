@@ -29,7 +29,7 @@ import {
     ToolbarSeparator,
 } from "@/components/tool-ui/toolbar"
 import { CopyLinkButton } from "@/components/tool-ui/copy-link-button"
-import { QuickLabelType, RelativeDisplayFormat } from "../constants"
+import { QuickLabelType, RelativeDisplayFormat, BAR_COLORS } from "../constants"
 
 interface BarModelToolbarProps {
     /** Number of selected bars */
@@ -64,6 +64,10 @@ interface BarModelToolbarProps {
     displayFormat?: RelativeDisplayFormat;
     /** Callback to set display format */
     onSetDisplayFormat: (format: RelativeDisplayFormat) => void;
+    /** Current color index of selected bars (undefined if mixed) */
+    currentColorIndex?: number;
+    /** Callback to set color index */
+    onSetColorIndex: (index: number) => void;
     /** Whether format dropdown is enabled */
     canSetDisplayFormat: boolean;
     /** Split validation states */
@@ -100,19 +104,22 @@ export function BarModelToolbar({
     displayFormat,
     onSetDisplayFormat,
     canSetDisplayFormat,
+    currentColorIndex,
+    onSetColorIndex,
     canSplit,
     onClear,
     onUndo,
     onCopyLink,
     onExport,
 }: BarModelToolbarProps) {
-    const [activeDropdown, setActiveDropdown] = useState<'quickLabel' | 'split' | 'clone' | 'format' | null>(null);
+    const [activeDropdown, setActiveDropdown] = useState<'quickLabel' | 'split' | 'clone' | 'format' | 'color' | null>(null);
     const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number } | null>(null);
 
     const quickLabelRef = useRef<HTMLDivElement>(null);
     const splitRef = useRef<HTMLDivElement>(null);
     const cloneRef = useRef<HTMLDivElement>(null);
     const formatRef = useRef<HTMLDivElement>(null);
+    const colorRef = useRef<HTMLDivElement>(null);
 
     // Update dropdown position when it opens
     useEffect(() => {
@@ -121,6 +128,7 @@ export function BarModelToolbar({
         else if (activeDropdown === 'split') ref = splitRef;
         else if (activeDropdown === 'clone') ref = cloneRef;
         else if (activeDropdown === 'format') ref = formatRef;
+        else if (activeDropdown === 'color') ref = colorRef;
 
         if (ref && ref.current) {
             const rect = ref.current.getBoundingClientRect();
@@ -190,6 +198,62 @@ export function BarModelToolbar({
                                 Units
                             </button>
 
+                        </div>
+                    </>,
+                    document.body
+                )}
+
+                {/* Colour Dropdown */}
+                <div className="relative" ref={colorRef}>
+                    <ToolbarButton
+                        icon={
+                            <div
+                                className="w-4 h-4 rounded-full border border-slate-300 dark:border-slate-600 flex items-center justify-center overflow-hidden"
+                                style={{
+                                    backgroundColor: currentColorIndex !== undefined
+                                        ? undefined // Use class
+                                        : '#cbd5e1' // slate-300
+                                }}
+                            >
+                                {currentColorIndex !== undefined && (
+                                    <div className={`w-full h-full ${BAR_COLORS[currentColorIndex].bg}`} />
+                                )}
+                            </div>
+                        }
+                        rightIcon={<ChevronDown size={14} className="text-slate-400 group-hover:text-slate-600 dark:text-slate-500 dark:group-hover:text-slate-400" />}
+                        label="Color"
+                        onClick={() => setActiveDropdown(activeDropdown === 'color' ? null : 'color')}
+                        disabled={selectedCount === 0}
+                        title="Change bar color"
+                    />
+                </div>
+                {activeDropdown === 'color' && dropdownPos && typeof document !== 'undefined' && createPortal(
+                    <>
+                        <div
+                            className="fixed inset-0 z-[100]"
+                            onClick={() => setActiveDropdown(null)}
+                        />
+                        <div
+                            className="fixed z-[101] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg min-w-[140px]"
+                            style={{
+                                top: dropdownPos.top,
+                                left: dropdownPos.left,
+                            }}
+                        >
+                            {BAR_COLORS.map((color, index) => (
+                                <button
+                                    key={index}
+                                    className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center gap-3
+                                        ${index === 0 ? 'rounded-t-lg' : ''}
+                                        ${index === BAR_COLORS.length - 1 ? 'rounded-b-lg' : ''}
+                                        ${currentColorIndex === index ? 'bg-slate-50 dark:bg-slate-700/50 font-medium' : ''}
+                                    `}
+                                    onClick={() => { onSetColorIndex(index); setActiveDropdown(null); }}
+                                >
+                                    <div className={`w-3 h-3 rounded-full ${color.bg} border ${color.border}`} />
+                                    <span>{color.name}</span>
+                                </button>
+                            ))}
                         </div>
                     </>,
                     document.body

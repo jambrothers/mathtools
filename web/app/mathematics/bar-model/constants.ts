@@ -60,9 +60,9 @@ export interface BarColor {
  * Index is used as colorIndex in BarData.
  */
 export const BAR_COLORS: BarColor[] = [
-    // 0: Unit (Red)
+    // 0: Red
     {
-        name: 'Unit',
+        name: 'Red',
         bg: 'bg-red-400',
         border: 'border-red-500',
         text: 'text-white',
@@ -70,9 +70,9 @@ export const BAR_COLORS: BarColor[] = [
         borderDark: 'dark:border-red-400',
         textDark: 'dark:text-white',
     },
-    // 1: Variable X (Blue)
+    // 1: Blue
     {
-        name: 'Variable X',
+        name: 'Blue',
         bg: 'bg-blue-400',
         border: 'border-blue-500',
         text: 'text-white',
@@ -80,9 +80,9 @@ export const BAR_COLORS: BarColor[] = [
         borderDark: 'dark:border-blue-400',
         textDark: 'dark:text-white',
     },
-    // 2: Variable Y (Green)
+    // 2: Green
     {
-        name: 'Variable Y',
+        name: 'Green',
         bg: 'bg-emerald-400',
         border: 'border-emerald-500',
         text: 'text-white',
@@ -90,9 +90,9 @@ export const BAR_COLORS: BarColor[] = [
         borderDark: 'dark:border-emerald-400',
         textDark: 'dark:text-white',
     },
-    // 3: Generic (Yellow)
+    // 3: Yellow
     {
-        name: 'Generic',
+        name: 'Yellow',
         bg: 'bg-amber-300',
         border: 'border-amber-400',
         text: 'text-amber-900',
@@ -100,9 +100,9 @@ export const BAR_COLORS: BarColor[] = [
         borderDark: 'dark:border-amber-400',
         textDark: 'dark:text-amber-950',
     },
-    // 4: Quantity (Purple)
+    // 4: Purple
     {
-        name: 'Quantity',
+        name: 'Purple',
         bg: 'bg-violet-400',
         border: 'border-violet-500',
         text: 'text-white',
@@ -110,9 +110,9 @@ export const BAR_COLORS: BarColor[] = [
         borderDark: 'dark:border-violet-400',
         textDark: 'dark:text-white',
     },
-    // 5: Unknown/Total (Gray)
+    // 5: Grey
     {
-        name: 'Unknown',
+        name: 'Grey',
         bg: 'bg-slate-200',
         border: 'border-slate-300',
         text: 'text-slate-700',
@@ -147,43 +147,43 @@ export interface SidebarItem {
  */
 export const SIDEBAR_ITEMS: SidebarItem[] = [
     {
-        id: 'unit',
-        sidebarLabel: '1 Unit',
+        id: 'red',
+        sidebarLabel: 'Red',
         defaultLabel: '',
         colorIndex: 0,
         width: 1,
     },
     {
-        id: 'var-x',
-        sidebarLabel: 'Variable x',
+        id: 'blue',
+        sidebarLabel: 'Blue',
         defaultLabel: '',
         colorIndex: 1,
         width: 1,
     },
     {
-        id: 'var-y',
-        sidebarLabel: 'Variable y',
+        id: 'green',
+        sidebarLabel: 'Green',
         defaultLabel: '',
         colorIndex: 2,
         width: 1,
     },
     {
-        id: 'generic',
-        sidebarLabel: 'Generic',
+        id: 'yellow',
+        sidebarLabel: 'Yellow',
         defaultLabel: '',
         colorIndex: 3,
         width: 1,
     },
     {
-        id: 'quantity',
-        sidebarLabel: 'Quantity',
+        id: 'purple',
+        sidebarLabel: 'Purple',
         defaultLabel: '',
         colorIndex: 4,
         width: 1,
     },
     {
-        id: 'unknown',
-        sidebarLabel: 'Unknown',
+        id: 'grey',
+        sidebarLabel: 'Grey',
         defaultLabel: '',
         colorIndex: 5,
         width: 1,

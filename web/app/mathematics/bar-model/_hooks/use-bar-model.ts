@@ -58,6 +58,7 @@ export interface UseBarModelReturn {
     setBarAsTotal: (id: string, isTotal: boolean) => void;
     toggleRelativeLabel: () => void;
     setDisplayFormat: (format: RelativeDisplayFormat) => void;
+    setColorIndex: (colorIndex: number) => void;
 
     // Movement/Resize
     moveBar: (id: string, x: number, y: number) => void;
@@ -214,6 +215,13 @@ export function useBarModel(): UseBarModelReturn {
         if (selectedIds.size === 0) return;
         pushBars(prev => prev.map(b =>
             selectedIds.has(b.id) ? { ...b, displayFormat: format } : b
+        ));
+    }, [pushBars, selectedIds]);
+
+    const setColorIndex = useCallback((colorIndex: number): void => {
+        if (selectedIds.size === 0) return;
+        pushBars(prev => prev.map(b =>
+            selectedIds.has(b.id) ? { ...b, colorIndex } : b
         ));
     }, [pushBars, selectedIds]);
 
@@ -566,6 +574,7 @@ export function useBarModel(): UseBarModelReturn {
         toggleTotal,
         toggleRelativeLabel,
         setDisplayFormat,
+        setColorIndex,
         undo,
         canUndo,
         clearAll,
