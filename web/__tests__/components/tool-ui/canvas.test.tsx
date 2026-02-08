@@ -49,7 +49,6 @@ describe('Canvas', () => {
             const marquee = container.querySelector('[class*="border-indigo"]');
             expect(marquee).toBeVisible();
             // Should not have hidden class (checking style because we override class with inline style)
-            // Or better, check that it's visible. toBeVisible checks styles.
         });
 
         it('calls onSelectionEnd with rect when drag exceeds threshold', () => {
