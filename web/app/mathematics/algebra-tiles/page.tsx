@@ -176,7 +176,7 @@ function AlgebraTilesPageContent() {
             <div className="flex flex-1 overflow-hidden relative">
                 <TileSidebar onAddTile={addTile} showY={showY} />
 
-                <ToolScaffold helpContent={helpContent}>
+                <ToolScaffold helpContent={helpContent} className="flex-1 overflow-hidden">
                     <Canvas
                         ref={canvasRef}
                         gridSize={snapToGrid ? 50 : undefined}

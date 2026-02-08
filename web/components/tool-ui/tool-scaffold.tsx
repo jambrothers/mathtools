@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { cn } from "@/lib/utils"
 import { InteractiveToolLayout } from "./interactive-tool-layout"
 import { ResolutionGuard } from "./resolution-guard"
 import { HelpButton } from "./help-button"
@@ -30,7 +31,7 @@ export function ToolScaffold({
     const [showHelp, setShowHelp] = React.useState(false)
 
     const content = (
-        <div className="relative w-full h-full">
+        <div className={cn("relative w-full min-h-0 flex flex-col", className)}>
             {children}
             {helpContent && (
                 <HelpButton onClick={() => setShowHelp(true)} />

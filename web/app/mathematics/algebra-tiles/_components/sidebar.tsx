@@ -43,6 +43,7 @@ function DraggableTileButton({
     const handleDragStart = (e: React.DragEvent) => {
         const data: TileDragData = { type, value };
         e.dataTransfer.setData('application/json', JSON.stringify(data));
+        e.dataTransfer.setData('text/plain', JSON.stringify(data));
         e.dataTransfer.effectAllowed = 'copy';
     };
 
@@ -102,6 +103,7 @@ function TileRow({
     const handleDragStart = (e: React.DragEvent, type: string) => {
         const data: TileDragData = { type, value };
         e.dataTransfer.setData('application/json', JSON.stringify(data));
+        e.dataTransfer.setData('text/plain', JSON.stringify(data));
         e.dataTransfer.effectAllowed = 'copy';
     };
 

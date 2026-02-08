@@ -24,7 +24,11 @@ export function useCanvasDrop<T extends object>({
 }: CanvasDropOptions<T>) {
     const handleDrop = useCallback((e: React.DragEvent<HTMLElement>) => {
         e.preventDefault()
-        const data = e.dataTransfer.getData('application/json')
+        e.stopPropagation()
+
+        // Try getting JSON data first, fall back to text if needed (though usually JSON stringified)
+        const data = e.dataTransfer.getData('application/json') || e.dataTransfer.getData('text/plain')
+
         if (!data) return
         if (!canvasRef.current) return
 
@@ -34,13 +38,14 @@ export function useCanvasDrop<T extends object>({
             const x = snap(e.clientX - rect.left, gridSize)
             const y = snap(e.clientY - rect.top, gridSize)
             onDropData(parsed, { x, y })
-        } catch {
-            // Ignore invalid data
+        } catch (err) {
+            console.error('Drop parse error:', err)
         }
     }, [canvasRef, gridSize, onDropData])
 
     const handleDragOver = useCallback((e: React.DragEvent<HTMLElement>) => {
         e.preventDefault()
+        e.stopPropagation()
         if (e.dataTransfer) {
             e.dataTransfer.dropEffect = dropEffect
         }
