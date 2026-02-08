@@ -41,16 +41,40 @@ test.describe('Bar Model Tool', () => {
     });
 
 
-    test('toolbar buttons exist', async ({ page }) => {
-        // Check operation buttons exist
-        await expect(page.getByRole('button', { name: /Quick Label/i })).toBeVisible();
-        await expect(page.getByRole('button', { name: /Join/i })).toBeVisible();
-        await expect(page.getByRole('button', { name: /Split ½/i })).toBeVisible();
-        await expect(page.getByRole('button', { name: /Split ⅓/i })).toBeVisible();
-        await expect(page.getByRole('button', { name: /Clone R/i })).toBeVisible();
-        await expect(page.getByRole('button', { name: /Clone D/i })).toBeVisible();
-        await expect(page.getByRole('button', { name: /Clear/i })).toBeVisible();
-        await expect(page.getByRole('button', { name: /Undo/i })).toBeVisible();
+    test('toolbar buttons exist and dropdowns work', async ({ page }) => {
+        // Add a bar and select it to enable toolbar buttons
+        const sidebarButton = page.locator('[data-testid="bar-model-canvas"]').locator('..').locator('button').first();
+        const canvas = page.locator('[data-testid="bar-model-canvas"]');
+        await sidebarButton.dragTo(canvas, { targetPosition: { x: 200, y: 200 } });
+        // Click the bar to select it (it should be at 200,200)
+        // We can find it by text or class. Newly added bar has no text label initially?
+        // Let's click the canvas center or use a locator for the bar.
+        const bar = canvas.locator('[data-testid^="bar-"]').first();
+        await bar.click();
+
+        // Check operation buttons exist (top level)
+        await expect(page.getByRole('button', { name: 'Quick Label' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Join' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Split', exact: true })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Clone', exact: true })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Clear' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Undo' })).toBeVisible();
+
+        // Check Split Dropdown
+        await page.getByRole('button', { name: 'Split', exact: true }).click();
+        await expect(page.getByRole('button', { name: 'Split ½' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Split ⅓' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Split ⅕' })).toBeVisible();
+
+        // Close split dropdown (click backdrop or another button)
+        await page.locator('body').click({ position: { x: 0, y: 0 } });
+
+        // Check Clone Dropdown
+        await page.getByRole('button', { name: 'Clone', exact: true }).click();
+        await expect(page.getByRole('button', { name: 'Clone Right' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Clone Left' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Clone Up' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Clone Down' })).toBeVisible();
     });
 
     test('help button opens modal', async ({ page }) => {

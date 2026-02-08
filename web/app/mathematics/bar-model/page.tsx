@@ -78,7 +78,9 @@ function BarModelPageContent() {
         selectBar,
         clearSelection,
         cloneSelectedRight,
+        cloneSelectedLeft,
         cloneSelectedDown,
+        cloneSelectedUp,
         joinSelected,
         splitSelected,
         applyQuickLabel,
@@ -417,7 +419,9 @@ function BarModelPageContent() {
                 onSplitThird={() => splitSelected(3)}
                 onSplitFifth={() => splitSelected(5)}
                 onCloneRight={cloneSelectedRight}
+                onCloneLeft={cloneSelectedLeft}
                 onCloneDown={cloneSelectedDown}
+                onCloneUp={cloneSelectedUp}
                 onQuickLabel={applyQuickLabel}
                 onToggleTotal={toggleTotal}
                 onToggleRelative={toggleRelativeLabel}

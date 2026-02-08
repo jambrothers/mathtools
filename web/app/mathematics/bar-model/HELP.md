@@ -31,15 +31,18 @@ There are two ways to add bars to the workspace:
 ## Operations
 
 ### Splitting and Joining
-- **Split**: Select one or more bars and use the toolbar buttons to split them into:
+- **Split**: Select one or more bars and use the **Split** dropdown in the toolbar to divide them into:
   - **Halves** (2 equal parts)
   - **Thirds** (3 equal parts)
   - **Fifths** (5 equal parts)
 - **Join**: Select two or more adjacent bars and click "Join" to merge them into a single bar.
 
 ### Cloning
-- **Clone Right**: Create a copy of the selected bars immediately to their right.
-- **Clone Down**: Create a copy of the selected bars immediately below them.
+- Use the **Clone** dropdown to copy selected bars:
+  - **Right**: Copies bars immediately to their right.
+  - **Left**: Copies bars immediately to their left.
+  - **Up**: Copies bars immediately above them.
+  - **Down**: Copies bars immediately below them.
 
 ### Totals (Braces)
 - Select one or more bars and click **Toggle Total** to add or remove a curly brace indicating the total value.

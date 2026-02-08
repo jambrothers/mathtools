@@ -45,6 +45,7 @@ export function ToolbarSeparator() {
 
 interface ToolbarButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     icon?: React.ReactNode
+    rightIcon?: React.ReactNode
     label?: string
     active?: boolean
     /** Visual style variant of the button. */
@@ -54,7 +55,7 @@ interface ToolbarButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 /**
  * A standardized button component for the toolbar.
  */
-export function ToolbarButton({ icon, label, active, variant = 'default', className, ...props }: ToolbarButtonProps) {
+export function ToolbarButton({ icon, rightIcon, label, active, variant = 'default', className, ...props }: ToolbarButtonProps) {
     const variants = {
         default: active
             ? "bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/50 dark:text-indigo-200 dark:border-indigo-700"
@@ -82,6 +83,7 @@ export function ToolbarButton({ icon, label, active, variant = 'default', classN
         >
             {icon}
             {label && <span className="hidden lg:inline">{label}</span>}
+            {rightIcon}
         </button>
     )
 }

@@ -68,7 +68,9 @@ export interface UseBarModelReturn {
 
     // Operations
     cloneSelectedRight: () => void;
+    cloneSelectedLeft: () => void;
     cloneSelectedDown: () => void;
+    cloneSelectedUp: () => void;
     joinSelected: () => void;
     splitSelected: (parts: SplitPart) => void;
     applyQuickLabel: (labelType: QuickLabelType) => void;
@@ -319,6 +321,22 @@ export function useBarModel(): UseBarModelReturn {
         setSelectedIds(new Set(clones.map(b => b.id)));
     }, [bars, selectedIds, pushBars]);
 
+    const cloneSelectedLeft = useCallback((): void => {
+        if (selectedIds.size === 0) return;
+
+        const selectedBars = bars.filter(b => selectedIds.has(b.id));
+        const clones: BarData[] = selectedBars.map(bar => ({
+            ...bar,
+            id: generateId(),
+            x: bar.x - bar.width, // Place directly to the left
+            y: bar.y, // Same Y
+            isTotal: false, // Clones shouldn't inherit total status
+        }));
+
+        pushBars(prev => [...prev, ...clones]);
+        setSelectedIds(new Set(clones.map(b => b.id)));
+    }, [bars, selectedIds, pushBars]);
+
     const cloneSelectedDown = useCallback((): void => {
         if (selectedIds.size === 0) return;
 
@@ -328,6 +346,22 @@ export function useBarModel(): UseBarModelReturn {
             id: generateId(),
             x: bar.x, // Same X
             y: bar.y + BAR_HEIGHT + GRID_SIZE, // Place directly below
+            isTotal: false, // Clones shouldn't inherit total status
+        }));
+
+        pushBars(prev => [...prev, ...clones]);
+        setSelectedIds(new Set(clones.map(b => b.id)));
+    }, [bars, selectedIds, pushBars]);
+
+    const cloneSelectedUp = useCallback((): void => {
+        if (selectedIds.size === 0) return;
+
+        const selectedBars = bars.filter(b => selectedIds.has(b.id));
+        const clones: BarData[] = selectedBars.map(bar => ({
+            ...bar,
+            id: generateId(),
+            x: bar.x, // Same X
+            y: bar.y - BAR_HEIGHT - GRID_SIZE, // Place directly above
             isTotal: false, // Clones shouldn't inherit total status
         }));
 
@@ -510,7 +544,9 @@ export function useBarModel(): UseBarModelReturn {
         clearSelection,
         selectInRect,
         cloneSelectedRight,
+        cloneSelectedLeft,
         cloneSelectedDown,
+        cloneSelectedUp,
         joinSelected,
         splitSelected,
         applyQuickLabel,
