@@ -10,14 +10,13 @@ export default function Home() {
             {/* Hero Text */}
             <div className="flex-1 text-center lg:text-left">
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-[var(--theme-main)] mb-6">
-                Bridging the gap <br className="hidden lg:block" />
-                between <br />
-                <span className="text-[var(--color-primary)]">
-                  Exposition & Understanding
-                </span>
+                Interactive mathematics in <br />
+                {/*<span className="text-[var(--color-primary)]"> */}
+                the classroom
+                {/*</span> */}
               </h1>
               <p className="text-lg md:text-xl text-[var(--theme-muted)] max-w-2xl mx-auto lg:mx-0 leading-relaxed mb-8">
-                Interactive digital tools designed to make abstract mathematical and computational concepts concrete, accessible, and engaging for every student.
+                Free, no login tools designed for your classroom. Visualise algebraic concepts, number, circuits and statistics to deepen understanding and aid exposition.
               </p>
 
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
