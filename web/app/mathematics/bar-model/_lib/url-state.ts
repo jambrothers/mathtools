@@ -5,9 +5,10 @@
  * and deserialize from URL back to state.
  */
 
-import { URLStateSerializer } from '@/lib/url-state';
+import { URLStateSerializer, serializeList, parseList } from '@/lib/url-state';
 import { BarData } from '../_hooks/use-bar-model';
 import { RelativeDisplayFormat } from '../constants';
+import { createId } from '@/lib/id';
 
 // =============================================================================
 // Types
@@ -36,9 +37,7 @@ const MAX_BARS = 50; // Security limit to prevent DoS
  * @returns Compact string representation using `;` as the item delimiter.
  */
 export function serializeBars(bars: BarData[]): string {
-    if (bars.length === 0) return '';
-
-    return bars.map(bar => {
+    return serializeList(bars, (bar) => {
         const encodedLabel = encodeURIComponent(bar.label);
 
         let flags = 0;
@@ -61,7 +60,7 @@ export function serializeBars(bars: BarData[]): string {
         }
 
         return `${bar.colorIndex}:${encodedLabel},${Math.round(bar.x)},${Math.round(bar.y)},${Math.round(bar.width)},${flags}`;
-    }).join(';');
+    });
 }
 
 /**
@@ -77,31 +76,25 @@ export function serializeBars(bars: BarData[]): string {
  * @returns Array of BarData objects.
  */
 export function parseBarsString(str: string): BarData[] {
-    if (!str || str.trim() === '') return [];
-
-    const bars: BarData[] = [];
-    const parts = str.split(';');
-
-    for (const part of parts) {
-        if (bars.length >= MAX_BARS) break;
+    return parseList(str, (part) => {
         try {
             // Format: colorIndex:label,x,y,width
             const colonIndex = part.indexOf(':');
-            if (colonIndex === -1) continue;
+            if (colonIndex === -1) return null;
 
             const colorIndex = parseInt(part.substring(0, colonIndex), 10);
-            if (isNaN(colorIndex)) continue;
+            if (isNaN(colorIndex)) return null;
 
             const rest = part.substring(colonIndex + 1);
             const commaIndex = rest.indexOf(',');
-            if (commaIndex === -1) continue;
+            if (commaIndex === -1) return null;
 
             const encodedLabel = rest.substring(0, commaIndex);
             const label = decodeURIComponent(encodedLabel);
 
             const coordsAndFlags = rest.substring(commaIndex + 1).split(',');
             // We expect at least x,y,width. flags is optional.
-            if (coordsAndFlags.length < 3) continue;
+            if (coordsAndFlags.length < 3) return null;
 
             const x = parseInt(coordsAndFlags[0], 10);
             const y = parseInt(coordsAndFlags[1], 10);
@@ -135,9 +128,6 @@ export function parseBarsString(str: string): BarData[] {
                     else if (formatBits === 3) displayFormat = 'percentage';
                     else displayFormat = 'total'; // Default to total/undefined
 
-                    // Actually 'total' is the default, so we can just leave it undefined or set it to 'total'.
-                    // The types says optional, default to 'total' logic in hook/component handle undefined as total.
-                    // But let's set it if we read it.
                     if (formatBits !== 0) {
                         parsedDisplayFormat = displayFormat;
                     } else {
@@ -146,10 +136,10 @@ export function parseBarsString(str: string): BarData[] {
                 }
             }
 
-            if (isNaN(x) || isNaN(y) || isNaN(width)) continue;
+            if (isNaN(x) || isNaN(y) || isNaN(width)) return null;
 
-            bars.push({
-                id: `bar-url-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            return {
+                id: createId('bar'),
                 x,
                 y,
                 width,
@@ -158,14 +148,11 @@ export function parseBarsString(str: string): BarData[] {
                 isTotal,
                 showRelativeLabel,
                 displayFormat: parsedDisplayFormat,
-            });
+            };
         } catch {
-            // Skip invalid parts
-            continue;
+            return null;
         }
-    }
-
-    return bars;
+    }, { maxItems: MAX_BARS });
 }
 
 // =============================================================================

@@ -18,6 +18,9 @@ import {
     SplitPart,
     RelativeDisplayFormat,
 } from "../constants"
+import { snapToGrid } from "@/lib/snap"
+import { createId } from "@/lib/id"
+import { selectIdsByRect } from "@/lib/selection"
 
 // =============================================================================
 // Types
@@ -100,10 +103,10 @@ export interface UseBarModelReturn {
 // =============================================================================
 
 /** Snap a value to the grid */
-const snap = (val: number): number => Math.round(val / GRID_SIZE) * GRID_SIZE;
+const snap = (val: number): number => snapToGrid(val, GRID_SIZE);
 
 /** Generate a unique bar ID */
-const generateId = (): string => `bar-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const generateId = (): string => createId('bar');
 
 /** Calculate GCD of two numbers using Euclidean algorithm */
 export const gcd = (a: number, b: number): number => {
@@ -132,6 +135,8 @@ export function useBarModel(): UseBarModelReturn {
         undo,
         canUndo,
         clearHistory,
+        beginTransaction,
+        commitTransaction
     } = useHistory<BarData[]>([]);
 
     // Selection state (not part of undo history)
@@ -303,21 +308,18 @@ export function useBarModel(): UseBarModelReturn {
     }, []);
 
     const selectInRect = useCallback((rect: DOMRect): void => {
-        const selected = bars.filter(bar => {
-            // Check if bar overlaps with selection rect
-            const barRight = bar.x + bar.width;
-            const barBottom = bar.y + BAR_HEIGHT;
-            const rectRight = rect.x + rect.width;
-            const rectBottom = rect.y + rect.height;
-
-            return !(
-                bar.x > rectRight ||
-                barRight < rect.x ||
-                bar.y > rectBottom ||
-                barBottom < rect.y
-            );
-        });
-        setSelectedIds(new Set(selected.map(b => b.id)));
+        const selection = selectIdsByRect(
+            bars,
+            rect,
+            (bar) => ({
+                left: bar.x,
+                top: bar.y,
+                right: bar.x + bar.width,
+                bottom: bar.y + BAR_HEIGHT
+            }),
+            (bar) => bar.id
+        );
+        setSelectedIds(new Set(selection as Set<string>));
     }, [bars]);
 
     // =========================================================================
@@ -518,9 +520,8 @@ export function useBarModel(): UseBarModelReturn {
     // =========================================================================
 
     const dragStart = useCallback((): void => {
-        // Push current state to history (checkpoint) before modification
-        pushBars(prev => prev);
-    }, [pushBars]);
+        beginTransaction();
+    }, [beginTransaction]);
 
     const dragMove = useCallback((dx: number, dy: number): void => {
         if (selectedIds.size === 0) return;
@@ -542,7 +543,8 @@ export function useBarModel(): UseBarModelReturn {
                 ? { ...b, x: snap(b.x), y: snap(b.y) }
                 : b
         ));
-    }, [updateBars, selectedIds]);
+        commitTransaction();
+    }, [updateBars, selectedIds, commitTransaction]);
 
     // =========================================================================
     // Return

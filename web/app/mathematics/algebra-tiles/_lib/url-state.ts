@@ -7,8 +7,12 @@ import {
     URLStateSerializer,
     serializeBool,
     deserializeBool,
+    serializeList,
+    parseList,
+    hasAnyParam
 } from '@/lib/url-state';
 import { TileData } from '../_hooks/use-algebra-tiles';
+import { createId } from '@/lib/id';
 
 /**
  * Full state that can be serialized to/from URL
@@ -42,12 +46,10 @@ const PARAM_SNAP = 'sn';
  * "x:1,100,150;x2:-1,200,200"
  */
 export function serializeTiles(tiles: TileData[]): string {
-    if (tiles.length === 0) return '';
-
-    return tiles.map(t => {
+    return serializeList(tiles, (t) => {
         // Round positions to integers for cleaner URLs
         return `${t.type}:${t.value},${Math.round(t.x)},${Math.round(t.y)}`;
-    }).join(';');
+    });
 }
 
 /**
@@ -63,32 +65,19 @@ export function serializeTiles(tiles: TileData[]): string {
  * @returns Array of TileData objects with newly generated unique IDs.
  */
 export function parseTileString(str: string): TileData[] {
-    if (!str || str.trim() === '') return [];
-
-    const tiles: TileData[] = [];
-    const parts = str.split(';');
-
-    for (let i = 0; i < parts.length; i++) {
-        if (tiles.length >= MAX_TILES) break;
-
-        const part = parts[i].trim();
-        if (!part) continue;
-
+    return parseList(str, (part) => {
         // Parse "type:value,x,y" format
         const match = part.match(/^([a-z0-9_]+):(-?\d+),(-?\d+),(-?\d+)$/i);
-        if (match) {
-            const [, type, valueStr, xStr, yStr] = match;
-            tiles.push({
-                id: Math.random().toString(36).substr(2, 9),
-                type,
-                value: parseInt(valueStr, 10),
-                x: parseInt(xStr, 10),
-                y: parseInt(yStr, 10),
-            });
-        }
-    }
-
-    return tiles;
+        if (!match) return null;
+        const [, type, valueStr, xStr, yStr] = match;
+        return {
+            id: createId('tile'),
+            type,
+            value: parseInt(valueStr, 10),
+            x: parseInt(xStr, 10),
+            y: parseInt(yStr, 10),
+        };
+    }, { maxItems: MAX_TILES });
 }
 
 /**
@@ -120,11 +109,11 @@ export const algebraTilesURLSerializer: URLStateSerializer<AlgebraTilesURLState>
         }
 
         // Check if there are any relevant params at all
-        const hasAnyParam = [
+        const hasAny = hasAnyParam(params, [
             PARAM_TILES, PARAM_LABELS, PARAM_SHOW_Y, PARAM_SNAP
-        ].some(key => params.has(key));
+        ]);
 
-        if (!hasAnyParam) {
+        if (!hasAny) {
             return null; // No URL state to restore
         }
 

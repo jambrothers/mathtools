@@ -9,7 +9,6 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { Trash2 } from 'lucide-react';
 
 import { SetPageTitle } from '@/components/set-page-title';
@@ -17,13 +16,14 @@ import { HelpModal } from '@/components/tool-ui/help-modal';
 import { HelpButton } from '@/components/tool-ui/help-button';
 import { Canvas } from '@/components/tool-ui/canvas';
 import { cn } from '@/lib/utils';
-import { generateShareableURL, copyURLToClipboard } from '@/lib/url-state';
+import { useUrlState } from '@/lib/hooks/use-url-state';
+import { useCanvasDrop } from '@/lib/hooks/use-canvas-drop';
 
-import { useBarModel, BarData } from './_hooks/use-bar-model';
+import { useBarModel } from './_hooks/use-bar-model';
 import { Bar } from './_components/bar';
 import { BarModelSidebar, BarDragData } from './_components/bar-model-sidebar';
 import { BarModelToolbar } from './_components/bar-model-toolbar';
-import { GRID_SIZE, BAR_HEIGHT } from './constants';
+import { GRID_SIZE } from './constants';
 import { barModelURLSerializer, BarModelURLState } from './_lib/url-state';
 import helpContent from './HELP.md';
 import { exportCanvasContent } from '@/lib/export/canvas-export';
@@ -63,7 +63,6 @@ export default function BarModelPage() {
 // =============================================================================
 
 function BarModelPageContent() {
-    const searchParams = useSearchParams();
     const canvasRef = useRef<HTMLDivElement>(null);
     const trashRef = useRef<HTMLDivElement>(null);
 
@@ -76,6 +75,7 @@ function BarModelPageContent() {
         updateBarLabel,
         resizeBar,
         selectBar,
+        selectInRect,
         clearSelection,
         cloneSelectedRight,
         cloneSelectedLeft,
@@ -129,7 +129,6 @@ function BarModelPageContent() {
     const [isOverTrash, setIsOverTrash] = useState(false);
     const [isHelpOpen, setIsHelpOpen] = useState(false);
     const [isExportOpen, setIsExportOpen] = useState(false);
-    const hasInitialized = useRef(false);
 
     // Drag tracking (mutable ref for performance)
     // For multi-select drag, we track the initial positions and the start click position
@@ -141,20 +140,17 @@ function BarModelPageContent() {
         hasStarted: boolean;
     } | null>(null);
 
-    // Initialize from URL on mount
-    useEffect(() => {
-        if (hasInitialized.current) return;
-
-        const state = barModelURLSerializer.deserialize(searchParams);
-        if (state && state.bars.length > 0) {
-            initFromState(state.bars);
+    const { hasRestored, getShareableUrl, copyShareableUrl } = useUrlState(barModelURLSerializer, {
+        onRestore: (state) => {
+            if (state && state.bars.length > 0) {
+                initFromState(state.bars);
+            }
         }
-        hasInitialized.current = true;
-    }, [searchParams, initFromState]);
+    });
 
     // Update URL when state changes
     useEffect(() => {
-        if (!hasInitialized.current) return;
+        if (!hasRestored) return;
 
         if (bars.length === 0) {
             const url = new URL(window.location.href);
@@ -162,10 +158,10 @@ function BarModelPageContent() {
             window.history.replaceState({}, '', url.toString());
         } else {
             const state: BarModelURLState = { bars };
-            const url = generateShareableURL(barModelURLSerializer, state);
+            const url = getShareableUrl(state);
             window.history.replaceState({}, '', url);
         }
-    }, [bars]);
+    }, [bars, hasRestored, getShareableUrl]);
 
     // Keyboard shortcuts
     useEffect(() => {
@@ -292,54 +288,13 @@ function BarModelPageContent() {
     // =========================================================================
 
     // Handle drop from sidebar (HTML5 drag and drop)
-    const handleDropOnCanvas = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        const data = e.dataTransfer.getData('application/json');
-        if (!data) return;
-
-        try {
-            const dragData = JSON.parse(data) as BarDragData;
-            if (dragData.type !== 'bar') return;
-            if (!canvasRef.current) return;
-
-            const canvasRect = canvasRef.current.getBoundingClientRect();
-            const x = e.clientX - canvasRect.left;
-            const y = e.clientY - canvasRect.top;
-
-            addBar(x, y, dragData.colorIndex, dragData.label);
-        } catch {
-            // Invalid JSON, ignore
+    const { handleDrop, handleDragOver } = useCanvasDrop<BarDragData>({
+        canvasRef,
+        onDropData: (data, position) => {
+            if (data.type !== 'bar') return;
+            addBar(position.x, position.y, data.colorIndex, data.label);
         }
-    }, [addBar]);
-
-    // Handle touch-drop from sidebar (custom event for touch/pen devices)
-    const handleTouchDrop = useCallback((e: Event) => {
-        const customEvent = e as CustomEvent<{ dragData: BarDragData; clientX: number; clientY: number }>;
-        const { dragData, clientX, clientY } = customEvent.detail;
-
-        if (dragData.type !== 'bar') return;
-        if (!canvasRef.current) return;
-
-        const canvasRect = canvasRef.current.getBoundingClientRect();
-        const x = clientX - canvasRect.left;
-        const y = clientY - canvasRect.top;
-
-        addBar(x, y, dragData.colorIndex, dragData.label);
-    }, [addBar]);
-
-    // Register touchdrop listener on canvas
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        canvas.addEventListener('touchdrop', handleTouchDrop);
-        return () => canvas.removeEventListener('touchdrop', handleTouchDrop);
-    }, [handleTouchDrop]);
-
-    const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'copy';
-    }, []);
+    });
 
     // =========================================================================
     // Selection Handlers
@@ -347,35 +302,8 @@ function BarModelPageContent() {
 
     // Handle marquee selection end from Canvas component
     const handleSelectionEnd = useCallback((rect: DOMRect) => {
-        // Canvas provides canvas-relative coordinates
-        // We need to find bars that intersect with this rect
-        const selected: string[] = [];
-        bars.forEach((bar: BarData) => {
-            const barRight = bar.x + bar.width;
-            const barBottom = bar.y + BAR_HEIGHT;
-            const rectRight = rect.x + rect.width;
-            const rectBottom = rect.y + rect.height;
-
-            // Check for intersection
-            const intersects = !(
-                bar.x > rectRight ||
-                barRight < rect.x ||
-                bar.y > rectBottom ||
-                barBottom < rect.y
-            );
-
-            if (intersects) {
-                selected.push(bar.id);
-            }
-        });
-
-        if (selected.length > 0) {
-            // Select all bars in the marquee
-            selected.forEach((id, index) => {
-                selectBar(id, index > 0); // First one replaces, rest are additive
-            });
-        }
-    }, [bars, selectBar]);
+        selectInRect(rect);
+    }, [selectInRect]);
 
     // Clear selection when clicking canvas background (not on a bar)
     const handleCanvasClick = useCallback((e: React.MouseEvent) => {
@@ -388,9 +316,8 @@ function BarModelPageContent() {
     // Copy link to clipboard
     const handleCopyLink = useCallback(() => {
         const state: BarModelURLState = { bars };
-        const url = generateShareableURL(barModelURLSerializer, state);
-        copyURLToClipboard(url);
-    }, [bars]);
+        copyShareableUrl(state);
+    }, [bars, copyShareableUrl]);
 
     // Clear all
     const handleClear = useCallback(() => {
@@ -460,7 +387,7 @@ function BarModelPageContent() {
                     ref={canvasRef}
                     gridSize={GRID_SIZE}
                     data-testid="bar-model-canvas"
-                    onDrop={handleDropOnCanvas}
+                    onDrop={handleDrop}
                     onDragOver={handleDragOver}
                     onSelectionEnd={handleSelectionEnd}
                     onClick={handleCanvasClick}

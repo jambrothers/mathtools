@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { useHistory } from '@/lib/hooks/use-history';
+import { selectIdsByRect } from '@/lib/selection';
 
 export interface Counter {
     id: number;
@@ -73,7 +74,10 @@ export function useCounters() {
         updateState: updateCountersImmediate,
         undo,
         canUndo,
-        clearHistory
+        clearHistory,
+        beginTransaction,
+        commitTransaction,
+        cancelTransaction
     } = useHistory<Counter[]>([]);
 
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -92,9 +96,6 @@ export function useCounters() {
     const animationQueueEndRef = useRef(0);
     const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
     const abortAnimationRef = useRef(false);
-
-    // Track start state for clean undo during drag
-    const dragStartRef = useRef<Counter[] | null>(null);
 
     // --- Helpers ---
     const wait = (ms: number) => new Promise(resolve => {
@@ -137,30 +138,18 @@ export function useCounters() {
     }, [isAnimating, selectedIds, pushCounters]);
 
     const handleMarqueeSelect = useCallback((rect: DOMRect) => {
-        const newSelection = new Set<number>();
-
-        counters.forEach(counter => {
-            // Counter rect (relative to canvas)
-            const cL = counter.x;
-            const cR = counter.x + COUNTER_SIZE;
-            const cT = counter.y;
-            const cB = counter.y + COUNTER_SIZE;
-
-            // Marquee rect
-            const mL = rect.x;
-            const mR = rect.x + rect.width;
-            const mT = rect.y;
-            const mB = rect.y + rect.height;
-
-            // Check overlap
-            const intersects = !(cR < mL || cL > mR || cB < mT || cT > mB);
-
-            if (intersects) {
-                newSelection.add(counter.id);
-            }
-        });
-
-        setSelectedIds(newSelection);
+        const selection = selectIdsByRect(
+            counters,
+            rect,
+            (counter) => ({
+                left: counter.x,
+                top: counter.y,
+                right: counter.x + COUNTER_SIZE,
+                bottom: counter.y + COUNTER_SIZE
+            }),
+            (counter) => counter.id
+        );
+        setSelectedIds(new Set(selection as Set<number>));
     }, [counters]);
 
     // --- Actions ---
@@ -302,8 +291,8 @@ export function useCounters() {
     }, [isAnimating, pushCounters, selectedIds]);
 
     const handleDragStart = useCallback(() => {
-        dragStartRef.current = counters;
-    }, [counters]);
+        beginTransaction();
+    }, [beginTransaction]);
 
     const handleDragMove = useCallback((id: number, delta: { x: number, y: number }) => {
         // If draggable is selected, move ALL selected counters.
@@ -324,13 +313,12 @@ export function useCounters() {
     const updateCounterPosition = useCallback((id: number, x: number, y: number) => {
         if (isAnimating) return;
 
-        pushCounters((prev: Counter[]) => prev.map(c =>
+        updateCountersImmediate((prev: Counter[]) => prev.map(c =>
             c.id === id ? { ...c, x, y } : c
-        ), dragStartRef.current || undefined);
-
-        dragStartRef.current = null;
+        ));
+        commitTransaction();
         setIsOrdered(false);
-    }, [isAnimating, pushCounters]);
+    }, [isAnimating, updateCountersImmediate, commitTransaction]);
 
     const snapToOrder = useCallback(() => {
         pushCounters((prev: Counter[]) => {

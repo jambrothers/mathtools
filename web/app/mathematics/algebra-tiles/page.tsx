@@ -1,20 +1,19 @@
 "use client"
 
 import { useState, useRef, useEffect, useCallback, Suspense } from "react"
-import { useSearchParams } from "next/navigation"
 import { useAlgebraTiles } from "./_hooks/use-algebra-tiles"
 import { AlgebraTile } from "./_components/algebra-tile"
 import { AlgebraToolbar } from "./_components/algebra-toolbar"
 import { TileSidebar } from "./_components/sidebar"
 import { Canvas } from '@/components/tool-ui/canvas';
 import { TrashZone } from '@/components/tool-ui/trash-zone';
-import { HelpButton } from '@/components/tool-ui/help-button';
-import { HelpModal } from '@/components/tool-ui/help-modal';
 import { SetPageTitle } from "@/components/set-page-title"
 import { Position } from "@/types/manipulatives"
 import { algebraTilesURLSerializer, AlgebraTilesURLState } from "./_lib/url-state"
-import { generateShareableURL, copyURLToClipboard } from "@/lib/url-state"
 import helpContent from './HELP.md';
+import { ToolScaffold } from "@/components/tool-ui/tool-scaffold";
+import { useUrlState } from "@/lib/hooks/use-url-state";
+import { useCanvasDrop } from "@/lib/hooks/use-canvas-drop";
 
 /**
  * Loading fallback component for the algebra tiles page.
@@ -27,17 +26,13 @@ function AlgebraTilesPageLoading() {
     );
 }
 
-import { ResolutionGuard } from "@/components/tool-ui/resolution-guard";
-
 /**
  * Main page component wrapped in Suspense for useSearchParams compatibility.
  */
 export default function AlgebraTilesPage() {
     return (
         <Suspense fallback={<AlgebraTilesPageLoading />}>
-            <ResolutionGuard>
-                <AlgebraTilesPageContent />
-            </ResolutionGuard>
+            <AlgebraTilesPageContent />
         </Suspense>
     );
 }
@@ -70,31 +65,22 @@ function AlgebraTilesPageContent() {
         setTilesFromState
     } = useAlgebraTiles()
 
-    const searchParams = useSearchParams()
     const [showLabels, setShowLabels] = useState(true)
     const [showY, setShowY] = useState(false)
     const [snapToGrid, setSnapToGrid] = useState(false)
     const [isTrashHovered] = useState(false)
-    const [hasInitialized, setHasInitialized] = useState(false)
-    const [showHelp, setShowHelp] = useState(false)
 
     const trashRef = useRef<HTMLDivElement>(null)
     const canvasRef = useRef<HTMLDivElement>(null)
 
-    // Initialize from URL on mount
-    useEffect(() => {
-        if (hasInitialized) return;
-
-        const state = algebraTilesURLSerializer.deserialize(searchParams);
-        if (state) {
+    const { copyShareableUrl } = useUrlState(algebraTilesURLSerializer, {
+        onRestore: (state) => {
             setTilesFromState(state.tiles);
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setShowLabels(state.showLabels);
             setShowY(state.showY);
             setSnapToGrid(state.snapToGrid);
         }
-        setHasInitialized(true);
-    }, [searchParams, hasInitialized, setTilesFromState]);
+    });
 
     // Keyboard shortcuts
     useEffect(() => {
@@ -134,73 +120,17 @@ function AlgebraTilesPageContent() {
             showY,
             snapToGrid
         };
-        const url = generateShareableURL(algebraTilesURLSerializer, state);
-        await copyURLToClipboard(url);
+        await copyShareableUrl(state);
         // TODO: Could add a toast notification here to confirm copy
-    }, [tiles, showLabels, showY, snapToGrid]);
+    }, [tiles, showLabels, showY, snapToGrid, copyShareableUrl]);
 
-    /**
-     * Handle tiles dropped from the sidebar onto the canvas.
-     */
-    const handleDropOnCanvas = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        const data = e.dataTransfer.getData('application/json');
-        if (!data) return;
-
-        try {
-            const { type, value } = JSON.parse(data);
-            if (!canvasRef.current) return;
-
-            const canvasRect = canvasRef.current.getBoundingClientRect();
-            let x = e.clientX - canvasRect.left;
-            let y = e.clientY - canvasRect.top;
-
-            // Snap to grid if enabled
-            if (snapToGrid) {
-                x = Math.round(x / 50) * 50;
-                y = Math.round(y / 50) * 50;
-            }
-
-            addTile(type, value, x, y);
-        } catch {
-            // Invalid JSON, ignore
+    const { handleDrop, handleDragOver } = useCanvasDrop<{ type: string; value: number }>({
+        canvasRef,
+        gridSize: snapToGrid ? 50 : undefined,
+        onDropData: (data, position) => {
+            addTile(data.type, data.value, position.x, position.y);
         }
-    }, [addTile, snapToGrid]);
-
-    /**
-     * Handle touch-drop from sidebar (custom event for touch/pen devices).
-     */
-    const handleTouchDrop = useCallback((e: Event) => {
-        const customEvent = e as CustomEvent<{ dragData: { type: string; value: number }; clientX: number; clientY: number }>;
-        const { dragData, clientX, clientY } = customEvent.detail;
-
-        if (!canvasRef.current) return;
-
-        const canvasRect = canvasRef.current.getBoundingClientRect();
-        let x = clientX - canvasRect.left;
-        let y = clientY - canvasRect.top;
-
-        if (snapToGrid) {
-            x = Math.round(x / 50) * 50;
-            y = Math.round(y / 50) * 50;
-        }
-
-        addTile(dragData.type, dragData.value, x, y);
-    }, [addTile, snapToGrid]);
-
-    // Register touchdrop listener on canvas
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        canvas.addEventListener('touchdrop', handleTouchDrop);
-        return () => canvas.removeEventListener('touchdrop', handleTouchDrop);
-    }, [handleTouchDrop]);
-
-    const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'copy';
-    }, []);
+    });
 
     const handleDragEnd = (id: string, pos: Position) => {
         // Check trash collision
@@ -246,40 +176,36 @@ function AlgebraTilesPageContent() {
             <div className="flex flex-1 overflow-hidden relative">
                 <TileSidebar onAddTile={addTile} showY={showY} />
 
-                <Canvas
-                    ref={canvasRef}
-                    gridSize={snapToGrid ? 50 : undefined}
-                    className="relative"
-                    onClick={clearSelection}
-                    onSelectionEnd={handleMarqueeSelect}
-                    onDrop={handleDropOnCanvas}
-                    onDragOver={handleDragOver}
-                >
-                    {tiles.map(tile => (
-                        <AlgebraTile
-                            key={tile.id}
-                            {...tile}
-                            isSelected={selectedIds.has(tile.id)}
-                            showLabels={showLabels}
-                            snapGridSize={snapToGrid ? 50 : undefined}
-                            onDragStart={handleDragStart}
-                            onDragMove={(id, pos, delta) => handleDragMove(id, delta)}
-                            onDragEnd={handleDragEnd}
-                            onSelect={handleSelect}
-                            onFlip={flipTile}
-                            onRotate={rotateTile}
-                        />
-                    ))}
+                <ToolScaffold helpContent={helpContent}>
+                    <Canvas
+                        ref={canvasRef}
+                        gridSize={snapToGrid ? 50 : undefined}
+                        className="relative"
+                        onClick={clearSelection}
+                        onSelectionEnd={handleMarqueeSelect}
+                        onDrop={handleDrop}
+                        onDragOver={handleDragOver}
+                    >
+                        {tiles.map(tile => (
+                            <AlgebraTile
+                                key={tile.id}
+                                {...tile}
+                                isSelected={selectedIds.has(tile.id)}
+                                showLabels={showLabels}
+                                snapGridSize={snapToGrid ? 50 : undefined}
+                                onDragStart={handleDragStart}
+                                onDragMove={(id, pos, delta) => handleDragMove(id, delta)}
+                                onDragEnd={handleDragEnd}
+                                onSelect={handleSelect}
+                                onFlip={flipTile}
+                                onRotate={rotateTile}
+                            />
+                        ))}
 
-                    <TrashZone ref={trashRef} isHovered={isTrashHovered} />
-                    <HelpButton onClick={() => setShowHelp(true)} />
-                </Canvas>
+                        <TrashZone ref={trashRef} isHovered={isTrashHovered} />
+                    </Canvas>
+                </ToolScaffold>
             </div>
-
-            {/* Help Modal */}
-            {showHelp && (
-                <HelpModal content={helpContent} onClose={() => setShowHelp(false)} />
-            )}
         </div>
     )
 }

@@ -9,6 +9,9 @@ import {
     deserializeBool,
     serializeNumber,
     deserializeNumber,
+    serializeList,
+    parseList,
+    hasAnyParam
 } from '@/lib/url-state';
 import { Counter, SortState, CounterType } from '../_hooks/use-counters';
 
@@ -52,13 +55,11 @@ const PARAM_COUNTER_TYPE = 'ct';
  * "p:32,32;p:128,32;n:224,32"
  */
 export function serializeCounters(counters: Counter[]): string {
-    if (counters.length === 0) return '';
-
-    return counters.map(c => {
+    return serializeList(counters, (c) => {
         const type = c.value > 0 ? 'p' : 'n';
         // Round positions to integers for cleaner URLs
         return `${type}:${Math.round(c.x)},${Math.round(c.y)}`;
-    }).join(';');
+    });
 }
 
 /**
@@ -69,31 +70,21 @@ export function serializeCounters(counters: Counter[]): string {
  * @returns Array of Counter objects with generated IDs
  */
 export function parseCounterString(str: string): Counter[] {
-    if (!str || str.trim() === '') return [];
-
-    const counters: Counter[] = [];
-    const parts = str.split(';');
-
-    for (let i = 0; i < parts.length; i++) {
-        if (counters.length >= MAX_COUNTERS) break;
-
-        const part = parts[i].trim();
-        if (!part) continue;
-
+    let index = 0;
+    return parseList(str, (part) => {
         // Parse "p:x,y" or "n:x,y" format
         const match = part.match(/^([pn]):(-?\d+),(-?\d+)$/);
-        if (match) {
-            const [, type, xStr, yStr] = match;
-            counters.push({
-                id: i,
-                value: type === 'p' ? 1 : -1,
-                x: parseInt(xStr, 10),
-                y: parseInt(yStr, 10),
-            });
-        }
-    }
-
-    return counters;
+        if (!match) return null;
+        const [, type, xStr, yStr] = match;
+        const counter: Counter = {
+            id: index,
+            value: type === 'p' ? 1 : -1,
+            x: parseInt(xStr, 10),
+            y: parseInt(yStr, 10),
+        };
+        index += 1;
+        return counter;
+    }, { maxItems: MAX_COUNTERS });
 }
 
 /**
@@ -154,13 +145,13 @@ export const counterURLSerializer: URLStateSerializer<CounterURLState> = {
 
     deserialize(params: URLSearchParams): CounterURLState | null {
         // Check if there are any relevant params at all
-        const hasAnyParam = [
+        const hasAny = hasAnyParam(params, [
             PARAM_COUNTERS, PARAM_NUMBER_LINE, PARAM_STATS,
             PARAM_SLOW_MODE, PARAM_SPEED, PARAM_SORT_STATE, PARAM_ORDERED,
             PARAM_COUNTER_TYPE
-        ].some(key => params.has(key));
+        ]);
 
-        if (!hasAnyParam) {
+        if (!hasAny) {
             return null; // No URL state to restore
         }
 

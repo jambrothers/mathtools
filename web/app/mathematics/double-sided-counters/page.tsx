@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { SetPageTitle } from '@/components/set-page-title';
 import { useCounters, CounterType } from './_hooks/use-counters';
 import { CountersToolbar } from './_components/counters-toolbar';
@@ -17,7 +16,8 @@ import { Canvas } from '@/components/tool-ui/canvas';
 import { HelpButton } from '@/components/tool-ui/help-button';
 import { HelpModal } from '@/components/tool-ui/help-modal';
 import { counterURLSerializer, CounterURLState } from './_lib/url-state';
-import { generateShareableURL, copyURLToClipboard } from '@/lib/url-state';
+import { useUrlState } from '@/lib/hooks/use-url-state';
+import { useCanvasDrop } from '@/lib/hooks/use-canvas-drop';
 import helpContent from './HELP.md';
 import { ResolutionGuard } from "@/components/tool-ui/resolution-guard";
 import { ExportModal } from '@/components/tool-ui/export-modal';
@@ -85,23 +85,17 @@ function CountersPageContent() {
         handleMarqueeSelect
     } = useCounters();
 
-    const searchParams = useSearchParams();
     const [showNumberLine, setShowNumberLine] = useState(false);
     const [showStats, setShowStats] = useState(true);
     const [counterType, setCounterType] = useState<CounterType>('numeric');
-    const [hasInitialized, setHasInitialized] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
     const [isExportOpen, setIsExportOpen] = useState(false);
     const [isTrashHovered, setIsTrashHovered] = useState(false);
     const canvasRef = useRef<HTMLDivElement>(null);
     const trashRef = useRef<HTMLDivElement>(null);
 
-    // Initialize from URL on mount
-    useEffect(() => {
-        if (hasInitialized) return;
-
-        const state = counterURLSerializer.deserialize(searchParams);
-        if (state) {
+    const { copyShareableUrl } = useUrlState(counterURLSerializer, {
+        onRestore: (state) => {
             setCountersFromState(
                 state.counters,
                 state.sortState,
@@ -109,13 +103,11 @@ function CountersPageContent() {
                 state.isSequentialMode,
                 state.animSpeed
             );
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setShowNumberLine(state.showNumberLine);
             setShowStats(state.showStats);
             setCounterType(state.counterType);
         }
-        setHasInitialized(true);
-    }, [searchParams, hasInitialized, setCountersFromState]);
+    });
 
     // Derived stats
     const positiveCount = counters.filter(c => c.value > 0).length;
@@ -178,69 +170,22 @@ function CountersPageContent() {
             showStats,
             counterType
         };
-        const url = generateShareableURL(counterURLSerializer, state);
-        await copyURLToClipboard(url);
+        await copyShareableUrl(state);
         // TODO: Could add a toast notification here to confirm copy
-    }, [counters, sortState, isOrdered, isSequentialMode, animSpeed, showNumberLine, showStats, counterType]);
+    }, [counters, sortState, isOrdered, isSequentialMode, animSpeed, showNumberLine, showStats, counterType, copyShareableUrl]);
 
     /**
      * Handle counters dropped from the sidebar onto the canvas.
      * Places the counter at the exact drop location instead of the next grid position.
      */
-    const handleDropOnCanvas = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        const data = e.dataTransfer.getData('application/json');
-        if (!data) return;
-
-        try {
-            const { type, value } = JSON.parse(data);
-            if (type === 'counter' && typeof value === 'number') {
-                // Get the canvas element's bounding rect to calculate relative position
-                if (canvasRef.current) {
-                    const rect = canvasRef.current.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-
-                    // Place counter at the drop location
-                    addCounterAtPosition(value, x, y);
-                }
-            }
-        } catch {
-            // Invalid JSON, ignore
-        }
-    }, [addCounterAtPosition]);
-
-    /**
-     * Handle touch-drop from sidebar (custom event for touch/pen devices).
-     * Similar to handleDropOnCanvas but uses custom event detail.
-     */
-    const handleTouchDrop = useCallback((e: Event) => {
-        const customEvent = e as CustomEvent<{ dragData: { type: string; value: number }; clientX: number; clientY: number }>;
-        const { dragData, clientX, clientY } = customEvent.detail;
-
-        if (dragData.type === 'counter' && typeof dragData.value === 'number') {
-            if (canvasRef.current) {
-                const rect = canvasRef.current.getBoundingClientRect();
-                const x = clientX - rect.left;
-                const y = clientY - rect.top;
-                addCounterAtPosition(dragData.value, x, y);
+    const { handleDrop, handleDragOver } = useCanvasDrop<{ type: string; value: number }>({
+        canvasRef,
+        onDropData: (data, position) => {
+            if (data.type === 'counter' && typeof data.value === 'number') {
+                addCounterAtPosition(data.value, position.x, position.y);
             }
         }
-    }, [addCounterAtPosition]);
-
-    // Register touchdrop listener on canvas
-    React.useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        canvas.addEventListener('touchdrop', handleTouchDrop);
-        return () => canvas.removeEventListener('touchdrop', handleTouchDrop);
-    }, [handleTouchDrop]);
-
-    const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'copy';
-    }, []);
+    });
 
     const handleCounterDragMove = useCallback((id: number, delta: { x: number, y: number }, position: { x: number, y: number }) => {
         handleDragMove(id, delta);
@@ -380,7 +325,7 @@ function CountersPageContent() {
                     ref={canvasRef}
                     gridSize={40}
                     data-testid="counter-canvas"
-                    onDrop={handleDropOnCanvas}
+                    onDrop={handleDrop}
                     onDragOver={handleDragOver}
                     onClick={() => clearSelection()}
                     onSelectionEnd={handleMarqueeSelect}
