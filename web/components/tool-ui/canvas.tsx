@@ -151,7 +151,8 @@ export const Canvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
                 {/* Marquee Box */}
                 <div
                     ref={marqueeRef}
-                    className="absolute bg-indigo-500/20 border border-indigo-500 z-50 pointer-events-none hidden"
+                    className="absolute bg-indigo-500/20 border border-indigo-500 z-50 pointer-events-none"
+                    style={{ display: "none" }}
                 />
             </div>
         )
