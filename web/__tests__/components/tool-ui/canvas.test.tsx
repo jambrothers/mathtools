@@ -31,7 +31,7 @@ describe('Canvas', () => {
             const marquee = container.querySelector('[class*="border-indigo"]');
             // The marquee element is always present but hidden
             expect(marquee).toBeInTheDocument();
-            expect(marquee).toHaveClass('hidden');
+            expect(marquee).not.toBeVisible();
         });
 
         it('shows marquee box during pointer drag', () => {
