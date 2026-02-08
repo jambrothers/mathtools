@@ -29,7 +29,9 @@ describe('Canvas', () => {
         it('does not show marquee initially', () => {
             const { container } = render(<Canvas data-testid="canvas" />);
             const marquee = container.querySelector('[class*="border-indigo"]');
-            expect(marquee).not.toBeInTheDocument();
+            // The marquee element is always present but hidden
+            expect(marquee).toBeInTheDocument();
+            expect(marquee).not.toBeVisible();
         });
 
         it('shows marquee box during pointer drag', () => {
@@ -45,7 +47,8 @@ describe('Canvas', () => {
             fireEvent.pointerMove(canvas, { clientX: 200, clientY: 200 });
 
             const marquee = container.querySelector('[class*="border-indigo"]');
-            expect(marquee).toBeInTheDocument();
+            expect(marquee).toBeVisible();
+            // Should not have hidden class (checking style because we override class with inline style)
         });
 
         it('calls onSelectionEnd with rect when drag exceeds threshold', () => {
@@ -101,11 +104,11 @@ describe('Canvas', () => {
             fireEvent.pointerDown(canvas, { clientX: 100, clientY: 100, target: canvas });
             fireEvent.pointerMove(canvas, { clientX: 200, clientY: 200 });
 
-            expect(container.querySelector('[class*="border-indigo"]')).toBeInTheDocument();
+            expect(container.querySelector('[class*="border-indigo"]')).toBeVisible();
 
             fireEvent.pointerUp(canvas, { clientX: 200, clientY: 200 });
 
-            expect(container.querySelector('[class*="border-indigo"]')).not.toBeInTheDocument();
+            expect(container.querySelector('[class*="border-indigo"]')).not.toBeVisible();
         });
 
         it('clears marquee on pointer leave', () => {
@@ -120,11 +123,11 @@ describe('Canvas', () => {
             fireEvent.pointerDown(canvas, { clientX: 100, clientY: 100, target: canvas });
             fireEvent.pointerMove(canvas, { clientX: 200, clientY: 200 });
 
-            expect(container.querySelector('[class*="border-indigo"]')).toBeInTheDocument();
+            expect(container.querySelector('[class*="border-indigo"]')).toBeVisible();
 
             fireEvent.pointerLeave(canvas);
 
-            expect(container.querySelector('[class*="border-indigo"]')).not.toBeInTheDocument();
+            expect(container.querySelector('[class*="border-indigo"]')).not.toBeVisible();
         });
 
         it('does not start marquee when clicking on child elements', () => {
@@ -139,7 +142,7 @@ describe('Canvas', () => {
             fireEvent.pointerMove(container, { clientX: 100, clientY: 100 });
 
             const marquee = container.querySelector('[class*="border-indigo"]');
-            expect(marquee).not.toBeInTheDocument();
+            expect(marquee).not.toBeVisible();
         });
     });
 
