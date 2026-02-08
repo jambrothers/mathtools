@@ -1,5 +1,7 @@
 import {
-    URLStateSerializer
+    URLStateSerializer,
+    serializeList,
+    parseList
 } from '@/lib/url-state';
 import { CircuitNode, Connection, ComponentTypeName, generateId } from '../constants';
 
@@ -25,9 +27,7 @@ const PARAM_WIRES = 'w';
  * - `state`: Optional boolean state (0/1), mainly for Input nodes.
  */
 export function serializeNodes(nodes: CircuitNode[]): string {
-    if (!nodes.length) return '';
-
-    return nodes.map(node => {
+    return serializeList(nodes, (node) => {
         const typeCode = getTypeCode(node.type);
         const x = Math.round(node.x);
         const y = Math.round(node.y);
@@ -39,23 +39,18 @@ export function serializeNodes(nodes: CircuitNode[]): string {
         let part = `${typeCode}:${node.id}:${x},${y}:${encodedLabel}`;
         if (stateVal) part += `:${stateVal}`;
         return part;
-    }).join(';');
+    });
 }
 
 /**
  * Parse compact node string to CircuitNode array.
  */
 export function parseNodeString(str: string): CircuitNode[] {
-    if (!str) return [];
-
-    const nodes: CircuitNode[] = [];
-    const parts = str.split(';');
-
-    for (const part of parts) {
+    return parseList(str, (part) => {
         // Try parsing: T:id:x,y:Label(:state)
         // Regex: T:id:x,y:Label(:state)?
         const sections = part.split(':');
-        if (sections.length < 4) continue;
+        if (sections.length < 4) return null;
 
         const typeCode = sections[0];
         const id = sections[1];
@@ -67,31 +62,28 @@ export function parseNodeString(str: string): CircuitNode[] {
         const y = parseInt(pos[1] || '0');
         const type = getTypeFromCode(typeCode);
 
-        if (!type) continue;
+        if (!type) return null;
 
-        if (type) {
-            let label = encodedLabel;
-            try {
-                label = decodeURIComponent(encodedLabel);
-            } catch {
-                // Fallback for legacy URLs or malformed encoding
-                label = encodedLabel;
-            }
-
-            const node: CircuitNode = {
-                id,
-                type,
-                x,
-                y,
-                label
-            };
-            if (stateStr !== undefined && stateStr !== '') {
-                node.state = stateStr === '1';
-            }
-            nodes.push(node);
+        let label = encodedLabel;
+        try {
+            label = decodeURIComponent(encodedLabel);
+        } catch {
+            // Fallback for legacy URLs or malformed encoding
+            label = encodedLabel;
         }
-    }
-    return nodes;
+
+        const node: CircuitNode = {
+            id,
+            type,
+            x,
+            y,
+            label
+        };
+        if (stateStr !== undefined && stateStr !== '') {
+            node.state = stateStr === '1';
+        }
+        return node;
+    });
 }
 
 /**
@@ -105,41 +97,34 @@ export function parseNodeString(str: string): CircuitNode[] {
  *   - `:` separates target ID from input index (for multi-input gates like AND/OR).
  */
 export function serializeConnections(connections: Connection[]): string {
-    if (!connections.length) return '';
-    return connections.map(c => `${c.from}>${c.to}:${c.inputIndex}`).join(';');
+    return serializeList(connections, (c) => `${c.from}>${c.to}:${c.inputIndex}`);
 }
 
 /**
  * Parse compact connection string.
  */
 export function parseConnectionString(str: string): Connection[] {
-    if (!str) return [];
-
-    const connections: Connection[] = [];
-    const parts = str.split(';');
-
-    for (const part of parts) {
+    return parseList(str, (part) => {
         // from>to:idx
         const arrowSplit = part.split('>');
-        if (arrowSplit.length !== 2) continue;
+        if (arrowSplit.length !== 2) return null;
 
         const from = arrowSplit[0];
         const remaining = arrowSplit[1];
         const colonSplit = remaining.split(':');
 
-        if (colonSplit.length !== 2) continue;
+        if (colonSplit.length !== 2) return null;
 
         const to = colonSplit[0];
         const idx = parseInt(colonSplit[1]);
 
-        connections.push({
+        return {
             id: generateId(), // Generate new ID for connection
             from,
             to,
             inputIndex: isNaN(idx) ? 0 : idx
-        });
-    }
-    return connections;
+        };
+    });
 }
 
 // Helpers for type codes

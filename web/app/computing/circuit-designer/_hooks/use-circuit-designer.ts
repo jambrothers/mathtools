@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useCallback, PointerEvent } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { useHistory } from '@/lib/hooks/use-history';
 import {
     CircuitNode,
@@ -16,11 +15,11 @@ import {
     DEFAULT_CONNECTIONS
 } from '../constants';
 import { circuitURLSerializer } from '../_lib/url-state';
-import { generateShareableURL, copyURLToClipboard } from '@/lib/url-state';
+import { useUrlState } from '@/lib/hooks/use-url-state';
+import { snapToGrid } from '@/lib/snap';
+import { selectIdsByRect } from '@/lib/selection';
 
 export function useCircuitDesigner() {
-    const searchParams = useSearchParams();
-
     // -- State --
     // -- State --
     const {
@@ -31,7 +30,10 @@ export function useCircuitDesigner() {
         redo,
         canUndo,
         canRedo,
-        clearHistory
+        clearHistory,
+        beginTransaction,
+        commitTransaction,
+        cancelTransaction
     } = useHistory<{ nodes: CircuitNode[], connections: Connection[] }>({
         nodes: DEFAULT_NODES,
         connections: DEFAULT_CONNECTIONS
@@ -54,21 +56,17 @@ export function useCircuitDesigner() {
     const trashRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLDivElement>(null);
     const hasDraggedRef = useRef(false);
-    const dragStartNodesRef = useRef<CircuitNode[]>([]); // To support undoing drags
 
     // -- Initialization --
-    useEffect(() => {
-        if (!searchParams || searchParams.toString() === '') return;
-
-        const restored = circuitURLSerializer.deserialize(searchParams);
-        if (restored) {
+    const { copyShareableUrl } = useUrlState(circuitURLSerializer, {
+        onRestore: (restored) => {
             pushState({
                 nodes: restored.nodes,
                 connections: restored.connections
             });
-            clearHistory(); // Clear history after loading from URL
+            clearHistory();
         }
-    }, [searchParams, pushState, clearHistory]);
+    });
 
     // -- Simulation --
     // Topological simulation - propagates signals through the circuit.
@@ -148,8 +146,8 @@ export function useCircuitDesigner() {
         const node = nodes.find(n => n.id === id);
         if (!node) return;
 
-        // Capture start nodes for undo
-        dragStartNodesRef.current = nodes;
+        // Start grouped history transaction
+        beginTransaction();
 
         // Capture start positions of ALL selected nodes for group drag
         const nodeStartPositions: Record<string, { x: number; y: number }> = {};
@@ -195,8 +193,8 @@ export function useCircuitDesigner() {
                             let newY = startPos.y + dy;
 
                             // Snap to grid
-                            newX = Math.round(newX / SNAP_GRID) * SNAP_GRID;
-                            newY = Math.round(newY / SNAP_GRID) * SNAP_GRID;
+                            newX = snapToGrid(newX, SNAP_GRID);
+                            newY = snapToGrid(newY, SNAP_GRID);
 
                             return { ...n, x: newX, y: newY };
                         }
@@ -238,15 +236,13 @@ export function useCircuitDesigner() {
                 // Clear selection
                 setSelectedIds(new Set());
                 setIsTrashHovered(false);
+                cancelTransaction();
             }
             // If just finished dragging without deletion, commit the drag to history
             else if (dragging && hasDraggedRef.current) {
-                // Push the current state (which has final positions) to history
-                // Provide the state BEFORE drag as the undo restore point
-                pushState(
-                    { nodes, connections }, // Current state is the "new" state
-                    { nodes: dragStartNodesRef.current, connections } // Previous state was nodes at start + SAME connections
-                );
+                commitTransaction();
+            } else if (dragging) {
+                cancelTransaction();
             }
 
             setDragging(null);
@@ -354,8 +350,8 @@ export function useCircuitDesigner() {
             label = type;
         }
 
-        const snappedX = Math.round(x / SNAP_GRID) * SNAP_GRID;
-        const snappedY = Math.round(y / SNAP_GRID) * SNAP_GRID;
+        const snappedX = snapToGrid(x, SNAP_GRID);
+        const snappedY = snapToGrid(y, SNAP_GRID);
 
         pushState(prev => ({
             ...prev,
@@ -385,29 +381,23 @@ export function useCircuitDesigner() {
 
     // Marquee Selection
     const handleMarqueeSelect = (rect: DOMRect) => {
-        const newSelected = new Set(selectedIds);
+        const selection = selectIdsByRect(
+            nodes,
+            rect,
+            (node) => {
+                const nodeW = 60;
+                const nodeH = 60;
+                return {
+                    left: node.x - nodeW / 2,
+                    top: node.y - nodeH / 2,
+                    right: node.x + nodeW / 2,
+                    bottom: node.y + nodeH / 2
+                };
+            },
+            (node) => node.id
+        );
 
-        nodes.forEach(node => {
-            const nodeW = 60;
-            const nodeH = 60;
-            const nodeL = node.x - nodeW / 2;
-            const nodeR = node.x + nodeW / 2;
-            const nodeT = node.y - nodeH / 2;
-            const nodeB = node.y + nodeH / 2;
-
-            const selL = rect.x;
-            const selR = rect.x + rect.width;
-            const selT = rect.y;
-            const selB = rect.y + rect.height;
-
-            const overlaps = !(nodeR < selL || nodeL > selR || nodeB < selT || nodeT > selB);
-
-            if (overlaps) {
-                newSelected.add(node.id);
-            }
-        });
-
-        setSelectedIds(newSelected);
+        setSelectedIds(new Set(selection as Set<string>));
     };
 
     const generateTruthTable = () => {
@@ -489,11 +479,7 @@ export function useCircuitDesigner() {
     };
 
     const handleCopyLink = async () => {
-        const url = generateShareableURL(
-            circuitURLSerializer,
-            { nodes, connections }
-        );
-        await copyURLToClipboard(url);
+        await copyShareableUrl({ nodes, connections });
     };
 
     // Helper for rendering

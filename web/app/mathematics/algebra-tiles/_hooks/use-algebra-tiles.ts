@@ -1,10 +1,12 @@
 "use client"
 
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback } from "react"
 import { useHistory } from "@/lib/hooks/use-history"
 import { Position } from "@/types/manipulatives"
 import { TILE_TYPES } from "../constants"
 import { groupTilesLogic, simplifyTilesLogic, parseExpression, getRotatedType } from "./algebra-logic"
+import { createId } from "@/lib/id"
+import { selectIdsByRect } from "@/lib/selection"
 
 export interface TileData {
     id: string
@@ -23,23 +25,23 @@ export function useAlgebraTiles() {
         undo,
         redo,
         canUndo,
-        canRedo
+        canRedo,
+        beginTransaction,
+        commitTransaction,
+        cancelTransaction
     } = useHistory<TileData[]>([])
 
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
-    // Track start state for clean undo
-    const dragStartRef = useRef<TileData[] | null>(null);
-
     const handleDragStart = useCallback(() => {
-        dragStartRef.current = tiles;
-    }, [tiles]);
+        beginTransaction();
+    }, [beginTransaction]);
 
     const addTile = useCallback((type: string, value: number, x: number = 100, y: number = 100) => {
         // Add slight random offset so they don't stack perfectly
         const offset = Math.random() * 20;
         const newTile: TileData = {
-            id: Math.random().toString(36).substr(2, 9),
+            id: createId('tile'),
             type,
             value,
             x: x + offset,
@@ -59,14 +61,10 @@ export function useAlgebraTiles() {
     }, [tiles, setTiles]);
 
     const updateTilePosition = useCallback((id: string, newPos: Position) => {
-        // This is called on drag end usually, so we push to history
-        // Pass the snapshot of state BEFORE drag started as the "previous" state
-        setTiles(
-            tiles.map(t => t.id === id ? { ...t, ...newPos } : t),
-            dragStartRef.current || undefined
-        );
-        dragStartRef.current = null;
-    }, [tiles, setTiles]);
+        // Update without history, then commit the drag transaction
+        updateTilesCurrent(prev => prev.map(t => t.id === id ? { ...t, ...newPos } : t));
+        commitTransaction();
+    }, [updateTilesCurrent, commitTransaction]);
 
     const handleDragMove = useCallback((id: string, delta: Position) => {
         // If draggable is selected, move ALL selected tiles.
@@ -148,7 +146,7 @@ export function useAlgebraTiles() {
                 values.forEach((val: number, i: number) => {
                     newTiles.push({
                         // Append timestamp or random to ensure unique ID 
-                        id: Math.random().toString(36).substr(2, 9) + `_${side}_${type}_${i}_${Date.now()}`,
+                        id: createId(`tile-${side}-${type}-${i}`),
                         type,
                         value: val,
                         x: currentX,
@@ -177,32 +175,21 @@ export function useAlgebraTiles() {
     }, [tiles, setTiles]);
 
     const handleMarqueeSelect = useCallback((rect: DOMRect) => {
-        const newSelection = new Set<string>();
-
-        tiles.forEach(tile => {
-            const def = TILE_TYPES[tile.type] || TILE_TYPES['1'];
-
-            // Check intersection
-            // Tile rect:
-            const tL = tile.x;
-            const tR = tile.x + def.width;
-            const tT = tile.y;
-            const tB = tile.y + def.height;
-
-            // Marquee rect (relative to canvas, same as tiles)
-            const mL = rect.x;
-            const mR = rect.x + rect.width;
-            const mT = rect.y;
-            const mB = rect.y + rect.height;
-
-            const intersects = !(tR < mL || tL > mR || tB < mT || tT > mB);
-
-            if (intersects) {
-                newSelection.add(tile.id);
-            }
-        });
-
-        setSelectedIds(newSelection);
+        const selection = selectIdsByRect(
+            tiles,
+            rect,
+            (tile) => {
+                const def = TILE_TYPES[tile.type] || TILE_TYPES['1'];
+                return {
+                    left: tile.x,
+                    top: tile.y,
+                    right: tile.x + def.width,
+                    bottom: tile.y + def.height
+                };
+            },
+            (tile) => tile.id
+        );
+        setSelectedIds(new Set(selection as Set<string>));
     }, [tiles]);
 
     const rotateTiles = useCallback((ids: string[]) => {
@@ -229,8 +216,9 @@ export function useAlgebraTiles() {
         if (canUndo) {
             undo();
             setSelectedIds(new Set());
+            cancelTransaction();
         }
-    }, [canUndo, undo]);
+    }, [canUndo, undo, cancelTransaction]);
 
     /**
      * Set tiles directly from external state (e.g., URL restoration).

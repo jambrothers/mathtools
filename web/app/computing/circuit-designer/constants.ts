@@ -1,5 +1,6 @@
 import React from 'react';
 import { Zap } from 'lucide-react';
+import { createId } from '@/lib/id';
 
 export type ComponentTypeName = 'INPUT' | 'OUTPUT' | 'AND' | 'OR' | 'NOT' | 'XOR';
 
@@ -183,7 +184,7 @@ export const COMPONENT_TYPES: Record<ComponentTypeName, ComponentDefinition> = {
     }
 };
 
-export const generateId = (): string => Math.random().toString(36).substr(2, 9);
+export const generateId = (): string => createId('circuit');
 
 export const getPortPosition = (nodeType: ComponentTypeName, portType: 'input' | 'output', index: number): { x: number; y: number } => {
     const def = COMPONENT_TYPES[nodeType];
