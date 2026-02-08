@@ -62,6 +62,7 @@ export function CountersToolbar({
                         setInput("");
                     }}
                     placeholder="e.g. 5 + -3"
+                    aria-label="Enter expression to add counters"
                     buttonLabel="Add"
                     disabled={isAnimating}
                 />
@@ -69,6 +70,7 @@ export function CountersToolbar({
                     value={counterType}
                     onChange={onCounterTypeChange}
                     disabled={isAnimating}
+                    aria-label="Select counter variable type"
                     className="shrink-0"
                 />
             </div>

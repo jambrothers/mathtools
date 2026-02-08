@@ -48,6 +48,7 @@ export function AlgebraToolbar({
                     onChange={setInput}
                     onSubmit={onVisualize}
                     placeholder="e.g. 2x + 1 - y + x^2"
+                    aria-label="Enter algebraic expression to visualize"
                     buttonLabel="Visualise"
                     buttonIcon={<Check size={16} />}
                 />

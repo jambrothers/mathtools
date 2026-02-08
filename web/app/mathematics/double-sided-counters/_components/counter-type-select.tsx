@@ -10,6 +10,7 @@ interface CounterTypeSelectProps {
     onChange: (type: CounterType) => void
     disabled?: boolean
     className?: string
+    "aria-label"?: string
 }
 
 const COUNTER_TYPE_OPTIONS: { value: CounterType; label: string }[] = [
@@ -26,12 +27,13 @@ const COUNTER_TYPE_OPTIONS: { value: CounterType; label: string }[] = [
  * Dropdown for selecting counter type.
  * Positioned next to the Add button in the toolbar.
  */
-export function CounterTypeSelect({ value, onChange, disabled, className }: CounterTypeSelectProps) {
+export function CounterTypeSelect({ value, onChange, disabled, className, "aria-label": ariaLabel }: CounterTypeSelectProps) {
     return (
         <select
             value={value}
             onChange={(e) => onChange(e.target.value as CounterType)}
             disabled={disabled}
+            aria-label={ariaLabel}
             className={cn(
                 "h-10 px-2 rounded-md text-sm font-medium",
                 "bg-slate-100 dark:bg-slate-800",
