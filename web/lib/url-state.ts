@@ -34,6 +34,55 @@ export interface URLStateSerializer<T> {
 }
 
 // ============================================
+// List Serialization Helpers
+// ============================================
+
+interface ListCodecOptions {
+    delimiter?: string;
+    maxItems?: number;
+    trim?: boolean;
+}
+
+export function serializeList<T>(
+    items: T[],
+    serializeItem: (item: T) => string,
+    options: ListCodecOptions = {}
+): string {
+    if (!items || items.length === 0) return '';
+    const { delimiter = ';' } = options;
+    return items.map(serializeItem).join(delimiter);
+}
+
+export function parseList<T>(
+    value: string | null | undefined,
+    parseItem: (part: string) => T | null,
+    options: ListCodecOptions = {}
+): T[] {
+    if (!value || value.trim() === '') return [];
+    const { delimiter = ';', maxItems = Infinity, trim = true } = options;
+
+    const parts = value.split(delimiter);
+    const items: T[] = [];
+
+    for (let i = 0; i < parts.length; i++) {
+        if (items.length >= maxItems) break;
+        const raw = trim ? parts[i].trim() : parts[i];
+        if (!raw) continue;
+        const parsed = parseItem(raw);
+        if (parsed !== null) {
+            items.push(parsed);
+        }
+    }
+
+    return items;
+}
+
+export function hasAnyParam(params: URLSearchParams | null | undefined, keys: string[]): boolean {
+    if (!params) return false;
+    return keys.some(key => params.has(key));
+}
+
+// ============================================
 // Boolean Helpers
 // ============================================
 

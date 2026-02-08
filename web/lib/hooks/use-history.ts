@@ -23,6 +23,9 @@ export function useHistory<T>(initialState: T, options: UseHistoryOptions = {}) 
 
     const { maxHistory = 20 } = options;
 
+    // Transaction snapshot for grouping many updates into a single history entry
+    const transactionRef = useRef<T | null>(null);
+
     const pushState = useCallback((newStateOrFn: T | ((prev: T) => T), currentOverride?: T) => {
         const currentState = stateRef.current; // Use ref to ensure we have latest commit
         const newState = typeof newStateOrFn === 'function'
@@ -52,6 +55,23 @@ export function useHistory<T>(initialState: T, options: UseHistoryOptions = {}) 
         // Sync ref immediately
         stateRef.current = newState;
         setState(newState);
+    }, []);
+
+    const beginTransaction = useCallback(() => {
+        if (transactionRef.current === null) {
+            transactionRef.current = stateRef.current;
+        }
+    }, []);
+
+    const commitTransaction = useCallback(() => {
+        if (transactionRef.current === null) return;
+        // Push current state with the captured snapshot as the previous value
+        pushState(stateRef.current, transactionRef.current);
+        transactionRef.current = null;
+    }, [pushState]);
+
+    const cancelTransaction = useCallback(() => {
+        transactionRef.current = null;
     }, []);
 
     const undo = useCallback(() => {
@@ -89,6 +109,9 @@ export function useHistory<T>(initialState: T, options: UseHistoryOptions = {}) 
         redo,
         canUndo: past.length > 0,
         canRedo: future.length > 0,
-        clearHistory
+        clearHistory,
+        beginTransaction,
+        commitTransaction,
+        cancelTransaction
     };
 }
