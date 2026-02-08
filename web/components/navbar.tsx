@@ -167,6 +167,7 @@ export function Navbar() {
                             <button
                                 onClick={() => setIsOpen(!isOpen)}
                                 className="inline-flex items-center justify-center p-2 rounded-md text-[var(--theme-muted)] hover:text-[var(--theme-main)] hover:bg-[var(--theme-card)] focus:outline-none"
+                                aria-label="Toggle mobile menu"
                             >
                                 {isOpen ? <X size={24} /> : <Menu size={24} />}
                             </button>
