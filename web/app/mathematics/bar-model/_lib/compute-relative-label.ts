@@ -23,20 +23,55 @@ function simplifyFraction(n: number, d: number): { n: number, d: number } {
     return { n: Math.round(n / divisor), d: Math.round(d / divisor) };
 }
 
+import { RelativeDisplayFormat } from "../constants";
+
 export function computeRelativeLabel(
     barWidth: number,
     totalBarWidth: number,
-    totalLabel: string
+    totalLabel: string,
+    displayFormat?: RelativeDisplayFormat
 ): string {
     if (!totalLabel || totalBarWidth === 0) return "?";
 
     // 1. Calculate ratio fraction (barWidth / totalBarWidth)
+    // Always use simplified fraction for storage/computation (this rounds to integers)
     const ratio = simplifyFraction(barWidth, totalBarWidth);
 
-    // If ratio is 0, return 0
+    // For non-fraction formats, we might want the exact value
+    const rawRatio = barWidth / totalBarWidth;
+
+    // 2. Handle Explicit Display Formats (if specified)
+    if (displayFormat && displayFormat !== 'total') {
+        // Handle zero specially
+        if (Math.abs(rawRatio) < 0.001) {
+            if (displayFormat === 'percentage') return "0%";
+            return "0";
+        }
+
+        if (displayFormat === 'fraction') {
+            if (ratio.n === 0) return "0";
+            return ratio.d === 1 ? String(ratio.n) : `${ratio.n}/${ratio.d}`;
+        }
+        if (displayFormat === 'decimal') {
+            // Remove trailing extra zeros if possible but keep up to 2 decimal places if needed
+            // For integers, return integer string
+            if (Math.abs(rawRatio % 1) < 0.001) return String(Math.round(rawRatio));
+            return String(Number(rawRatio.toFixed(2)));
+        }
+        if (displayFormat === 'percentage') {
+            const val = rawRatio * 100;
+            // If it's an integer percentage (e.g. 50%), show integer
+            if (val % 1 === 0) return `${val}%`;
+            return `${Number(val.toFixed(1))}%`;
+        }
+    }
+
+    // If ratio is 0 (and we are in 'total' mode), return 0
     if (ratio.n === 0) return "0";
 
-    // 2. Parse total label
+
+    // 3. Fallback to "Match Total" (Default Behavior)
+    // Parse total label to decide format
     const label = totalLabel.trim();
 
     // CASE: Percentage "100%"

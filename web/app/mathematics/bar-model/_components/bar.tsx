@@ -62,10 +62,10 @@ export function Bar({
     const displayLabel = React.useMemo(() => {
         if (bar.showRelativeLabel) {
             if (!totalBar) return "?";
-            return computeRelativeLabel(bar.width, totalBar.width, totalBar.label);
+            return computeRelativeLabel(bar.width, totalBar.width, totalBar.label, bar.displayFormat);
         }
         return bar.label;
-    }, [bar.label, bar.width, bar.showRelativeLabel, totalBar]);
+    }, [bar.label, bar.width, bar.showRelativeLabel, bar.displayFormat, totalBar]);
 
     // Sync local label with bar label when it changes externally
     React.useEffect(() => {

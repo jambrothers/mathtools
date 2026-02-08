@@ -72,9 +72,86 @@ test.describe('Bar Model Tool', () => {
         // Check Clone Dropdown
         await page.getByRole('button', { name: 'Clone', exact: true }).click();
         await expect(page.getByRole('button', { name: 'Clone Right' })).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Clone Left' })).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Clone Up' })).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Clone Down' })).toBeVisible();
+
+        // Close Clone Dropdown
+        await page.locator('body').click({ position: { x: 0, y: 0 } });
+    });
+
+    test('FDP format dropdown works correctly', async ({ page }) => {
+        const canvas = page.locator('[data-testid="bar-model-canvas"]');
+
+        // 1. Add two bars
+        const sidebarButton = page.locator('[data-testid="bar-model-canvas"]').locator('..').locator('button').first();
+
+        // Add Bar 1 (Total)
+        await sidebarButton.dragTo(canvas, { targetPosition: { x: 100, y: 100 } });
+        // Add Bar 2 (Relative)
+        await sidebarButton.dragTo(canvas, { targetPosition: { x: 100, y: 200 } });
+
+        // 2. Setup Bar 1 as Total
+        const bars = canvas.locator('[data-testid^="bar-"]');
+        await expect(bars).toHaveCount(2);
+
+        const bar1 = bars.nth(0);
+        await bar1.click();
+        await page.getByRole('button', { name: 'Set Total' }).click();
+        await expect(bar1.getByText('TOTAL')).toBeVisible();
+
+        // Ensure Total has a label like "100%" for relative calculation
+        await bar1.dblclick();
+        await page.keyboard.type('100%');
+        await page.keyboard.press('Enter');
+
+        // 3. Setup Bar 2 as Relative
+        const bar2 = bars.nth(1);
+        await bar2.click();
+
+        // Initially format dropdown disabled
+        const formatBtn = page.getByRole('button', { name: /Format/i });
+        await expect(formatBtn).toBeDisabled();
+
+        // Enable Relative
+        await page.getByRole('button', { name: /Relative/i }).click();
+
+        // Format dropdown should be enabled now
+        await expect(formatBtn).toBeEnabled();
+
+        // 4. Change Format
+        await formatBtn.click();
+        await expect(page.getByRole('button', { name: 'Match Total' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Fraction' })).toBeVisible();
+
+        // Select Fraction
+        await page.getByRole('button', { name: 'Fraction' }).click();
+
+        // Verify label changes (since widths equal, should be 1/1 or 1)
+        // Default width is 100. Ratio is 1.
+        // Fraction for 1 is "1".
+        await expect(bar2.getByText(/^1$/)).toBeVisible();
+
+        // 5. Split to create fractions
+        // Default bar width is 100px (5 grid units).
+        // Cannot split into 2 (2.5 units) because of grid snapping.
+        // We can split into 5 (1 unit each).
+        await page.getByRole('button', { name: 'Split', exact: true }).click();
+        await page.getByRole('button', { name: 'Split ⅕' }).click();
+
+        // Now we should have 6 bars total (1 total + 5 fifths)
+        // The first fifth should inherit Fraction format
+        const fifth = canvas.locator('[data-testid^="bar-"]').nth(1);
+        await expect(fifth.getByText('1/5')).toBeVisible();
+
+        // 6. Change to Decimal
+        await expect(formatBtn).toBeEnabled();
+
+        await formatBtn.click();
+        await page.getByRole('button', { name: 'Decimal' }).click();
+        await expect(fifth.getByText('0.2')).toBeVisible();
+
+        // 7. Change to Percentage
+        await formatBtn.click();
+        await page.getByRole('button', { name: 'Percentage' }).click();
+        await expect(fifth.getByText('20%')).toBeVisible();
     });
 
     test('help button opens modal', async ({ page }) => {

@@ -29,7 +29,7 @@ import {
     ToolbarSeparator,
 } from "@/components/tool-ui/toolbar"
 import { CopyLinkButton } from "@/components/tool-ui/copy-link-button"
-import { QuickLabelType } from "../constants"
+import { QuickLabelType, RelativeDisplayFormat } from "../constants"
 
 interface BarModelToolbarProps {
     /** Number of selected bars */
@@ -60,6 +60,12 @@ interface BarModelToolbarProps {
     onToggleRelative: () => void;
     /** Whether properties can be applied (checkboxes) */
     canToggleRelative: boolean;
+    /** Current display format of selected bars (undefined if mixed) */
+    displayFormat?: RelativeDisplayFormat;
+    /** Callback to set display format */
+    onSetDisplayFormat: (format: RelativeDisplayFormat) => void;
+    /** Whether format dropdown is enabled */
+    canSetDisplayFormat: boolean;
     /** Split validation states */
     canSplit: {
         half: boolean;
@@ -91,25 +97,30 @@ export function BarModelToolbar({
     onToggleTotal,
     onToggleRelative,
     canToggleRelative,
+    displayFormat,
+    onSetDisplayFormat,
+    canSetDisplayFormat,
     canSplit,
     onClear,
     onUndo,
     onCopyLink,
     onExport,
 }: BarModelToolbarProps) {
-    const [activeDropdown, setActiveDropdown] = useState<'quickLabel' | 'split' | 'clone' | null>(null);
+    const [activeDropdown, setActiveDropdown] = useState<'quickLabel' | 'split' | 'clone' | 'format' | null>(null);
     const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number } | null>(null);
 
     const quickLabelRef = useRef<HTMLDivElement>(null);
     const splitRef = useRef<HTMLDivElement>(null);
     const cloneRef = useRef<HTMLDivElement>(null);
+    const formatRef = useRef<HTMLDivElement>(null);
 
     // Update dropdown position when it opens
     useEffect(() => {
-        let ref: any = null;
+        let ref: React.RefObject<HTMLDivElement | null> | null = null;
         if (activeDropdown === 'quickLabel') ref = quickLabelRef;
         else if (activeDropdown === 'split') ref = splitRef;
         else if (activeDropdown === 'clone') ref = cloneRef;
+        else if (activeDropdown === 'format') ref = formatRef;
 
         if (ref && ref.current) {
             const rect = ref.current.getBoundingClientRect();
@@ -201,6 +212,61 @@ export function BarModelToolbar({
                     disabled={!canToggleRelative}
                     title="Toggle relative label display"
                 />
+
+                {/* Format Dropdown */}
+                <div className="relative" ref={formatRef}>
+                    <ToolbarButton
+                        icon={<span className="text-xs font-bold">FDP</span>}
+                        rightIcon={<ChevronDown size={14} className="text-slate-400 group-hover:text-slate-600 dark:text-slate-500 dark:group-hover:text-slate-400" />}
+                        label="Format"
+                        onClick={() => setActiveDropdown(activeDropdown === 'format' ? null : 'format')}
+                        disabled={!canSetDisplayFormat}
+                        title="Set display format (Fraction, Decimal, Percentage)"
+                    />
+                </div>
+                {activeDropdown === 'format' && dropdownPos && typeof document !== 'undefined' && createPortal(
+                    <>
+                        {/* Backdrop */}
+                        <div
+                            className="fixed inset-0 z-[100]"
+                            onClick={() => setActiveDropdown(null)}
+                        />
+                        {/* Dropdown menu */}
+                        <div
+                            className="fixed z-[101] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg min-w-[140px]"
+                            style={{
+                                top: dropdownPos.top,
+                                left: dropdownPos.left,
+                            }}
+                        >
+                            <button
+                                className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700 first:rounded-t-lg transition-colors flex items-center justify-between ${displayFormat === 'total' || !displayFormat ? 'font-semibold text-blue-600 dark:text-blue-400' : ''}`}
+                                onClick={() => { onSetDisplayFormat('total'); setActiveDropdown(null); }}
+                            >
+                                Match Total
+                            </button>
+                            <button
+                                className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center justify-between ${displayFormat === 'fraction' ? 'font-semibold text-blue-600 dark:text-blue-400' : ''}`}
+                                onClick={() => { onSetDisplayFormat('fraction'); setActiveDropdown(null); }}
+                            >
+                                Fraction
+                            </button>
+                            <button
+                                className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center justify-between ${displayFormat === 'decimal' ? 'font-semibold text-blue-600 dark:text-blue-400' : ''}`}
+                                onClick={() => { onSetDisplayFormat('decimal'); setActiveDropdown(null); }}
+                            >
+                                Decimal
+                            </button>
+                            <button
+                                className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700 last:rounded-b-lg transition-colors flex items-center justify-between ${displayFormat === 'percentage' ? 'font-semibold text-blue-600 dark:text-blue-400' : ''}`}
+                                onClick={() => { onSetDisplayFormat('percentage'); setActiveDropdown(null); }}
+                            >
+                                Percentage
+                            </button>
+                        </div>
+                    </>,
+                    document.body
+                )}
 
                 <ToolbarSeparator />
 

@@ -27,6 +27,9 @@ export type QuickLabelType = 'x' | 'y' | '?' | 'units' | 'relative';
 export const SPLIT_PARTS = [2, 3, 5] as const;
 export type SplitPart = typeof SPLIT_PARTS[number];
 
+/** Display format for relative labels */
+export type RelativeDisplayFormat = 'total' | 'fraction' | 'decimal' | 'percentage';
+
 // =============================================================================
 // Color Definitions
 // =============================================================================

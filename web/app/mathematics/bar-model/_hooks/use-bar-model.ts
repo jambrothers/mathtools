@@ -16,6 +16,7 @@ import {
     BAR_HEIGHT,
     QuickLabelType,
     SplitPart,
+    RelativeDisplayFormat,
 } from "../constants"
 
 // =============================================================================
@@ -39,6 +40,8 @@ export interface BarData {
     isTotal?: boolean;
     /** Whether to show a dynamically computed relative label */
     showRelativeLabel?: boolean;
+    /** Display format for relative labels (optional, defaults to 'total') */
+    displayFormat?: RelativeDisplayFormat;
 }
 
 export interface UseBarModelReturn {
@@ -54,6 +57,7 @@ export interface UseBarModelReturn {
     updateBarLabel: (id: string, label: string) => void;
     setBarAsTotal: (id: string, isTotal: boolean) => void;
     toggleRelativeLabel: () => void;
+    setDisplayFormat: (format: RelativeDisplayFormat) => void;
 
     // Movement/Resize
     moveBar: (id: string, x: number, y: number) => void;
@@ -203,6 +207,13 @@ export function useBarModel(): UseBarModelReturn {
         if (selectedIds.size === 0) return;
         pushBars(prev => prev.map(b =>
             selectedIds.has(b.id) ? { ...b, showRelativeLabel: !b.showRelativeLabel } : b
+        ));
+    }, [pushBars, selectedIds]);
+
+    const setDisplayFormat = useCallback((format: RelativeDisplayFormat): void => {
+        if (selectedIds.size === 0) return;
+        pushBars(prev => prev.map(b =>
+            selectedIds.has(b.id) ? { ...b, displayFormat: format } : b
         ));
     }, [pushBars, selectedIds]);
 
@@ -389,6 +400,7 @@ export function useBarModel(): UseBarModelReturn {
             label: '', // Reset label
             isTotal: false,
             showRelativeLabel: allRelative,
+            displayFormat: selectedBars[0].displayFormat, // Inherit format from first bar
         };
 
         pushBars(prev => {
@@ -424,6 +436,7 @@ export function useBarModel(): UseBarModelReturn {
                     width: Math.max(MIN_BAR_WIDTH, width),
                     label: '', // No label on split
                     showRelativeLabel: bar.showRelativeLabel, // Inherit relative label
+                    displayFormat: bar.displayFormat, // Inherit format
                     isTotal: false, // Split parts can't be total
                 });
                 currentX += minPartWidth;
@@ -552,6 +565,7 @@ export function useBarModel(): UseBarModelReturn {
         applyQuickLabel,
         toggleTotal,
         toggleRelativeLabel,
+        setDisplayFormat,
         undo,
         canUndo,
         clearAll,

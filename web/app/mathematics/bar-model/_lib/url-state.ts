@@ -7,6 +7,7 @@
 
 import { URLStateSerializer } from '@/lib/url-state';
 import { BarData } from '../_hooks/use-bar-model';
+import { RelativeDisplayFormat } from '../constants';
 
 // =============================================================================
 // Types
@@ -44,12 +45,20 @@ export function serializeBars(bars: BarData[]): string {
         if (bar.isTotal) flags |= 1;
         if (bar.showRelativeLabel) flags |= 2;
 
-        // If flags is 0, we can omit it to keep URL short (optional, but let's be explicit for now for consistency)
-        // Actually, to keep it backward compatible/cleaner, let's just always append it if > 0, 
-        // or we can append it always. The parsing logic needs to handle optionality.
-        // Let's append it always for simplicity in parsing for now, or use a specific format.
-        // Current format: colorIndex:label,x,y,width
-        // New format: colorIndex:label,x,y,width,flags
+        // Encode display format bits 2-3
+        // 0 (00) = total/undefined
+        // 1 (01) = fraction
+        // 2 (10) = decimal
+        // 3 (11) = percentage
+        if (bar.displayFormat) {
+            let formatBits = 0;
+            switch (bar.displayFormat) {
+                case 'fraction': formatBits = 1; break;
+                case 'decimal': formatBits = 2; break;
+                case 'percentage': formatBits = 3; break;
+            }
+            flags |= (formatBits << 2);
+        }
 
         return `${bar.colorIndex}:${encodedLabel},${Math.round(bar.x)},${Math.round(bar.y)},${Math.round(bar.width)},${flags}`;
     }).join(';');
@@ -100,6 +109,7 @@ export function parseBarsString(str: string): BarData[] {
 
             let isTotal = false;
             let showRelativeLabel = false;
+            let parsedDisplayFormat: RelativeDisplayFormat | undefined = undefined;
 
             if (coordsAndFlags.length >= 4) {
                 const flags = parseInt(coordsAndFlags[3], 10);
@@ -115,6 +125,24 @@ export function parseBarsString(str: string): BarData[] {
                         isTotal = hasIsTotal;
                         showRelativeLabel = hasShowRelativeLabel;
                     }
+
+                    // Parse display format bits 2-3
+                    const formatBits = (flags >> 2) & 3;
+                    let displayFormat: RelativeDisplayFormat | undefined = undefined;
+
+                    if (formatBits === 1) displayFormat = 'fraction';
+                    else if (formatBits === 2) displayFormat = 'decimal';
+                    else if (formatBits === 3) displayFormat = 'percentage';
+                    else displayFormat = 'total'; // Default to total/undefined
+
+                    // Actually 'total' is the default, so we can just leave it undefined or set it to 'total'.
+                    // The types says optional, default to 'total' logic in hook/component handle undefined as total.
+                    // But let's set it if we read it.
+                    if (formatBits !== 0) {
+                        parsedDisplayFormat = displayFormat;
+                    } else {
+                        parsedDisplayFormat = 'total';
+                    }
                 }
             }
 
@@ -129,6 +157,7 @@ export function parseBarsString(str: string): BarData[] {
                 label,
                 isTotal,
                 showRelativeLabel,
+                displayFormat: parsedDisplayFormat,
             });
         } catch {
             // Skip invalid parts

@@ -86,6 +86,7 @@ function BarModelPageContent() {
         applyQuickLabel,
         toggleTotal,
         toggleRelativeLabel,
+        setDisplayFormat,
         undo,
         canUndo,
         clearAll,
@@ -110,6 +111,14 @@ function BarModelPageContent() {
     };
 
     const canToggleRelative = selectedCount > 0;
+
+    // Check if any selected bar has relative label enabled
+    const hasRelativeSelected = selectedBars.some(b => b.showRelativeLabel);
+
+    // Get common display format if all selected share it, otherwise undefined
+    const commonDisplayFormat = selectedBars.length > 0 && selectedBars.every(b => b.displayFormat === selectedBars[0].displayFormat)
+        ? selectedBars[0].displayFormat
+        : undefined;
 
     // Local UI State
     const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -426,6 +435,9 @@ function BarModelPageContent() {
                 onToggleTotal={toggleTotal}
                 onToggleRelative={toggleRelativeLabel}
                 canToggleRelative={canToggleRelative}
+                displayFormat={commonDisplayFormat}
+                onSetDisplayFormat={setDisplayFormat}
+                canSetDisplayFormat={hasRelativeSelected}
                 canSplit={canSplit}
                 onClear={handleClear}
                 onUndo={undo}

@@ -92,4 +92,71 @@ describe('useBarModel', () => {
             expect(b.showRelativeLabel).toBe(true);
         });
     });
+
+    it('should update displayFormat for selected bars', () => {
+        const { result } = renderHook(() => useBarModel());
+        let barId: string;
+
+        // 1. Add a bar
+        act(() => {
+            const bar = result.current.addBar(0, 0, 0, 'Test Bar');
+            barId = bar.id;
+        });
+
+        // 2. Select the bar
+        act(() => {
+            result.current.selectBars([barId]);
+        });
+
+        // 3. Set Format to Percentage
+        act(() => {
+            result.current.setDisplayFormat('percentage');
+        });
+
+        // Verify
+        const bar = result.current.bars.find(b => b.id === barId);
+        expect(bar?.displayFormat).toBe('percentage');
+
+        // 4. Set Format to Fraction
+        act(() => {
+            result.current.setDisplayFormat('fraction');
+        });
+
+        // Verify
+        const bar2 = result.current.bars.find(b => b.id === barId);
+        expect(bar2?.displayFormat).toBe('fraction');
+    });
+
+    it('should inherit displayFormat when splitting', () => {
+        const { result } = renderHook(() => useBarModel());
+        let barId: string;
+
+        // Add
+        act(() => {
+            const bar = result.current.addBar(0, 0, 0, 'Test Bar');
+            barId = bar.id;
+        });
+
+        // Select
+        act(() => {
+            result.current.selectBars([barId]);
+        });
+
+        // Set Format
+        act(() => {
+            result.current.setDisplayFormat('decimal');
+        });
+
+        // Split
+        act(() => {
+            result.current.splitSelected(2);
+        });
+
+        // Verify
+        const bars = result.current.bars;
+        expect(bars).toHaveLength(2); // Original removed, 2 new added
+        bars.forEach(b => {
+            expect(b.displayFormat).toBe('decimal');
+        });
+    });
 });
