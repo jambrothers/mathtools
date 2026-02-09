@@ -73,7 +73,7 @@ export function ToolbarButton({ icon, rightIcon, label, active, variant = 'defau
         <button
             type="button"
             className={cn(
-                "px-3 py-2 border text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed h-10 whitespace-nowrap",
+                "px-3 py-2 border text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed h-10 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900",
                 variants[variant],
                 className
             )}
