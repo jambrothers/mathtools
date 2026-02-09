@@ -59,16 +59,43 @@ export function parseList<T>(
     options: ListCodecOptions = {}
 ): T[] {
     if (!value || value.trim() === '') return [];
-    const { delimiter = ';', maxItems = Infinity, trim = true } = options;
+    // SECURITY: Default maxItems to 1000 to prevent DoS via unbounded deserialization
+    // Use an iterative approach instead of split() to avoid allocation spikes
+    const { delimiter = ';', maxItems = 1000, trim = true } = options;
 
-    const parts = value.split(delimiter);
     const items: T[] = [];
+    let startIndex = 0;
+    const len = value.length;
+    const delimiterLen = delimiter.length;
 
-    for (let i = 0; i < parts.length; i++) {
-        if (items.length >= maxItems) break;
-        const raw = trim ? parts[i].trim() : parts[i];
-        if (!raw) continue;
-        const parsed = parseItem(raw);
+    // Safety break: if delimiter is empty, fall back to split for character iteration
+    if (delimiterLen === 0) {
+        const parts = value.split('');
+        for (let i = 0; i < parts.length; i++) {
+            if (items.length >= maxItems) break;
+            const parsed = parseItem(parts[i]);
+            if (parsed !== null) items.push(parsed);
+        }
+        return items;
+    }
+
+    while (startIndex < len && items.length < maxItems) {
+        let delimiterIndex = value.indexOf(delimiter, startIndex);
+
+        // If no more delimiters, take the rest of the string
+        if (delimiterIndex === -1) {
+            delimiterIndex = len;
+        }
+
+        const raw = value.substring(startIndex, delimiterIndex);
+        const processed = trim ? raw.trim() : raw;
+
+        // Move start index past the delimiter
+        startIndex = delimiterIndex + delimiterLen;
+
+        if (!processed) continue;
+
+        const parsed = parseItem(processed);
         if (parsed !== null) {
             items.push(parsed);
         }
