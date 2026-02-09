@@ -97,12 +97,12 @@ export function useAlgebraTiles() {
             if (next.has(id)) next.delete(id);
             else next.add(id);
         } else {
-            // If it is already selected and it is the ONLY one selected, do nothing
-            if (current.has(id) && current.size === 1) {
-                next = current;
-            } else {
-                next = new Set([id]);
+            // If already selected, do nothing (preserve selection for group drag)
+            // This matches original behavior
+            if (current.has(id)) {
+                return;
             }
+            next = new Set([id]);
         }
 
         if (next !== current) {
@@ -206,7 +206,9 @@ export function useAlgebraTiles() {
             },
             (tile) => tile.id
         );
-        setSelectedIds(new Set(selection as Set<string>));
+        const next = new Set(selection as Set<string>);
+        selectedIdsRef.current = next;
+        setSelectedIds(next);
     }, [tiles]);
 
     const rotateTiles = useCallback((ids: string[]) => {
