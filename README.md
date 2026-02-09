@@ -17,7 +17,9 @@ A comprehensive environment for modeling algebraic concepts such as:
 - Solving linear equations
 - Factorizing quadratics
 - Exploring integer arithmetic
+
 *Status: Architecture finalized (Hooks + Components).*
+[Documentation](./web/app/mathematics/algebra-tiles/HELP.md)
 
 ### 2. Double Sided Counters
 A tool for teaching integer operations using positive (yellow) and negative (red) counters. Features include:
@@ -26,7 +28,9 @@ A tool for teaching integer operations using positive (yellow) and negative (red
 - Automated number line tracking
 - Sorting and grouping animations
 - **Shareable URLs**: Generate links to share exact counter configurations
+
 *Status: Architecture aligned with project standards. URL state sharing implemented.*
+[Documentation](./web/app/mathematics/double-sided-counters/HELP.md)
 
 ### 3. Bar Model
 A visualization tool for problem-solving using proportional bars.
@@ -35,14 +39,18 @@ A visualization tool for problem-solving using proportional bars.
     - Comparison braces (Totals).
     - Relative and custom labeling.
     - Drag-and-drop interface.
+
 *Status: Stable. Core functionality implemented.*
+[Documentation](./web/app/mathematics/bar-model/HELP.md)
 
 ### 4. Linear Equations
 An interactive graph for exploring linear relationships ($y = mx + c$).
 - **Interaction Modes**: Move ($c$), Rotate ($m$), and Select.
 - **Visual Aids**: Slope triangles, intercepts, and equation display.
 - **Export**: Save graphs as PNG or SVG.
+
 *Status: Stable. Export and interaction modes available.*
+[Documentation](./web/app/mathematics/linear-equations/HELP.md)
 
 ### 5. Circuit Designer
 A logic gate simulator for Computer Science students.
@@ -52,7 +60,9 @@ A logic gate simulator for Computer Science students.
     - Truth Table generation and validation.
     - Multi-selection and Drag-to-Delete.
     - Quick Demo presets.
+
 *Status: Stable. Recently updated with multi-select and enhanced UI.*
+[Documentation](./web/app/computing/circuit-designer/HELP.md)
 
 ## Key Features
 
@@ -89,12 +99,12 @@ mathtools/
 │   ├── lib/               # Utilities and hooks
 │   ├── public/            # Static assets
 │   └── ...
-├── api/                    # Future: FastAPI backend (Cloudflare Workers)
 └── README.md
 ```
 
 - **`web/app/`**: Contains the route segments and page definitions.
-  - **`mathematics/`**: Dedicated section for the interactive mathematics tools.
+  - **`mathematics/`**: Dedicated section for interactive mathematics tools (e.g., Algebra Tiles).
+  - **`computing/`**: Dedicated section for computing tools (e.g., Circuit Designer).
     - **`[tool-name]/`**: Each tool (e.g., `algebra-tiles`) has its own subdirectory containing its page, `HELP.md`, and tool-specific local components.
 - **`components/`**: Shared reusable components.
   - **`tool-ui/`**: Components shared across multiple tools (e.g., `Canvas`, `TileBase`, `Toolbar`, `HelpModal`).
@@ -186,10 +196,10 @@ npm run test:watch
 - **Environment**: `jsdom` is used to simulate a browser environment.
 - **Library**: `react-testing-library` is used to render components and query the DOM in a way that resembles how users find elements.
 
-Tests are located in the `__tests__` directory at the project root, mirroring the `app/` and `components/` structure:
-- **Component Tests**: Unit tests for individual components (e.g., `__tests__/components/footer.test.tsx`).
-- **Page Tests**: Snapshot tests to ensure pages render correctly (e.g., `__tests__/app/page.test.tsx`).
-- **Logic Tests**: Integration tests for complex interactions (e.g., `__tests__/app/mathematics/double-sided-counters/page.test.tsx`).
+Tests are located in the `web/__tests__` directory, mirroring the `app/` and `components/` structure:
+- **Component Tests**: Unit tests for individual components (e.g., `web/__tests__/components/footer.test.tsx`).
+- **Page Tests**: Snapshot tests to ensure pages render correctly (e.g., `web/__tests__/app/page.test.tsx`).
+- **Logic Tests**: Integration tests for complex interactions (e.g., `web/__tests__/app/mathematics/double-sided-counters/page.test.tsx`).
 
 ### Adding New Tests
 
@@ -228,8 +238,8 @@ npm run test:e2e
 
 ### E2E Test Structure
 
-- **Location**: Tests are in the `e2e/` directory at the project root.
-- **Configuration**: `playwright.config.ts` defines browser settings and dev server startup.
+- **Location**: Tests are in the `web/e2e/` directory.
+- **Configuration**: `web/playwright.config.ts` defines browser settings and dev server startup.
 - **Browsers**: Tests run in Chromium by default.
 
 ### Example E2E Test

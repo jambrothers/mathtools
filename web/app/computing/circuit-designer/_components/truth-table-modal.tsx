@@ -24,6 +24,7 @@ export function TruthTableModal({ data, onClose, onRefresh }: TruthTableModalPro
                     </h2>
                     <button
                         onClick={onClose}
+                        aria-label="Close"
                         className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white"
                     >
                         <X size={24} />
