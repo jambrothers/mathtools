@@ -7,7 +7,7 @@
  * Provides a consistent UI across all tools.
  */
 
-import { Image, FileCode, X } from "lucide-react"
+import { Image as ImageIcon, FileCode, X } from "lucide-react"
 import { useEffect } from "react"
 
 interface ExportModalProps {
@@ -72,7 +72,7 @@ export function ExportModal({ isOpen, onClose, onExport, title = "Export" }: Exp
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-lg border-2 border-slate-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-all group"
                     >
                         <div className="p-2 rounded-md bg-indigo-100 dark:bg-indigo-900/50 group-hover:bg-indigo-200 dark:group-hover:bg-indigo-900 transition-colors">
-                            <Image size={20} className="text-indigo-600 dark:text-indigo-400" />
+                            <ImageIcon size={20} className="text-indigo-600 dark:text-indigo-400" />
                         </div>
                         <div className="flex-1 text-left">
                             <div className="font-medium text-slate-900 dark:text-slate-100">PNG Image</div>

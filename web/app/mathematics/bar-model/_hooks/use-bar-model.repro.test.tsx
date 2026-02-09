@@ -24,7 +24,7 @@ describe('useBarModel splitSelected bug', () => {
         });
 
         // Verify the bar has relative label enabled
-        let bar = result.current.bars.find(b => b.id === barId);
+        const bar = result.current.bars.find(b => b.id === barId);
         expect(bar?.showRelativeLabel).toBe(true);
 
         // 4. Split the bar

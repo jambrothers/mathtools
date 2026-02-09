@@ -2,7 +2,7 @@
 import React from 'react';
 import { render, fireEvent, screen } from '@testing-library/react';
 import { Bar } from '@/app/mathematics/bar-model/_components/bar';
-import { BAR_COLORS } from '@/app/mathematics/bar-model/constants';
+
 
 // Mock props
 const defaultProps = {

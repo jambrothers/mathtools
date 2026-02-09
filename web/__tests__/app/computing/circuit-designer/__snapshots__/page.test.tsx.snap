@@ -646,6 +646,10 @@ exports[`Circuit Designer Page matches snapshot 1`] = `
             />
           </svg>
         </button>
+        <div
+          class="absolute bg-indigo-500/20 border border-indigo-500 z-50 pointer-events-none"
+          style="display: none;"
+        />
       </div>
     </div>
   </div>

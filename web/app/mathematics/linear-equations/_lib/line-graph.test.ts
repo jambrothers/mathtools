@@ -1,4 +1,4 @@
-import { calculateLineEndpoints, calculateXIntercept, formatEquation, calculateSlopeTriangle, VIEWPORT } from './line-graph';
+import { calculateXIntercept, formatEquation, calculateSlopeTriangle } from './line-graph';
 
 describe('line-graph math', () => {
     describe('formatEquation', () => {

@@ -76,8 +76,7 @@ export function useCounters() {
         canUndo,
         clearHistory,
         beginTransaction,
-        commitTransaction,
-        cancelTransaction
+        commitTransaction
     } = useHistory<Counter[]>([]);
 
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
