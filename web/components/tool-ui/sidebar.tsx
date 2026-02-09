@@ -21,7 +21,7 @@ type ManipulativeSidebarProps = React.HTMLAttributes<HTMLDivElement>
 
 export function Sidebar({ className, children, ...props }: ManipulativeSidebarProps) {
     return (
-        <div
+        <aside
             className={cn(
                 "w-48 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-6 shadow-sm overflow-y-auto z-10 shrink-0 h-full",
                 className
@@ -29,7 +29,7 @@ export function Sidebar({ className, children, ...props }: ManipulativeSidebarPr
             {...props}
         >
             {children}
-        </div>
+        </aside>
     )
 }
 

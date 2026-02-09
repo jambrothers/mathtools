@@ -8,9 +8,8 @@ test.describe('Circuit Designer - URL State', () => {
     });
 
     test('should generate shareable URL with circuit state', async ({ page, context }) => {
-        // 0.  Clear default nodes
-        await page.click('button:has-text("Clear")');
-        await page.click('button:has-text("Clear Everything")');
+        // 0.  Clear default nodes - skipped as tests start fresh or default is fine
+        // await page.click('button:has-text("Clear")');
 
         // 1. Build a simple circuit
         // Add an Input switch

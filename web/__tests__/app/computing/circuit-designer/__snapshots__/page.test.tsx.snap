@@ -216,7 +216,7 @@ exports[`Circuit Designer Page matches snapshot 1`] = `
     <div
       class="flex flex-1 overflow-hidden relative"
     >
-      <div
+      <aside
         class="bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 flex flex-col gap-6 shadow-sm overflow-y-auto z-10 shrink-0 h-full w-56"
       >
         <div
@@ -412,7 +412,7 @@ exports[`Circuit Designer Page matches snapshot 1`] = `
             </li>
           </ul>
         </div>
-      </div>
+      </aside>
       <div
         class="touch-none select-none flex-1 relative bg-slate-50 dark:bg-slate-950 overflow-hidden cursor-crosshair"
         data-testid="canvas"
