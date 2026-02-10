@@ -9,7 +9,9 @@ import {
     exportSVGElement,
     exportHTMLElement,
     ExportOptions,
+    triggerDownload, // Added import
 } from './canvas-export';
+import * as htmlToImage from 'html-to-image'; // Added import
 
 describe('canvas-export', () => {
     beforeEach(() => {
@@ -115,7 +117,7 @@ describe('canvas-export', () => {
 
             await exportHTMLElement(element, options);
 
-            expect(require('html-to-image').toPng).toHaveBeenCalledWith(
+            expect(htmlToImage.toPng).toHaveBeenCalledWith(
                 element,
                 expect.objectContaining({ pixelRatio: 2 })
             );
@@ -141,7 +143,7 @@ describe('canvas-export', () => {
 
             await exportHTMLElement(element, options);
 
-            expect(require('html-to-image').toSvg).toHaveBeenCalledWith(
+            expect(htmlToImage.toSvg).toHaveBeenCalledWith(
                 element,
                 expect.anything()
             );
@@ -152,7 +154,6 @@ describe('canvas-export', () => {
 
     describe('triggerDownload', () => {
         it('should create download link and trigger click', () => {
-            const { triggerDownload } = require('./canvas-export');
 
             const mockBlob = new Blob(['test'], { type: 'text/plain' });
             const mockObjectURL = 'blob:mock-url';

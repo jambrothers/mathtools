@@ -31,7 +31,10 @@ export function useDraggable(
 
     // Refs to avoid re-attaching listeners on every render/move
     const optionsRef = React.useRef(options);
-    optionsRef.current = options;
+
+    React.useEffect(() => {
+        optionsRef.current = options;
+    }, [options]);
 
     const positionRef = React.useRef(position);
     React.useEffect(() => {

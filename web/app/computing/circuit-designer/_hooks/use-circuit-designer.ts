@@ -256,7 +256,7 @@ export function useCircuitDesigner() {
             window.removeEventListener('pointermove', handleWindowPointerMove);
             window.removeEventListener('pointerup', handleWindowPointerUp);
         };
-    }, [dragging, wiring, isTrashHovered, selectedIds, nodes, connections, pushState, updateState]);
+    }, [dragging, wiring, isTrashHovered, selectedIds, nodes, connections, pushState, updateState, commitTransaction, cancelTransaction]);
 
     const toggleInput = (e: PointerEvent<HTMLDivElement>, id: string) => {
         // Don't toggle if we just finished dragging

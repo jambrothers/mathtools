@@ -20,7 +20,7 @@ exports[`Home Page matches snapshot 1`] = `
             <h1
               class="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-[var(--theme-main)] mb-6"
             >
-              Interactive mathematics in
+              Interactive mathematics in 
               <br />
               the classroom
             </h1>

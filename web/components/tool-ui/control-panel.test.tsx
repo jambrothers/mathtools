@@ -76,7 +76,7 @@ describe('ControlPanel Components', () => {
                 />
             );
 
-            const input = screen.getByRole('slider', { hidden: true }); // inputs type=range act as sliders
+            // const input = screen.getByRole('slider', { hidden: true }); // inputs type=range act as sliders
             // Note: input type=range might not have role=slider by default in some setups depending on library version
             // It's safer to get by display value (but that's separate) or just inputs:
             // Actually getByRole('slider') works for <input type="range" />

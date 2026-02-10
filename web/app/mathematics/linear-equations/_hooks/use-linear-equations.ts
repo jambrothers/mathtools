@@ -1,12 +1,11 @@
 import { useState, useCallback, useEffect } from "react"
-import { useSearchParams, useRouter, usePathname } from "next/navigation"
+import { useSearchParams, usePathname } from "next/navigation"
 import { LineConfig, MAX_LINES, LINE_COLORS, DEFAULT_M, DEFAULT_C } from "../constants"
 import { linearEquationsSerializer } from "../_lib/url-state"
 import { generateShareableURL } from "@/lib/url-state"
 
 export function useLinearEquations() {
     const searchParams = useSearchParams()
-    const router = useRouter()
     const pathname = usePathname()
 
     // Initialize state from URL or defaults
@@ -25,14 +24,17 @@ export function useLinearEquations() {
     useEffect(() => {
         const state = linearEquationsSerializer.deserialize(searchParams)
         if (state) {
-            setLines(state.lines)
-            setActiveLineId(state.activeLineId)
-            setShowEquation(state.showEquation)
-            setShowIntercepts(state.showIntercepts)
-            setShowSlopeTriangle(state.showSlopeTriangle)
-            setSlopeTriangleSize(state.slopeTriangleSize)
-            setShowGradientCalculation(state.showGradientCalculation)
-            setShowGrid(state.showGrid)
+            // Defer updates to avoid synchronous render warning
+            setTimeout(() => {
+                setLines(state.lines)
+                setActiveLineId(state.activeLineId)
+                setShowEquation(state.showEquation)
+                setShowIntercepts(state.showIntercepts)
+                setShowSlopeTriangle(state.showSlopeTriangle)
+                setSlopeTriangleSize(state.slopeTriangleSize)
+                setShowGradientCalculation(state.showGradientCalculation)
+                setShowGrid(state.showGrid)
+            }, 0)
         } else {
             // Initialize with default line if no state in URL
             const defaultLine: LineConfig = {
@@ -42,10 +44,13 @@ export function useLinearEquations() {
                 color: LINE_COLORS[0],
                 visible: true
             }
-            setLines([defaultLine])
-            setActiveLineId(defaultLine.id)
+            // Defer updates
+            setTimeout(() => {
+                setLines([defaultLine])
+                setActiveLineId(defaultLine.id)
+            }, 0)
         }
-        setIsInitialized(true)
+        setTimeout(() => setIsInitialized(true), 0)
     }, [searchParams])
 
     // Update URL when state changes (debounced?)
@@ -54,23 +59,9 @@ export function useLinearEquations() {
     // But `useSearchParams` is read-only. We need to push router.
 
     // Helper to update URL
-    const updateURL = useCallback((newState: any) => {
-        const url = generateShareableURL(linearEquationsSerializer, newState, pathname)
-        router.replace(url, { scroll: false })
-    }, [pathname, router])
+    // URL updates are handled by the page component or effects if needed, 
+    // but here we are using local state for immediate feedback.
 
-    const updateState = useCallback((updates: Partial<any>) => {
-        // Construct new state
-        // We need current state values. Reliance on closure here is risky if not careful.
-        // Better to use functional updates where possible, but here we need to sync multiple things.
-
-        // This pattern might be simpler:
-        // When a setter is called, update local state AND trigger URL update.
-        // But preventing loops with the useEffect above is key.
-        // Actually, normally we might want: URL is truth -> State derives from URL.
-        // But sliders need instant feedback without router roundtrip lag.
-        // So: Local State -> Render. And Debounce -> URL Update.
-    }, [])
 
 
     // Methods

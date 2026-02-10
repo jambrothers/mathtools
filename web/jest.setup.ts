@@ -58,6 +58,7 @@ class MockDOMRect {
 
 jest.mock('next/image', () => ({
     __esModule: true,
+    /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
     default: ({
         priority,
         unoptimized,
@@ -70,6 +71,7 @@ jest.mock('next/image', () => ({
     }: any) => {
         return React.createElement('img', props)
     },
+    /* eslint-enable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 }))
 
 // Mock react-markdown to render content as basic HTML for testing

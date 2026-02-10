@@ -39,9 +39,8 @@ describe('useCounters Hook', () => {
         });
 
         // Trigger Cancel Pairs
-        let promise: Promise<void>;
         act(() => {
-            promise = result.current.cancelZeroPairs();
+            result.current.cancelZeroPairs();
         });
 
         // Advance timers to simulate animation steps

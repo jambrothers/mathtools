@@ -45,29 +45,14 @@ describe('Navbar', () => {
         expect(screen.getByText('Test Title')).toBeInTheDocument()
     })
 
-    it('toggles mobile menu', async () => {
-        // Need to mock window resize or ensure we test mobile view typically, 
-        // but strictly logic-wise we can check if the button exists and triggers state.
-        // However, the button is hidden on md screens. jsdom default width might differ.
-        // We can force the state update by interacting with the toggle button if visible.
-        // Ideally we'd set window.innerWidth but that can be flaky in jsdom without resizing.
-        // Let's assume standard render and just try to find the button.
+    it('renders the mobile menu toggle with accessible label', () => {
+        render(<Navbar />)
+        // The button is md:hidden, but in JSDOM default size it might be visible or hidden depending on setup.
+        // However, standard testing-library queries don't check visibility (display:none) by default unless configured.
+        // We just want to ensure the button exists with the correct aria-label.
 
-        // Update: The mobile menu button `md:hidden`, so we verify if it appears or we need to simulate viewport.
-        // For simplicity in this env, we trust the logic is present. 
-        // We can try to find the menu toggle button.
-        const menuButton = screen.queryByRole('button', { name: '' }) // often lacks accessible name if just icon?
-        // actually code has aria-label not set on the toggle button itself in some updates, 
-        // checking the code: 
-        /*
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="..."
-            >
-                {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-        */
-        // It triggers on click.
+        const menuButton = screen.getByRole('button', { name: /Toggle mobile menu/i })
+        expect(menuButton).toBeInTheDocument()
     })
 
     it('calls toggleNavbar when toggle button is clicked', () => {

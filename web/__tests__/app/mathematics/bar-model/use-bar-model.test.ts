@@ -372,7 +372,7 @@ describe('useBarModel', () => {
 
             act(() => {
                 const bar1 = result.current.addBar(100, 100, 0, 'A');
-                const bar2 = result.current.addBar(200, 100, 1, 'B');
+                result.current.addBar(200, 100, 1, 'B');
                 result.current.setBarAsTotal(bar1.id, true); // Set A as total
             });
 

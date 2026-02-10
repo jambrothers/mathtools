@@ -81,7 +81,7 @@ describe('Double Sided Counters Interaction', () => {
         render(<CountersPage />);
 
         const counters = screen.getAllByTestId('counter');
-        const counter = counters.find(c => c.textContent?.includes('1')); // Assuming label shows value?
+
         // Or just assume first one is id 1 since mock has id 1.
         fireEvent.pointerDown(counters[0]);
 

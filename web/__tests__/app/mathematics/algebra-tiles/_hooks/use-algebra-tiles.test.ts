@@ -1,22 +1,29 @@
 import { renderHook, act } from '@testing-library/react';
 import { useAlgebraTiles } from '@/app/mathematics/algebra-tiles/_hooks/use-algebra-tiles';
-import { TileData } from '@/app/mathematics/algebra-tiles/_hooks/use-algebra-tiles';
+
 
 // Mock useHistory hook
+// Mock useHistory hook
 jest.mock('@/lib/hooks/use-history', () => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     useHistory: (initialState: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         const [state, setState] = require('react').useState(initialState);
         return {
             state,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             pushState: (newState: any) => {
                 if (typeof newState === 'function') {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     setState((prev: any) => newState(prev));
                 } else {
                     setState(newState);
                 }
             },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             updateState: (newState: any) => {
                 if (typeof newState === 'function') {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     setState((prev: any) => newState(prev));
                 } else {
                     setState(newState);

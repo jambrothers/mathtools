@@ -23,7 +23,8 @@ export function useUrlState<T>(
         if (hasRestoredRef.current) return
         if (!searchParams || searchParams.toString() === '') {
             hasRestoredRef.current = true
-            setHasRestored(true)
+            // Defer state update to avoid synchronous render warning
+            setTimeout(() => setHasRestored(true), 0)
             return
         }
 
@@ -32,7 +33,8 @@ export function useUrlState<T>(
             onRestore(restored)
         }
         hasRestoredRef.current = true
-        setHasRestored(true)
+        // Defer state update to avoid synchronous render warning
+        setTimeout(() => setHasRestored(true), 0)
     }, [searchParams, serializer, onRestore])
 
     const getShareableUrl = useCallback((state: T) => {
