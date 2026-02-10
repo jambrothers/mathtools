@@ -92,7 +92,7 @@ export function parseBarsString(str: string): BarData[] {
             const encodedLabel = rest.substring(0, commaIndex);
             const label = decodeURIComponent(encodedLabel);
 
-            const coordsAndFlags = rest.substring(commaIndex + 1).split(',');
+            const coordsAndFlags = rest.substring(commaIndex + 1).split(',', 4);
             // We expect at least x,y,width. flags is optional.
             if (coordsAndFlags.length < 3) return null;
 

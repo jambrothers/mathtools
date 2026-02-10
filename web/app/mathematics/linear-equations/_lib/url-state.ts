@@ -48,7 +48,7 @@ function serializeLines(lines: LineConfig[]): string {
 function deserializeLines(value: string | null): LineConfig[] {
     let index = 0;
     const lines = parseList(value, (part) => {
-        const [mStr, cStr] = part.split(',');
+        const [mStr, cStr] = part.split(',', 2);
         const m = parseFloat(mStr);
         const c = parseFloat(cStr);
 

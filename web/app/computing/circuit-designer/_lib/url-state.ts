@@ -49,12 +49,12 @@ export function parseNodeString(str: string): CircuitNode[] {
     return parseList(str, (part) => {
         // Try parsing: T:id:x,y:Label(:state)
         // Regex: T:id:x,y:Label(:state)?
-        const sections = part.split(':');
+        const sections = part.split(':', 6);
         if (sections.length < 4) return null;
 
         const typeCode = sections[0];
         const id = sections[1];
-        const pos = sections[2].split(',');
+        const pos = sections[2].split(',', 3);
         const encodedLabel = sections[3];
         const stateStr = sections[4]; // optional
 
@@ -106,14 +106,14 @@ export function serializeConnections(connections: Connection[]): string {
 export function parseConnectionString(str: string): Connection[] {
     return parseList(str, (part) => {
         // from>to:idx
-        const arrowSplit = part.split('>');
-        if (arrowSplit.length !== 2) return null;
+        const arrowSplit = part.split('>', 3);
+        if (arrowSplit.length < 2) return null;
 
         const from = arrowSplit[0];
         const remaining = arrowSplit[1];
-        const colonSplit = remaining.split(':');
+        const colonSplit = remaining.split(':', 3);
 
-        if (colonSplit.length !== 2) return null;
+        if (colonSplit.length < 2) return null;
 
         const to = colonSplit[0];
         const idx = parseInt(colonSplit[1]);

@@ -135,7 +135,7 @@ export function useAlgebraTiles() {
     const visualizeEquation = useCallback((equationInput: string) => {
         if (!equationInput.trim()) return;
 
-        const parts = equationInput.split('=');
+        const parts = equationInput.split('=', 2);
         const isEq = parts.length > 1;
 
         // Use generic workspace parsing
