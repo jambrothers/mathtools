@@ -38,4 +38,11 @@ describe('HelpButton', () => {
         const button = screen.getByTestId('help-button')
         expect(button).toHaveClass('custom-class')
     })
+
+    it('has visible focus styles', () => {
+        render(<HelpButton onClick={() => { }} />)
+        const button = screen.getByRole('button', { name: /help/i })
+        expect(button).toHaveClass('focus-visible:ring-2')
+        expect(button).toHaveClass('focus-visible:ring-indigo-500')
+    })
 })
