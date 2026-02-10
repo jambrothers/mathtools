@@ -12,3 +12,7 @@
 **Vulnerability:** Using `string.split(delimiter)` on potentially large user-controlled inputs creates a massive array of strings before any validation or limiting can occur, leading to immediate memory exhaustion (DoS).
 **Learning:** Even with a loop limit, the initial `split()` call is a vulnerability if the input size isn't capped first.
 **Prevention:** Use iterative parsing (e.g., `indexOf` loop) with a counter to process the string lazily, stopping once the limit is reached, or cap the input string length before processing.
+## 2026-02-09 - Allocation-Based DoS in URL State Parsing
+**Vulnerability:** Found a potential Denial of Service (DoS) vulnerability in `linear-equations` URL state deserialization where `value.split('|').slice(0, MAX_LINES)` would attempt to allocate memory for all items in the input string before limiting them, allowing an attacker to trigger OOM/CPU exhaustion with a crafted URL containing millions of delimiters.
+**Learning:** Even when logically limiting items (via `.slice()`), the underlying string processing method (like `.split()`) may allocate memory proportional to the input size *before* the limit is applied.
+**Prevention:** Use iterative parsing approaches (like `parseList`) that process the input string incrementally and stop processing once the item limit (`maxItems`) is reached, avoiding unnecessary allocation.

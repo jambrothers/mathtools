@@ -1,4 +1,4 @@
-import { URLStateSerializer, serializeBool, deserializeBool } from "@/lib/url-state"
+import { URLStateSerializer, serializeBool, deserializeBool, parseList } from "@/lib/url-state"
 import { LineConfig, LINE_COLORS, DEFAULT_M, DEFAULT_C } from "../constants"
 
 const MAX_LINES = 20; // Security limit to prevent DoS
@@ -46,39 +46,34 @@ function serializeLines(lines: LineConfig[]): string {
  * @returns Reconstructed array of LineConfig objects.
  */
 function deserializeLines(value: string | null): LineConfig[] {
-    if (!value) {
+    let index = 0;
+    const lines = parseList(value, (part) => {
+        const [mStr, cStr] = part.split(',');
+        const m = parseFloat(mStr);
+        const c = parseFloat(cStr);
+
+        const line: LineConfig = {
+            id: `line-${index + 1}`, // Deterministic IDs based on order
+            m: isNaN(m) ? DEFAULT_M : m,
+            c: isNaN(c) ? DEFAULT_C : c,
+            color: LINE_COLORS[index % LINE_COLORS.length],
+            visible: true
+        };
+        index++;
+        return line;
+    }, { delimiter: '|', maxItems: MAX_LINES });
+
+    if (lines.length === 0) {
         return [{
             id: 'line-1',
             m: DEFAULT_M,
             c: DEFAULT_C,
             color: LINE_COLORS[0],
             visible: true
-        }]
+        }];
     }
 
-    try {
-        const parts = value.split('|').slice(0, MAX_LINES);
-        return parts.map((part, index) => {
-            const [mStr, cStr] = part.split(',')
-            const m = parseFloat(mStr)
-            const c = parseFloat(cStr)
-            return {
-                id: `line-${index + 1}`, // Deterministic IDs based on order
-                m: isNaN(m) ? DEFAULT_M : m,
-                c: isNaN(c) ? DEFAULT_C : c,
-                color: LINE_COLORS[index % LINE_COLORS.length],
-                visible: true
-            }
-        })
-    } catch {
-        return [{
-            id: 'line-1',
-            m: DEFAULT_M,
-            c: DEFAULT_C,
-            color: LINE_COLORS[0],
-            visible: true
-        }]
-    }
+    return lines;
 }
 
 export const linearEquationsSerializer: URLStateSerializer<LinearEquationsState> = {
