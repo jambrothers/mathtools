@@ -41,13 +41,14 @@ export function useDraggable(
         positionRef.current = position;
     }, [position]);
 
+    const { x: initialX, y: initialY } = initialPos;
     // Sync visual position if external reset happens (e.g. undo)
     useEffect(() => {
-        if (!isDragging && (position.x !== initialPos.x || position.y !== initialPos.y)) {
+        if (!isDragging && (position.x !== initialX || position.y !== initialY)) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
-            setPosition(initialPos);
+            setPosition({ x: initialX, y: initialY });
         }
-    }, [initialPos, isDragging, position.x, position.y]);
+    }, [initialX, initialY, isDragging, position.x, position.y]);
 
     const handlePointerDown = useCallback((e: React.PointerEvent) => {
         if (optionsRef.current.disabled) return;
@@ -85,11 +86,6 @@ export function useDraggable(
                 currentOptions.onDragStart?.(id, startPos);
             }
 
-            // Calculate incremental delta for external consumers
-            const movementX = (e.clientX - (prevPointerRef.current?.x || dragStartPointer.x)) / scale;
-            const movementY = (e.clientY - (prevPointerRef.current?.y || dragStartPointer.y)) / scale;
-            prevPointerRef.current = { x: e.clientX, y: e.clientY };
-
             // Calculate total displacement for local position
             const dx = (e.clientX - dragStartPointer.x) / scale;
             const dy = (e.clientY - dragStartPointer.y) / scale;
@@ -103,10 +99,22 @@ export function useDraggable(
             }
 
             const newPos = { x: newX, y: newY };
+
+            // Optimization: Skip updates if position hasn't changed (throttling for grid snap)
+            if (newPos.x === positionRef.current.x && newPos.y === positionRef.current.y) {
+                return;
+            }
+
+            // Use snapped delta so external consumers update in sync with visual snap
+            const deltaX = newPos.x - positionRef.current.x;
+            const deltaY = newPos.y - positionRef.current.y;
+
             setPosition(newPos);
             positionRef.current = newPos; // Update ref immediately so handlers see it
 
-            currentOptions.onDragMove?.(id, newPos, { x: movementX, y: movementY });
+            currentOptions.onDragMove?.(id, newPos, { x: deltaX, y: deltaY });
+
+            prevPointerRef.current = { x: e.clientX, y: e.clientY };
         };
 
         const handlePointerUp = () => {
