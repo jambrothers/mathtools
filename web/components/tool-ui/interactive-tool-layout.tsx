@@ -4,16 +4,45 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { ChevronRight } from "lucide-react"
 
+/**
+ * Props for the InteractiveToolLayout.
+ */
 interface InteractiveToolLayoutProps {
+    /** The main workspace/canvas content. Occupies remaining space. */
     children: React.ReactNode
+    /**
+     * The sidebar content.
+     * If provided, a collapsible sidebar is rendered on the right.
+     * A toggle button is automatically added.
+     */
     sidebar?: React.ReactNode
+    /**
+     * Width of the sidebar in pixels when expanded.
+     * @default 384 (24rem / w-96)
+     */
     sidebarWidth?: number
+    /** Additional classes for the root container. */
     className?: string
+    /** Content to overlay in the top-left (e.g., Toolbar). */
     toolbarOverlay?: React.ReactNode
+    /** Content to overlay in the bottom-center (e.g., Status bar). */
     footerOverlay?: React.ReactNode
+    /** Test ID for testing. */
     dataTestId?: string
 }
 
+/**
+ * An advanced layout for interactive tools that require a maximized canvas
+ * and a collapsible sidebar.
+ *
+ * Features:
+ * - **Full Viewport**: Takes up the remaining screen height (calc(100vh - header)).
+ * - **Collapsible Sidebar**: Sidebar can be toggled. Automatically collapses on small screens (<1024px).
+ * - **Overlays**: Supports absolute positioning for toolbars and footers over the canvas.
+ * - **No Scroll**: The main container disables scrolling to support drag-and-drop canvases.
+ *
+ * This component is typically used internally by `ToolScaffold` when `useInteractiveLayout={true}`.
+ */
 export function InteractiveToolLayout({
     children,
     sidebar,

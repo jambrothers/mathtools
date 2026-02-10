@@ -72,6 +72,11 @@ function AlgebraTilesPageContent() {
 
     const trashRef = useRef<HTMLDivElement>(null)
     const canvasRef = useRef<HTMLDivElement>(null)
+    const selectedIdsRef = useRef(selectedIds);
+
+    useEffect(() => {
+        selectedIdsRef.current = selectedIds;
+    }, [selectedIds]);
 
     const { copyShareableUrl } = useUrlState(algebraTilesURLSerializer, {
         onRestore: (state) => {
@@ -132,7 +137,7 @@ function AlgebraTilesPageContent() {
         }
     });
 
-    const handleDragEnd = (id: string, pos: Position) => {
+    const handleDragEnd = useCallback((id: string, pos: Position) => {
         // Check trash collision
         if (canvasRef.current && trashRef.current) {
             const canvasRect = canvasRef.current.getBoundingClientRect();
@@ -148,14 +153,15 @@ function AlgebraTilesPageContent() {
             const tileCenterY = pos.y + 25;
 
             if (tileCenterX > trashL && tileCenterY > trashT) {
-                const idsToDelete = (selectedIds.has(id) ? Array.from(selectedIds) : [id]) as string[];
+                const currentSelectedIds = selectedIdsRef.current;
+                const idsToDelete = (currentSelectedIds.has(id) ? Array.from(currentSelectedIds) : [id]) as string[];
                 removeTiles(idsToDelete);
                 return;
             }
         }
 
         updateTilePosition(id, pos);
-    };
+    }, [removeTiles, updateTilePosition]);
 
     return (
         <div className="flex flex-col flex-1 min-h-0 w-full">

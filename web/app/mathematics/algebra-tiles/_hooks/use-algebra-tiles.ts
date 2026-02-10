@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef, useEffect } from "react"
 import { useHistory } from "@/lib/hooks/use-history"
 import { Position } from "@/types/manipulatives"
 import { TILE_TYPES } from "../constants"
@@ -32,6 +32,12 @@ export function useAlgebraTiles() {
     } = useHistory<TileData[]>([])
 
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+    const selectedIdsRef = useRef(selectedIds);
+
+    // Keep ref in sync
+    useEffect(() => {
+        selectedIdsRef.current = selectedIds;
+    }, [selectedIds]);
 
     const handleDragStart = useCallback(() => {
         beginTransaction();
@@ -52,13 +58,13 @@ export function useAlgebraTiles() {
 
     const removeTiles = useCallback((ids: string[]) => {
         const idSet = new Set(ids);
-        setTiles(tiles.filter(t => !idSet.has(t.id)));
-        setSelectedIds(prev => {
-            const next = new Set(prev);
-            ids.forEach(id => next.delete(id));
-            return next;
-        });
-    }, [tiles, setTiles]);
+        setTiles(prevTiles => prevTiles.filter(t => !idSet.has(t.id)));
+
+        const next = new Set(selectedIdsRef.current);
+        ids.forEach(id => next.delete(id));
+        selectedIdsRef.current = next;
+        setSelectedIds(next);
+    }, [setTiles]);
 
     const updateTilePosition = useCallback((id: string, newPos: Position) => {
         // Update without history, then commit the drag transaction
@@ -69,49 +75,53 @@ export function useAlgebraTiles() {
     const handleDragMove = useCallback((id: string, delta: Position) => {
         // If draggable is selected, move ALL selected tiles.
         // If not selected, move just it.
-        const isSelected = selectedIds.has(id);
-        const idsToMove = isSelected ? selectedIds : new Set([id]);
+        const ids = selectedIdsRef.current;
+        const isSelected = ids.has(id);
+        const idsToMove = isSelected ? ids : new Set([id]);
 
-        // Optimization: If only moving one tile, do not update state during drag.
-        // The individual tile component handles its own visual position via useDraggable local state.
-        // Updating parent state on every drag frame causes unnecessary re-renders of the entire page.
-        if (idsToMove.size === 1) {
-            return;
-        }
-
-        const newTiles = tiles.map(t => {
+        // Use updateState to avoid polluting history with every pixel move
+        updateTilesCurrent(prevTiles => prevTiles.map(t => {
             if (idsToMove.has(t.id)) {
                 return { ...t, x: t.x + delta.x, y: t.y + delta.y };
             }
             return t;
-        });
-
-        // Use updateState to avoid polluting history with every pixel move
-        updateTilesCurrent(newTiles);
-    }, [tiles, selectedIds, updateTilesCurrent]);
+        }));
+    }, [updateTilesCurrent]);
 
     const handleSelect = useCallback((id: string, multi: boolean) => {
+        const current = selectedIdsRef.current;
+        let next: Set<string>;
+
         if (multi) {
-            setSelectedIds(prev => {
-                const next = new Set(prev);
-                if (next.has(id)) next.delete(id);
-                else next.add(id);
-                return next;
-            });
+            next = new Set(current);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
         } else {
-            if (!selectedIds.has(id)) {
-                setSelectedIds(new Set([id]));
+            // If already selected, do nothing (preserve selection for group drag)
+            // This matches original behavior
+            if (current.has(id)) {
+                return;
             }
+            next = new Set([id]);
         }
-    }, [selectedIds]);
+
+        if (next !== current) {
+            selectedIdsRef.current = next;
+            setSelectedIds(next);
+        }
+    }, []);
 
     const clearSelection = useCallback(() => {
-        setSelectedIds(new Set());
+        const next = new Set<string>();
+        selectedIdsRef.current = next;
+        setSelectedIds(next);
     }, []);
 
     const clearAll = useCallback(() => {
         setTiles([]);
-        setSelectedIds(new Set());
+        const next = new Set<string>();
+        selectedIdsRef.current = next;
+        setSelectedIds(next);
     }, [setTiles]);
 
     const groupTiles = useCallback(() => {
@@ -196,7 +206,9 @@ export function useAlgebraTiles() {
             },
             (tile) => tile.id
         );
-        setSelectedIds(new Set(selection as Set<string>));
+        const next = new Set(selection as Set<string>);
+        selectedIdsRef.current = next;
+        setSelectedIds(next);
     }, [tiles]);
 
     const rotateTiles = useCallback((ids: string[]) => {

@@ -7,3 +7,7 @@
 ## 2024-05-22 - Test Location Misconception
 **Learning:** The project root README incorrectly stated tests were at the root. All tests (unit and E2E) reside within the `web/` directory.
 **Action:** Always verify directory paths in documentation against the actual file system before publishing.
+
+## 2026-02-10 - Tool UI Documentation Gap
+**Learning:** Shared UI components in `web/components/tool-ui/` were undocumented, making it hard to understand the "Scaffolded Layout" pattern.
+**Action:** Created `web/components/tool-ui/README.md` and added JSDoc to core layout components. Future shared libraries must have a README explanation.
