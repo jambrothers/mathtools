@@ -152,15 +152,19 @@ function BarModelPageContent() {
     useEffect(() => {
         if (!hasRestored) return;
 
-        if (bars.length === 0) {
-            const url = new URL(window.location.href);
-            url.search = '';
-            window.history.replaceState({}, '', url.toString());
-        } else {
-            const state: BarModelURLState = { bars };
-            const url = getShareableUrl(state);
-            window.history.replaceState({}, '', url);
-        }
+        const timer = setTimeout(() => {
+            if (bars.length === 0) {
+                const url = new URL(window.location.href);
+                url.search = '';
+                window.history.replaceState({}, '', url.toString());
+            } else {
+                const state: BarModelURLState = { bars };
+                const url = getShareableUrl(state);
+                window.history.replaceState({}, '', url);
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
     }, [bars, hasRestored, getShareableUrl]);
 
     // Keyboard shortcuts
