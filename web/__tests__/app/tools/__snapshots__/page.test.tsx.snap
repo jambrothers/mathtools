@@ -412,6 +412,88 @@ exports[`Tools Page matches snapshot 1`] = `
                 </div>
               </div>
             </a>
+            <a
+              class="group relative block w-full h-full"
+              href="/mathematics/percentage-grid"
+            >
+              <div
+                class="relative h-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card)] shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col justify-between"
+              >
+                <div
+                  class="relative z-10"
+                >
+                  <div
+                    class="mb-4 inline-flex items-center justify-center rounded-lg bg-[var(--theme-page)] p-3 border border-[var(--theme-border)]"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="lucide lucide-percent w-8 h-8 text-blue-500"
+                      fill="none"
+                      height="24"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                      width="24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <line
+                        x1="19"
+                        x2="5"
+                        y1="5"
+                        y2="19"
+                      />
+                      <circle
+                        cx="6.5"
+                        cy="6.5"
+                        r="2.5"
+                      />
+                      <circle
+                        cx="17.5"
+                        cy="17.5"
+                        r="2.5"
+                      />
+                    </svg>
+                  </div>
+                  <h3
+                    class="mb-2 text-xl font-bold tracking-tight text-[var(--theme-main)] group-hover:text-[var(--color-primary)] transition-colors font-[family-name:var(--font-heading)]"
+                  >
+                    Percentage Grid
+                  </h3>
+                  <p
+                    class="text-[var(--theme-muted)] leading-relaxed"
+                  >
+                    Paint a 10×10 grid to explore percentages and quickly fill 10%, 25%, or 50%.
+                  </p>
+                </div>
+                <div
+                  class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
+                >
+                  Launch Tool
+                  <svg
+                    aria-hidden="true"
+                    class="lucide lucide-arrow-right ml-2 w-4 h-4"
+                    fill="none"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12h14"
+                    />
+                    <path
+                      d="m12 5 7 7-7 7"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </a>
           </div>
         </div>
         <div
