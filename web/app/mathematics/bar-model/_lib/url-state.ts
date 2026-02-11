@@ -19,6 +19,8 @@ export interface BarModelURLState {
 }
 
 const MAX_BARS = 50; // Security limit to prevent DoS
+// Limit split parts to 6 (x, y, width, flags + 2 future properties)
+const MAX_BAR_COORD_PARTS = 6;
 
 // =============================================================================
 // Serialization Helpers
@@ -92,7 +94,7 @@ export function parseBarsString(str: string): BarData[] {
             const encodedLabel = rest.substring(0, commaIndex);
             const label = decodeURIComponent(encodedLabel);
 
-            const coordsAndFlags = rest.substring(commaIndex + 1).split(',');
+            const coordsAndFlags = rest.substring(commaIndex + 1).split(',', MAX_BAR_COORD_PARTS);
             // We expect at least x,y,width. flags is optional.
             if (coordsAndFlags.length < 3) return null;
 

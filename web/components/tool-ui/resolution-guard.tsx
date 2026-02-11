@@ -3,6 +3,18 @@
 import * as React from "react"
 import { Tablet } from "lucide-react"
 
+/**
+ * A responsive guard that displays a warning on small screens (< 768px).
+ *
+ * It checks the viewport width and shows a modal suggesting the user to use a larger device
+ * (tablet/desktop) for the best experience.
+ *
+ * Features:
+ * - **Dismissible**: Users can click "Continue Anyway".
+ * - **Session Persistence**: Once dismissed, the preference is saved in `sessionStorage`
+ *   to avoid pestering the user during the same session.
+ * - **Hydration Safe**: Ensures the check only runs on the client.
+ */
 export function ResolutionGuard({ children }: { children: React.ReactNode }) {
     const [isSmallScreen, setIsSmallScreen] = React.useState(false)
     const [isDismissed, setIsDismissed] = React.useState(false)

@@ -23,7 +23,7 @@ export const HelpButton = React.forwardRef<HTMLButtonElement, HelpButtonProps>(
                 onClick={onClick}
                 aria-label="Help"
                 className={cn(
-                    "absolute bottom-4 left-4 p-4 rounded-full transition-all duration-200 z-40 border-2",
+                    "absolute bottom-4 left-4 p-4 rounded-full transition-all duration-200 z-40 border-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900",
                     "bg-white/80 dark:bg-slate-900/80 border-slate-200 dark:border-slate-700",
                     "text-slate-400 dark:text-slate-500",
                     "hover:border-indigo-300 dark:hover:border-indigo-700",

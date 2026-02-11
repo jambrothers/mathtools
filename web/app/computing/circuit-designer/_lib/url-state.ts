@@ -14,6 +14,14 @@ export interface CircuitURLState {
 const PARAM_NODES = 'n';
 const PARAM_WIRES = 'w';
 
+// Split Limits for DoS Protection
+// Justification: These limits provide headroom for future fields (e.g. z-index, rotation)
+// while preventing attackers from allocating massive arrays via excessive delimiters.
+const MAX_NODE_PARTS = 8; // type:id:coords:label:state + 3 future fields
+const MAX_POS_PARTS = 4; // x,y + 2 future dimensions (e.g. z, w)
+const MAX_CONNECTION_ARROW_PARTS = 4; // from>to:idx + future metadata
+const MAX_CONNECTION_COLON_PARTS = 4; // to:idx + future metadata
+
 /**
  * Serialize nodes to compact string.
  *
@@ -49,12 +57,12 @@ export function parseNodeString(str: string): CircuitNode[] {
     return parseList(str, (part) => {
         // Try parsing: T:id:x,y:Label(:state)
         // Regex: T:id:x,y:Label(:state)?
-        const sections = part.split(':');
+        const sections = part.split(':', MAX_NODE_PARTS);
         if (sections.length < 4) return null;
 
         const typeCode = sections[0];
         const id = sections[1];
-        const pos = sections[2].split(',');
+        const pos = sections[2].split(',', MAX_POS_PARTS);
         const encodedLabel = sections[3];
         const stateStr = sections[4]; // optional
 
@@ -106,14 +114,14 @@ export function serializeConnections(connections: Connection[]): string {
 export function parseConnectionString(str: string): Connection[] {
     return parseList(str, (part) => {
         // from>to:idx
-        const arrowSplit = part.split('>');
-        if (arrowSplit.length !== 2) return null;
+        const arrowSplit = part.split('>', MAX_CONNECTION_ARROW_PARTS);
+        if (arrowSplit.length < 2) return null;
 
         const from = arrowSplit[0];
         const remaining = arrowSplit[1];
-        const colonSplit = remaining.split(':');
+        const colonSplit = remaining.split(':', MAX_CONNECTION_COLON_PARTS);
 
-        if (colonSplit.length !== 2) return null;
+        if (colonSplit.length < 2) return null;
 
         const to = colonSplit[0];
         const idx = parseInt(colonSplit[1]);

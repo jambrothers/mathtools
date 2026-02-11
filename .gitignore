@@ -14,12 +14,15 @@ api/node_modules
 
 # testing
 /coverage
+web/coverage/
+coverage/
 
 # next.js
 .next/
 web/.next/
 out/
 web/out/
+web/.swc/
 
 # production
 /build

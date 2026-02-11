@@ -43,6 +43,12 @@ jest.mock('@/lib/hooks/use-draggable', () => ({
 describe('Double Sided Counters Interaction', () => {
     const mockUseCounters = useCounters as jest.Mock;
 
+    beforeAll(() => {
+        // Polyfill setPointerCapture for JSDOM
+        Element.prototype.setPointerCapture = jest.fn();
+        Element.prototype.releasePointerCapture = jest.fn();
+    });
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
@@ -89,7 +95,7 @@ describe('Double Sided Counters Interaction', () => {
 
         render(<CountersPage />);
 
-        const counters = screen.getAllByTestId(/^counter-/);
+        const counters = screen.getAllByTestId(/^counter-\d+$/);
 
         // Or just assume first one is id 1 since mock has id 1.
         fireEvent.pointerDown(counters[0]);
@@ -110,7 +116,7 @@ describe('Double Sided Counters Interaction', () => {
 
         render(<CountersPage />);
 
-        const counters = screen.getAllByTestId(/^counter-/);
+        const counters = screen.getAllByTestId(/^counter-\d+$/);
         // Click the second one (id 2)
         // DraggableCounter handles shift+selection on CLICK, not pointerDown
         fireEvent.click(counters[1], { shiftKey: true });
