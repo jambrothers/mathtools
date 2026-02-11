@@ -106,9 +106,8 @@ mathtools/
   - **`mathematics/`**: Dedicated section for interactive mathematics tools (e.g., Algebra Tiles).
   - **`computing/`**: Dedicated section for computing tools (e.g., Circuit Designer).
     - **`[tool-name]/`**: Each tool (e.g., `algebra-tiles`) has its own subdirectory containing its page, `HELP.md`, and tool-specific local components.
-- **`components/`**: Shared reusable components.
+- **`web/components/`**: Shared reusable components. [Documentation](./web/components/README.md)
   - **`tool-ui/`**: Components shared across multiple tools (e.g., `Canvas`, `TileBase`, `Toolbar`, `HelpModal`).
-  - **`ui/`**: General UI components.
 - **`lib/`**: Utility functions and custom hooks.
   - **`url-state.ts`**: Generic URL state serialization utilities for shareable tool configurations.
 

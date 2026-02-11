@@ -43,6 +43,15 @@ interface ListCodecOptions {
     trim?: boolean;
 }
 
+/**
+ * Serializes a list of items into a delimited string.
+ *
+ * @param items - The array of items to serialize.
+ * @param serializeItem - A function that converts a single item to a string.
+ * @param options - Configuration options.
+ * @param options.delimiter - The character to use for separating items (default: ';').
+ * @returns A single string containing all serialized items separated by the delimiter.
+ */
 export function serializeList<T>(
     items: T[],
     serializeItem: (item: T) => string,
@@ -53,6 +62,22 @@ export function serializeList<T>(
     return items.map(serializeItem).join(delimiter);
 }
 
+/**
+ * Parses a delimited string into a list of items.
+ *
+ * Security Note:
+ * This function enforces a `maxItems` limit (default: 1000) to prevent Denial of Service (DoS)
+ * attacks where a malicious URL could cause excessive memory allocation or CPU usage.
+ * It also uses an iterative parsing approach to avoid creating large intermediate arrays.
+ *
+ * @param value - The delimited string to parse (e.g., from a URL parameter).
+ * @param parseItem - A function that parses a single substring into an item (returns null if invalid).
+ * @param options - Configuration options.
+ * @param options.delimiter - The character used to separate items (default: ';').
+ * @param options.maxItems - The maximum number of items to parse (default: 1000).
+ * @param options.trim - Whether to trim whitespace from each part (default: true).
+ * @returns An array of successfully parsed items.
+ */
 export function parseList<T>(
     value: string | null | undefined,
     parseItem: (part: string) => T | null,
