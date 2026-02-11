@@ -41,11 +41,9 @@ export function usePercentageGrid() {
         // Calculate new cell count to maintain percentage (floored)
         const nextSelectedCount = Math.floor(currentPercentage * nextConfig.totalCells);
 
-        // Create new selection set (0 to n-1)
-        const nextSelectedIndices = new Set<number>();
-        for (let i = 0; i < nextSelectedCount; i++) {
-            nextSelectedIndices.add(i);
-        }
+        // Create new selection set based on column major order
+        const columnOrder = getColumnMajorOrder(nextConfig.cols, nextConfig.rows);
+        const nextSelectedIndices = new Set<number>(columnOrder.slice(0, nextSelectedCount));
 
         setSelectedIndices(nextSelectedIndices);
         setGridModeState(modeId);
