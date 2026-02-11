@@ -384,4 +384,67 @@ describe('useDraggable', () => {
             expect(result.current.isDragging).toBe(true);
         });
     });
+
+    describe('optimizations', () => {
+        it('throttles onDragMove updates when grid snapping results in same position', () => {
+            const onDragMove = jest.fn();
+            const { result } = renderHook(() =>
+                useDraggable('test-id', { x: 0, y: 0 }, {
+                    onDragMove,
+                    gridSize: 50,
+                    threshold: 0
+                })
+            );
+
+            const handler = result.current.handleMouseDown ?? result.current.handlePointerDown;
+            act(() => {
+                handler(createReactPointerEvent({ clientX: 0, clientY: 0 }));
+            });
+
+            // Move slightly (should snap to 0,0) - NO update expected
+            act(() => {
+                window.dispatchEvent(createPointerEvent('pointermove', { clientX: 10, clientY: 10 }));
+                window.dispatchEvent(createPointerEvent('mousemove', { clientX: 10, clientY: 10 } as any));
+            });
+
+            expect(onDragMove).not.toHaveBeenCalled();
+            expect(result.current.position).toEqual({ x: 0, y: 0 });
+
+            // Move to snap point (should snap to 50,50) - Update expected
+            act(() => {
+                window.dispatchEvent(createPointerEvent('pointermove', { clientX: 55, clientY: 55 }));
+                window.dispatchEvent(createPointerEvent('mousemove', { clientX: 55, clientY: 55 } as any));
+            });
+
+            expect(onDragMove).toHaveBeenCalledTimes(1);
+            expect(result.current.position).toEqual({ x: 50, y: 50 });
+
+            // Verify delta is snapped
+            expect(onDragMove).toHaveBeenCalledWith(
+                'test-id',
+                { x: 50, y: 50 },
+                { x: 50, y: 50 }
+            );
+
+            // Move slightly more (still snap to 50,50) - NO update expected
+            act(() => {
+                window.dispatchEvent(createPointerEvent('pointermove', { clientX: 60, clientY: 60 }));
+                window.dispatchEvent(createPointerEvent('mousemove', { clientX: 60, clientY: 60 } as any));
+            });
+
+            expect(onDragMove).toHaveBeenCalledTimes(1);
+            expect(result.current.position).toEqual({ x: 50, y: 50 });
+        });
+
+        it('does not re-set position when initialPos changes reference but values are same', () => {
+            const { result, rerender } = renderHook(
+                ({ pos }) => useDraggable('test-id', pos),
+                { initialProps: { pos: { x: 100, y: 100 } } }
+            );
+
+            rerender({ pos: { x: 100, y: 100 } }); // New object, same values
+
+            expect(result.current.position).toEqual({ x: 100, y: 100 });
+        });
+    });
 });
