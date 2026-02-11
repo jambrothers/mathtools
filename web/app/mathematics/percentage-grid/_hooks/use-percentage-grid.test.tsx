@@ -21,7 +21,7 @@ describe('usePercentageGrid', () => {
         expect(result.current.selectedIndices.has(3)).toBe(false);
     });
 
-    it('drag paints when starting on empty and erases when starting on filled', () => {
+    it('drag paints a rectangle when starting on empty', () => {
         const { result } = renderHook(() => usePercentageGrid());
 
         act(() => {
@@ -29,26 +29,63 @@ describe('usePercentageGrid', () => {
         });
 
         act(() => {
-            result.current.dragEnter(1);
+            result.current.dragEnter(11);
         });
 
-        expect(result.current.selectedIndices.has(0)).toBe(true);
-        expect(result.current.selectedIndices.has(1)).toBe(true);
+        const expected = [0, 1, 10, 11];
+        expected.forEach(index => {
+            expect(result.current.selectedIndices.has(index)).toBe(true);
+        });
 
         act(() => {
             result.current.endDrag();
         });
+    });
+
+    it('drag erases a rectangle when starting on filled', () => {
+        const { result } = renderHook(() => usePercentageGrid());
 
         act(() => {
-            result.current.startDrag(1);
+            result.current.fillPercent(10);
+        });
+
+        expect(result.current.selectedIndices.has(0)).toBe(true);
+        expect(result.current.selectedIndices.has(10)).toBe(true);
+
+        act(() => {
+            result.current.startDrag(0);
         });
 
         act(() => {
-            result.current.dragEnter(0);
+            result.current.dragEnter(11);
         });
 
-        expect(result.current.selectedIndices.has(1)).toBe(false);
-        expect(result.current.selectedIndices.has(0)).toBe(false);
+        const erased = [0, 1, 10, 11];
+        erased.forEach(index => {
+            expect(result.current.selectedIndices.has(index)).toBe(false);
+        });
+
+        act(() => {
+            result.current.endDrag();
+        });
+    });
+
+    it('preserves existing selections outside the rectangle', () => {
+        const { result } = renderHook(() => usePercentageGrid());
+
+        act(() => {
+            result.current.toggleSquare(55);
+        });
+
+        act(() => {
+            result.current.startDrag(0);
+        });
+
+        act(() => {
+            result.current.dragEnter(11);
+        });
+
+        expect(result.current.selectedIndices.has(55)).toBe(true);
     });
 
     it('fills by columns for quick fills', () => {
