@@ -42,6 +42,7 @@ function PercentageGridPageContent() {
         fillPercent,
         clear,
         setFromIndices,
+        setDisplayOptions,
         percentageDisplay,
         decimalDisplay,
         fractionDisplay,
@@ -60,15 +61,27 @@ function PercentageGridPageContent() {
     const { copyShareableUrl } = useUrlState(percentageGridURLSerializer, {
         onRestore: (state) => {
             setFromIndices(state.selectedIndices);
+            setDisplayOptions({
+                showPanel: state.showPanel,
+                showPercentage: state.showPercentage,
+                showDecimal: state.showDecimal,
+                showFraction: state.showFraction,
+                simplifyFraction: state.simplifyFraction,
+            });
         }
     });
 
     const handleCopyLink = React.useCallback(async () => {
         const state: PercentageGridURLState = {
             selectedIndices: Array.from(selectedIndices).sort((a, b) => a - b),
+            showPanel,
+            showPercentage,
+            showDecimal,
+            showFraction,
+            simplifyFraction,
         };
         await copyShareableUrl(state);
-    }, [copyShareableUrl, selectedIndices]);
+    }, [copyShareableUrl, selectedIndices, showPanel, showPercentage, showDecimal, showFraction, simplifyFraction]);
 
     return (
         <div className="flex flex-col h-[calc(100vh-81px)] w-full bg-slate-50 dark:bg-slate-950 overflow-hidden">

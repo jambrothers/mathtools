@@ -2,15 +2,27 @@ import {
     URLStateSerializer,
     serializeList,
     parseList,
-    hasAnyParam
+    hasAnyParam,
+    serializeBool,
+    deserializeBool,
 } from '@/lib/url-state';
 import { TOTAL_SQUARES } from '../constants';
 
 export interface PercentageGridURLState {
     selectedIndices: number[];
+    showPanel: boolean;
+    showPercentage: boolean;
+    showDecimal: boolean;
+    showFraction: boolean;
+    simplifyFraction: boolean;
 }
 
 const PARAM_SELECTED = 's';
+const PARAM_PANEL = 'p';
+const PARAM_PERCENTAGE = 'pc';
+const PARAM_DECIMAL = 'dc';
+const PARAM_FRACTION = 'fr';
+const PARAM_SIMPLIFY = 'sf';
 const MAX_SELECTED = TOTAL_SQUARES;
 
 function parseSelectedIndices(value: string | null): number[] {
@@ -32,12 +44,31 @@ export const percentageGridURLSerializer: URLStateSerializer<PercentageGridURLSt
         if (serialized) {
             params.set(PARAM_SELECTED, serialized);
         }
+        params.set(PARAM_PANEL, serializeBool(state.showPanel));
+        params.set(PARAM_PERCENTAGE, serializeBool(state.showPercentage));
+        params.set(PARAM_DECIMAL, serializeBool(state.showDecimal));
+        params.set(PARAM_FRACTION, serializeBool(state.showFraction));
+        params.set(PARAM_SIMPLIFY, serializeBool(state.simplifyFraction));
         return params;
     },
     deserialize(params: URLSearchParams): PercentageGridURLState | null {
-        const hasAny = hasAnyParam(params, [PARAM_SELECTED]);
+        const hasAny = hasAnyParam(params, [
+            PARAM_SELECTED,
+            PARAM_PANEL,
+            PARAM_PERCENTAGE,
+            PARAM_DECIMAL,
+            PARAM_FRACTION,
+            PARAM_SIMPLIFY,
+        ]);
         if (!hasAny) return null;
         const selectedIndices = parseSelectedIndices(params.get(PARAM_SELECTED));
-        return { selectedIndices };
+        return {
+            selectedIndices,
+            showPanel: deserializeBool(params.get(PARAM_PANEL), true),
+            showPercentage: deserializeBool(params.get(PARAM_PERCENTAGE), false),
+            showDecimal: deserializeBool(params.get(PARAM_DECIMAL), false),
+            showFraction: deserializeBool(params.get(PARAM_FRACTION), false),
+            simplifyFraction: deserializeBool(params.get(PARAM_SIMPLIFY), false),
+        };
     }
 };

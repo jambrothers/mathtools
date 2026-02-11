@@ -18,10 +18,10 @@ export function usePercentageGrid() {
         colMax: number;
     } | null>(null);
     const [showPanel, setShowPanel] = useState(true);
-    const [showPercentage, setShowPercentage] = useState(true);
-    const [showDecimal, setShowDecimal] = useState(true);
-    const [showFraction, setShowFraction] = useState(true);
-    const [simplifyFraction, setSimplifyFraction] = useState(true);
+    const [showPercentage, setShowPercentage] = useState(false);
+    const [showDecimal, setShowDecimal] = useState(false);
+    const [showFraction, setShowFraction] = useState(false);
+    const [simplifyFraction, setSimplifyFraction] = useState(false);
 
     const updateDragging = useCallback((value: boolean) => {
         isDraggingRef.current = value;
@@ -132,6 +132,20 @@ export function usePercentageGrid() {
         setSelectedIndices(next);
     }, []);
 
+    const setDisplayOptions = useCallback((options: {
+        showPanel?: boolean;
+        showPercentage?: boolean;
+        showDecimal?: boolean;
+        showFraction?: boolean;
+        simplifyFraction?: boolean;
+    }) => {
+        if (typeof options.showPanel === 'boolean') setShowPanel(options.showPanel);
+        if (typeof options.showPercentage === 'boolean') setShowPercentage(options.showPercentage);
+        if (typeof options.showDecimal === 'boolean') setShowDecimal(options.showDecimal);
+        if (typeof options.showFraction === 'boolean') setShowFraction(options.showFraction);
+        if (typeof options.simplifyFraction === 'boolean') setSimplifyFraction(options.simplifyFraction);
+    }, []);
+
     const selectedCount = selectedIndices.size;
     const percentageDisplay = `${selectedCount}%`;
     const decimalDisplay = (selectedCount / 100).toFixed(2);
@@ -176,6 +190,7 @@ export function usePercentageGrid() {
         fillPercent,
         clear,
         setFromIndices,
+        setDisplayOptions,
         selectedCount,
         percentageDisplay,
         decimalDisplay,

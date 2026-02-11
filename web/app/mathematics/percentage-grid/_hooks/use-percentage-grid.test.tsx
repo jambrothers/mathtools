@@ -176,9 +176,10 @@ describe('usePercentageGrid', () => {
         const { result } = renderHook(() => usePercentageGrid());
 
         expect(result.current.showPanel).toBe(true);
-        expect(result.current.showPercentage).toBe(true);
-        expect(result.current.showDecimal).toBe(true);
-        expect(result.current.showFraction).toBe(true);
+        expect(result.current.showPercentage).toBe(false);
+        expect(result.current.showDecimal).toBe(false);
+        expect(result.current.showFraction).toBe(false);
+        expect(result.current.simplifyFraction).toBe(false);
 
         act(() => {
             result.current.togglePanel();
@@ -191,5 +192,6 @@ describe('usePercentageGrid', () => {
         expect(result.current.showPercentage).toBe(false);
         expect(result.current.showDecimal).toBe(false);
         expect(result.current.showFraction).toBe(false);
+        expect(result.current.simplifyFraction).toBe(true);
     });
 });
