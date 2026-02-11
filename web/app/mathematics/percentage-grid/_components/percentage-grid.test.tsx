@@ -1,14 +1,17 @@
 import { render, fireEvent } from '@testing-library/react';
 import { PercentageGrid } from './percentage-grid';
-import { TOTAL_SQUARES } from '../constants';
+
 
 describe('PercentageGrid', () => {
-    it('renders 100 squares', () => {
+    it('renders 100 squares for 10x10 grid', () => {
         const { getAllByRole } = render(
             <PercentageGrid
                 selectedIndices={new Set()}
                 dragPreviewBounds={null}
                 isDragging={false}
+                rows={10}
+                cols={10}
+                totalCells={100}
                 onToggle={() => undefined}
                 onDragStart={() => undefined}
                 onDragEnter={() => undefined}
@@ -16,7 +19,26 @@ describe('PercentageGrid', () => {
             />
         );
 
-        expect(getAllByRole('button')).toHaveLength(TOTAL_SQUARES);
+        expect(getAllByRole('button')).toHaveLength(100);
+    });
+
+    it('renders 20 squares for 10x2 grid', () => {
+        const { getAllByRole } = render(
+            <PercentageGrid
+                selectedIndices={new Set()}
+                dragPreviewBounds={null}
+                isDragging={false}
+                rows={2}
+                cols={10}
+                totalCells={20}
+                onToggle={() => undefined}
+                onDragStart={() => undefined}
+                onDragEnter={() => undefined}
+                onDragEnd={() => undefined}
+            />
+        );
+
+        expect(getAllByRole('button')).toHaveLength(20);
     });
 
     it('calls drag handlers on mouse interactions', () => {
@@ -28,6 +50,9 @@ describe('PercentageGrid', () => {
                 selectedIndices={new Set()}
                 dragPreviewBounds={null}
                 isDragging={true}
+                rows={10}
+                cols={10}
+                totalCells={100}
                 onToggle={() => undefined}
                 onDragStart={onDragStart}
                 onDragEnter={onDragEnter}
@@ -49,6 +74,9 @@ describe('PercentageGrid', () => {
                 selectedIndices={new Set()}
                 dragPreviewBounds={{ rowMin: 0, rowMax: 1, colMin: 0, colMax: 1 }}
                 isDragging={true}
+                rows={10}
+                cols={10}
+                totalCells={100}
                 onToggle={() => undefined}
                 onDragStart={() => undefined}
                 onDragEnter={() => undefined}

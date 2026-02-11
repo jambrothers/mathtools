@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 
 interface GridSquareProps {
     index: number;
+    cols: number;
     selected: boolean;
     isDragging: boolean;
     onToggle: (index: number) => void;
@@ -13,6 +14,7 @@ interface GridSquareProps {
 
 export const GridSquare = React.memo(function GridSquare({
     index,
+    cols,
     selected,
     isDragging,
     onToggle,
@@ -40,8 +42,8 @@ export const GridSquare = React.memo(function GridSquare({
         const keyMap: Record<string, number> = {
             ArrowRight: 1,
             ArrowLeft: -1,
-            ArrowDown: 10,
-            ArrowUp: -10,
+            ArrowDown: cols,
+            ArrowUp: -cols,
         };
 
         const delta = keyMap[event.key];
@@ -57,7 +59,7 @@ export const GridSquare = React.memo(function GridSquare({
         <button
             type="button"
             className={cn(
-                'h-7 w-7 sm:h-8 sm:w-8 border border-slate-200 dark:border-slate-700 rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50 dark:focus-visible:ring-offset-slate-900',
+                'w-full h-full border border-slate-200 dark:border-slate-700 rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50 dark:focus-visible:ring-offset-slate-900',
                 selected
                     ? 'bg-[var(--color-primary)] border-blue-500'
                     : 'bg-white dark:bg-slate-900 hover:bg-blue-50 dark:hover:bg-slate-800'

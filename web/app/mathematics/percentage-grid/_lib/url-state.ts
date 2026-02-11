@@ -5,10 +5,12 @@ import {
     hasAnyParam,
     serializeBool,
     deserializeBool,
+    deserializeString,
 } from '@/lib/url-state';
-import { TOTAL_SQUARES } from '../constants';
+import { GRID_MODES, GridMode } from '../constants';
 
 export interface PercentageGridURLState {
+    gridMode: GridMode;
     selectedIndices: number[];
     showPanel: boolean;
     showPercentage: boolean;
@@ -17,21 +19,21 @@ export interface PercentageGridURLState {
     simplifyFraction: boolean;
 }
 
+const PARAM_MODE = 'gm';
 const PARAM_SELECTED = 's';
 const PARAM_PANEL = 'p';
 const PARAM_PERCENTAGE = 'pc';
 const PARAM_DECIMAL = 'dc';
 const PARAM_FRACTION = 'fr';
 const PARAM_SIMPLIFY = 'sf';
-const MAX_SELECTED = TOTAL_SQUARES;
 
-function parseSelectedIndices(value: string | null): number[] {
+function parseSelectedIndices(value: string | null, maxItems: number): number[] {
     const parsed = parseList(value, (part) => {
         const num = Number(part);
         if (!Number.isInteger(num)) return null;
-        if (num < 0 || num >= TOTAL_SQUARES) return null;
+        if (num < 0 || num >= maxItems) return null;
         return num;
-    }, { maxItems: MAX_SELECTED });
+    }, { maxItems });
 
     return parsed.sort((a, b) => a - b);
 }
@@ -44,6 +46,7 @@ export const percentageGridURLSerializer: URLStateSerializer<PercentageGridURLSt
         if (serialized) {
             params.set(PARAM_SELECTED, serialized);
         }
+        params.set(PARAM_MODE, state.gridMode);
         params.set(PARAM_PANEL, serializeBool(state.showPanel));
         params.set(PARAM_PERCENTAGE, serializeBool(state.showPercentage));
         params.set(PARAM_DECIMAL, serializeBool(state.showDecimal));
@@ -53,6 +56,7 @@ export const percentageGridURLSerializer: URLStateSerializer<PercentageGridURLSt
     },
     deserialize(params: URLSearchParams): PercentageGridURLState | null {
         const hasAny = hasAnyParam(params, [
+            PARAM_MODE,
             PARAM_SELECTED,
             PARAM_PANEL,
             PARAM_PERCENTAGE,
@@ -61,8 +65,14 @@ export const percentageGridURLSerializer: URLStateSerializer<PercentageGridURLSt
             PARAM_SIMPLIFY,
         ]);
         if (!hasAny) return null;
-        const selectedIndices = parseSelectedIndices(params.get(PARAM_SELECTED));
+
+        const gridModeStr = deserializeString(params.get(PARAM_MODE), '10x10');
+        const gridMode = GRID_MODES.some(m => m.id === gridModeStr) ? (gridModeStr as GridMode) : '10x10';
+        const config = GRID_MODES.find(m => m.id === gridMode)!;
+
+        const selectedIndices = parseSelectedIndices(params.get(PARAM_SELECTED), config.totalCells);
         return {
+            gridMode,
             selectedIndices,
             showPanel: deserializeBool(params.get(PARAM_PANEL), true),
             showPercentage: deserializeBool(params.get(PARAM_PERCENTAGE), false),

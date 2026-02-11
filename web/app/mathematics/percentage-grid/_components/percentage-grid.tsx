@@ -1,11 +1,14 @@
 import * as React from 'react';
 import { GridSquare } from './grid-square';
-import { GRID_SIZE, TOTAL_SQUARES } from '../constants';
+
 
 interface PercentageGridProps {
     selectedIndices: Set<number>;
     dragPreviewBounds: { rowMin: number; rowMax: number; colMin: number; colMax: number } | null;
     isDragging: boolean;
+    rows: number;
+    cols: number;
+    totalCells: number;
     onToggle: (index: number) => void;
     onDragStart: (index: number) => void;
     onDragEnter: (index: number) => void;
@@ -16,6 +19,9 @@ export function PercentageGrid({
     selectedIndices,
     dragPreviewBounds,
     isDragging,
+    rows,
+    cols,
+    totalCells,
     onToggle,
     onDragStart,
     onDragEnter,
@@ -28,20 +34,21 @@ export function PercentageGrid({
     }, [onDragEnd]);
 
     return (
-        <div className="relative">
+        <div className="relative aspect-square w-full max-w-[600px] mx-auto">
             <div
-                className="grid gap-1 select-none"
+                className="grid gap-1 select-none w-full h-full"
                 style={{
-                    gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
-                    gridTemplateRows: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
+                    gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+                    gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
                 }}
                 role="grid"
                 aria-label="Percentage grid"
             >
-                {Array.from({ length: TOTAL_SQUARES }, (_, index) => (
+                {Array.from({ length: totalCells }, (_, index) => (
                     <GridSquare
                         key={index}
                         index={index}
+                        cols={cols}
                         selected={selectedIndices.has(index)}
                         isDragging={isDragging}
                         onToggle={onToggle}
@@ -54,10 +61,10 @@ export function PercentageGrid({
 
             {dragPreviewBounds && (
                 <div
-                    className="absolute inset-0 pointer-events-none grid gap-1"
+                    className="absolute inset-0 pointer-events-none grid gap-1 w-full h-full"
                     style={{
-                        gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
-                        gridTemplateRows: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
+                        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+                        gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
                     }}
                     data-testid="drag-preview-overlay"
                 >
