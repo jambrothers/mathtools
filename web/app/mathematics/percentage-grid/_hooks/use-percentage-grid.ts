@@ -28,20 +28,28 @@ export function usePercentageGrid() {
     const [showFraction, setShowFraction] = useState(false);
     const [simplifyFraction, setSimplifyFraction] = useState(false);
 
-    const setGridMode = useCallback((newMode: GridMode) => {
-        setGridModeState(newMode);
-        const newConfig = GRID_MODES.find(m => m.id === newMode) ?? GRID_MODES[0];
-        // Filter out indices that exceed the new totalCells
-        setSelectedIndices(prev => {
-            const next = new Set<number>();
-            prev.forEach(index => {
-                if (index < newConfig.totalCells) {
-                    next.add(index);
-                }
-            });
-            return next;
-        });
-    }, []);
+    const setGridMode = useCallback((modeId: GridMode) => {
+        if (gridMode === modeId) return;
+
+        const prevConfig = activeMode;
+        const nextConfig = GRID_MODES.find(m => m.id === modeId) ?? GRID_MODES[0];
+
+        // Calculate current percentage
+        const currentSelectedCount = selectedIndices.size;
+        const currentPercentage = currentSelectedCount / prevConfig.totalCells;
+
+        // Calculate new cell count to maintain percentage (floored)
+        const nextSelectedCount = Math.floor(currentPercentage * nextConfig.totalCells);
+
+        // Create new selection set (0 to n-1)
+        const nextSelectedIndices = new Set<number>();
+        for (let i = 0; i < nextSelectedCount; i++) {
+            nextSelectedIndices.add(i);
+        }
+
+        setSelectedIndices(nextSelectedIndices);
+        setGridModeState(modeId);
+    }, [gridMode, activeMode, selectedIndices.size]);
 
     const updateDragging = useCallback((value: boolean) => {
         isDraggingRef.current = value;
