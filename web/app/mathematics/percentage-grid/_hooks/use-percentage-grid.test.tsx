@@ -137,4 +137,59 @@ describe('usePercentageGrid', () => {
 
         expect(result.current.selectedIndices.size).toBe(0);
     });
+
+    it('derives percentage and decimal display values', () => {
+        const { result } = renderHook(() => usePercentageGrid());
+
+        act(() => {
+            result.current.fillPercent(34);
+        });
+
+        expect(result.current.percentageDisplay).toBe('34%');
+        expect(result.current.decimalDisplay).toBe('0.34');
+    });
+
+    it('simplifies fraction display and handles zero', () => {
+        const { result } = renderHook(() => usePercentageGrid());
+
+        act(() => {
+            result.current.fillPercent(50);
+        });
+
+        expect(result.current.fractionDisplay).toBe('1/2');
+
+        act(() => {
+            result.current.toggleSimplifyFraction();
+        });
+
+        expect(result.current.fractionDisplay).toBe('50/100');
+
+        act(() => {
+            result.current.clear();
+            result.current.toggleSimplifyFraction();
+        });
+
+        expect(result.current.fractionDisplay).toBe('0');
+    });
+
+    it('toggles visibility controls for the panel', () => {
+        const { result } = renderHook(() => usePercentageGrid());
+
+        expect(result.current.showPanel).toBe(true);
+        expect(result.current.showPercentage).toBe(true);
+        expect(result.current.showDecimal).toBe(true);
+        expect(result.current.showFraction).toBe(true);
+
+        act(() => {
+            result.current.togglePanel();
+            result.current.toggleShowPercentage();
+            result.current.toggleShowDecimal();
+            result.current.toggleShowFraction();
+        });
+
+        expect(result.current.showPanel).toBe(false);
+        expect(result.current.showPercentage).toBe(false);
+        expect(result.current.showDecimal).toBe(false);
+        expect(result.current.showFraction).toBe(false);
+    });
 });

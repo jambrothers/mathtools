@@ -8,6 +8,7 @@ import { Canvas } from '@/components/tool-ui/canvas';
 import { ResolutionGuard } from '@/components/tool-ui/resolution-guard';
 import { usePercentageGrid } from './_hooks/use-percentage-grid';
 import { PercentageGrid } from './_components/percentage-grid';
+import { FdpPanel } from './_components/fdp-panel';
 import { useUrlState } from '@/lib/hooks/use-url-state';
 import { percentageGridURLSerializer, PercentageGridURLState } from './_lib/url-state';
 
@@ -32,6 +33,7 @@ export default function PercentageGridPage() {
 function PercentageGridPageContent() {
     const {
         selectedIndices,
+        dragPreviewBounds,
         isDragging,
         toggleSquare,
         startDrag,
@@ -40,6 +42,19 @@ function PercentageGridPageContent() {
         fillPercent,
         clear,
         setFromIndices,
+        percentageDisplay,
+        decimalDisplay,
+        fractionDisplay,
+        showPanel,
+        showPercentage,
+        showDecimal,
+        showFraction,
+        simplifyFraction,
+        togglePanel,
+        toggleShowPercentage,
+        toggleShowDecimal,
+        toggleShowFraction,
+        toggleSimplifyFraction,
     } = usePercentageGrid();
 
     const { copyShareableUrl } = useUrlState(percentageGridURLSerializer, {
@@ -68,15 +83,46 @@ function PercentageGridPageContent() {
                 </ToolbarGroup>
                 <ToolbarGroup>
                     <ToolbarSeparator />
+                    <ToolbarButton
+                        label={showPanel ? "Panel" : "Panel"}
+                        onClick={togglePanel}
+                        active={showPanel}
+                        aria-pressed={showPanel}
+                    />
+                    <ToolbarButton
+                        label="Percentage"
+                        onClick={toggleShowPercentage}
+                        active={showPercentage}
+                        aria-pressed={showPercentage}
+                    />
+                    <ToolbarButton
+                        label="Decimal"
+                        onClick={toggleShowDecimal}
+                        active={showDecimal}
+                        aria-pressed={showDecimal}
+                    />
+                    <ToolbarButton
+                        label="Fraction"
+                        onClick={toggleShowFraction}
+                        active={showFraction}
+                        aria-pressed={showFraction}
+                    />
+                    <ToolbarButton
+                        label="Simplify"
+                        onClick={toggleSimplifyFraction}
+                        active={simplifyFraction}
+                        aria-pressed={simplifyFraction}
+                    />
                     <CopyLinkButton onCopyLink={handleCopyLink} />
                 </ToolbarGroup>
             </Toolbar>
 
             <Canvas className="flex-1">
-                <div className="flex h-full w-full items-center justify-center p-6">
+                <div className="relative flex h-full w-full items-center justify-center p-6">
                     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-4 sm:p-6">
                         <PercentageGrid
                             selectedIndices={selectedIndices}
+                            dragPreviewBounds={dragPreviewBounds}
                             isDragging={isDragging}
                             onToggle={toggleSquare}
                             onDragStart={startDrag}
@@ -84,6 +130,16 @@ function PercentageGridPageContent() {
                             onDragEnd={endDrag}
                         />
                     </div>
+                    {showPanel && (
+                        <FdpPanel
+                            percentage={percentageDisplay}
+                            decimal={decimalDisplay}
+                            fraction={fractionDisplay}
+                            showPercentage={showPercentage}
+                            showDecimal={showDecimal}
+                            showFraction={showFraction}
+                        />
+                    )}
                 </div>
             </Canvas>
         </div>
