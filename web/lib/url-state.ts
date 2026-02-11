@@ -93,12 +93,13 @@ export function parseList<T>(
     const len = value.length;
     const delimiterLen = delimiter.length;
 
-    // Safety break: if delimiter is empty, fall back to split for character iteration
+    // Safety break: if delimiter is empty, fall back to character iteration
+    // Use direct indexing to avoid O(N) memory allocation from split('')
     if (delimiterLen === 0) {
-        const parts = value.split('');
-        for (let i = 0; i < parts.length; i++) {
+        for (let i = 0; i < len; i++) {
             if (items.length >= maxItems) break;
-            const parsed = parseItem(parts[i]);
+            // Iterate characters directly without allocation
+            const parsed = parseItem(value[i]);
             if (parsed !== null) items.push(parsed);
         }
         return items;

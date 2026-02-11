@@ -22,3 +22,8 @@
 **Vulnerability:** While `parseList` uses iterative parsing to limit the number of items, the individual item parsers (e.g., `parseNodeString`) used unbounded `split()` on item properties, allowing DoS via a single massive item with many delimiters.
 **Learning:** Iterative parsing at the top level is insufficient if the inner parsing logic for each item is vulnerable to allocation attacks.
 **Prevention:** Apply `limit` to `split()` calls even within individual item parsing logic, or validate length before splitting.
+
+## 2026-03-01 - Allocation-Based DoS in Empty Delimiter Parsing
+**Vulnerability:** The `parseList` utility used `value.split('')` when handling empty delimiters, which allocates an array of size N for an input string of length N immediately, creating a memory exhaustion DoS vector for large inputs.
+**Learning:** Even simple utility functions can be DoS vectors if they allocate memory proportional to input size before validation or limiting. `split('')` is deceptively expensive for large strings.
+**Prevention:** Use iterative character access (e.g., `value[i]`) instead of `split('')` when processing strings character-by-character to avoid intermediate allocation.

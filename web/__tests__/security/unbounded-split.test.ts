@@ -1,6 +1,6 @@
 import { parseNodeString, parseConnectionString } from '@/app/computing/circuit-designer/_lib/url-state';
 import { parseBarsString } from '@/app/mathematics/bar-model/_lib/url-state';
-// @ts-ignore - Importing potentially private function or using serializer
+// @ts-expect-error - Importing potentially private function or using serializer
 import { linearEquationsSerializer } from '@/app/mathematics/linear-equations/_lib/url-state';
 
 describe('Security: Unbounded String Splitting', () => {
