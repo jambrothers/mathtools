@@ -2,6 +2,8 @@ import { URLStateSerializer, serializeBool, deserializeBool, parseList } from "@
 import { LineConfig, LINE_COLORS, DEFAULT_M, DEFAULT_C } from "../constants"
 
 const MAX_LINES = 20; // Security limit to prevent DoS
+// Limit split parts to 4 (m, c + 2 future properties like color/style)
+const MAX_LINE_PARTS = 4;
 
 /**
  * State interface for the linear equations tool
@@ -48,7 +50,7 @@ function serializeLines(lines: LineConfig[]): string {
 function deserializeLines(value: string | null): LineConfig[] {
     let index = 0;
     const lines = parseList(value, (part) => {
-        const [mStr, cStr] = part.split(',');
+        const [mStr, cStr] = part.split(',', MAX_LINE_PARTS);
         const m = parseFloat(mStr);
         const c = parseFloat(cStr);
 
