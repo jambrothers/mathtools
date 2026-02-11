@@ -3,7 +3,7 @@
 import { useCallback, useEffect } from "react"
 
 interface CanvasDropOptions<T> {
-    canvasRef: React.RefObject<HTMLElement>
+    canvasRef: React.RefObject<HTMLElement | null>
     onDropData: (data: T, position: { x: number; y: number }) => void
     /** Optional grid size to snap drop coordinates. */
     gridSize?: number
