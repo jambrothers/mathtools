@@ -16,6 +16,9 @@ export interface TileData {
     y: number
 }
 
+// Security limit for parsing equations
+const MAX_EQUATION_PARTS = 3; // left=right + potential extra (e.g. check flag)
+
 export function useAlgebraTiles() {
     // History manages the tiles array
     const {
@@ -135,7 +138,7 @@ export function useAlgebraTiles() {
     const visualizeEquation = useCallback((equationInput: string) => {
         if (!equationInput.trim()) return;
 
-        const parts = equationInput.split('=', 2);
+        const parts = equationInput.split('=', MAX_EQUATION_PARTS);
         const isEq = parts.length > 1;
 
         // Use generic workspace parsing
