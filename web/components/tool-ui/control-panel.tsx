@@ -24,13 +24,16 @@ export function ControlSection({
     ...props
 }: ControlSectionProps) {
     const [isOpen, setIsOpen] = React.useState(defaultOpen)
+    const contentId = React.useId()
 
     return (
         <div className={cn("border-b border-slate-100 dark:border-slate-800", className)} {...props}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group"
+                className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none focus-visible:ring-inset"
                 type="button"
+                aria-expanded={isOpen}
+                aria-controls={contentId}
             >
                 <div className="flex items-center gap-2">
                     {/* {icon && <span className="text-slate-400">{icon}</span>} */}
@@ -48,6 +51,7 @@ export function ControlSection({
             </button>
 
             <div
+                id={contentId}
                 className={cn(
                     "overflow-hidden transition-all duration-300 ease-in-out",
                     isOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
@@ -107,7 +111,7 @@ export function ControlSlider({
                             onValueChange(newValue)
                         }
                     }}
-                    className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors disabled:opacity-50"
+                    className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                     disabled={disabled || value <= min}
                     aria-label={`Decrease ${label}`}
                 >
@@ -139,7 +143,7 @@ export function ControlSlider({
                             onValueChange(newValue)
                         }
                     }}
-                    className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors disabled:opacity-50"
+                    className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                     disabled={disabled || value >= max}
                     aria-label={`Increase ${label}`}
                 >
@@ -200,7 +204,7 @@ export function ControlPresetButton({
         <button
             type="button"
             className={cn(
-                "w-full text-left px-4 py-3 rounded-lg border transition-all group relative overflow-hidden",
+                "w-full text-left px-4 py-3 rounded-lg border transition-all group relative overflow-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900",
                 isActive
                     ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
                     : "bg-white dark:bg-transparent border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600",
