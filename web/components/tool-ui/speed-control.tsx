@@ -44,6 +44,13 @@ export function SpeedControl({ speed, onChange, min = 200, max = 2000, className
         onChange(Math.round(newSpeed));
     };
 
+    const getAriaValueText = (val: number) => {
+        const rounded = Math.round(val);
+        if (rounded === 0) return "Slowest speed";
+        if (rounded === 100) return "Fastest speed";
+        return `Animation speed ${rounded}%`;
+    };
+
     return (
         <FloatingPanel className={className}>
             <div className="flex flex-col items-center gap-2 min-w-[140px]">
@@ -51,7 +58,11 @@ export function SpeedControl({ speed, onChange, min = 200, max = 2000, className
                     Animation Speed
                 </span>
                 <div className="flex items-center gap-2 w-full">
-                    <Turtle size={16} className="text-slate-400 dark:text-slate-500" />
+                    <Turtle
+                        size={16}
+                        className="text-slate-400 dark:text-slate-500"
+                        aria-hidden="true"
+                    />
                     <input
                         type="range"
                         min="0"
@@ -59,9 +70,15 @@ export function SpeedControl({ speed, onChange, min = 200, max = 2000, className
                         step="5"
                         value={sliderVal}
                         onChange={handleChange}
-                        className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500 hover:accent-blue-600"
+                        className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500 hover:accent-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                        aria-label="Animation Speed"
+                        aria-valuetext={getAriaValueText(sliderVal)}
                     />
-                    <Rabbit size={16} className="text-slate-400 dark:text-slate-500" />
+                    <Rabbit
+                        size={16}
+                        className="text-slate-400 dark:text-slate-500"
+                        aria-hidden="true"
+                    />
                 </div>
             </div>
         </FloatingPanel>
