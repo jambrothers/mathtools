@@ -299,6 +299,10 @@ export function useCounters() {
         const isSelected = selectedIds.has(id);
         const idsToMove = isSelected ? selectedIds : new Set([id]);
 
+        // Optimization: For single counter drag, rely on local visual state (useDraggable).
+        // Skip global state update until drag end to prevent re-rendering all counters.
+        if (idsToMove.size === 1) return;
+
         const newCounters = counters.map(c => {
             if (idsToMove.has(c.id)) {
                 return { ...c, x: c.x + delta.x, y: c.y + delta.y };
