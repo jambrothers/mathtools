@@ -52,7 +52,19 @@ An interactive graph for exploring linear relationships ($y = mx + c$).
 *Status: Stable. Export and interaction modes available.*
 [Documentation](./web/app/mathematics/linear-equations/HELP.md)
 
-### 5. Circuit Designer
+### 5. Percentage Grid
+An interactive grid for exploring the relationship between percentages, fractions, and decimals.
+- **Modes**: 10x10, 10x5, 10x2, 10x1 grids.
+- **Features**:
+    - Paint and Erase modes.
+    - Automatic FDP (Fraction, Decimal, Percentage) conversion.
+    - Simplified fraction display.
+    - Shareable URLs.
+
+*Status: Stable. Core functionality and URL sharing implemented.*
+[Documentation](./web/app/mathematics/percentage-grid/HELP.md)
+
+### 6. Circuit Designer
 A logic gate simulator for Computer Science students.
 - **Components**: Switches, Bulbs, AND, OR, NOT, XOR gates.
 - **Features**:
