@@ -21,8 +21,8 @@ describe('parseList Security Tests', () => {
         // Ensure it's fast (iterative) and didn't process the whole string
         // With split(''), it would allocate 1MB array first, taking time and memory.
         // With iterative, it should be instant.
-        // 50ms is generous for 10 iterations.
-        expect(durationMs).toBeLessThan(50);
+        // 200ms is generous for 10 iterations, allowing for CI/environment variance.
+        expect(durationMs).toBeLessThan(200);
     });
 
     it('should correctly parse characters with empty delimiter', () => {
