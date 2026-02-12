@@ -40,9 +40,13 @@ export function DraggableSidebarItem({
     onClick,
     ...props
 }: DraggableSidebarItemProps) {
-    // Touch drag state
-    const [isTouchDragging, setIsTouchDragging] = React.useState(false);
-    const [dragPos, setDragPos] = React.useState<{ x: number; y: number } | null>(null);
+    // State to trigger render when drag starts (and store initial visual position)
+    const [activeDragPos, setActiveDragPos] = React.useState<{ x: number; y: number } | null>(null);
+
+    // Refs for internal tracking
+    const pointerDownPosRef = React.useRef<{ x: number; y: number } | null>(null);
+    const ghostRef = React.useRef<HTMLDivElement>(null);
+
     const dragDataRef = React.useRef(dragData);
     const buttonRef = React.useRef<HTMLButtonElement>(null);
 
@@ -64,32 +68,47 @@ export function DraggableSidebarItem({
 
         // Don't capture or start drag yet - wait for move to confirm intent
         e.currentTarget.setPointerCapture(e.pointerId);
-        setDragPos({ x: e.clientX, y: e.clientY });
+
+        pointerDownPosRef.current = { x: e.clientX, y: e.clientY };
     };
 
     const handlePointerMove = (e: React.PointerEvent) => {
         if (e.pointerType === 'mouse') return;
-        if (!dragPos) return;
+        if (!pointerDownPosRef.current) return;
 
-        // If not yet dragging and we've moved, start drag
-        if (!isTouchDragging) {
+        const currentX = e.clientX;
+        const currentY = e.clientY;
+
+        // If not yet dragging, check threshold
+        if (!activeDragPos) {
+            const startX = pointerDownPosRef.current.x;
+            const startY = pointerDownPosRef.current.y;
+
             const dist = Math.sqrt(
-                Math.pow(e.clientX - dragPos.x, 2) +
-                Math.pow(e.clientY - dragPos.y, 2)
+                Math.pow(currentX - startX, 2) +
+                Math.pow(currentY - startY, 2)
             );
+
             if (dist > 5) {
-                setIsTouchDragging(true);
+                // Start dragging: triggers render to mount ghost
+                setActiveDragPos({ x: currentX, y: currentY });
             }
+            return;
         }
 
-        setDragPos({ x: e.clientX, y: e.clientY });
+        // If dragging, update ghost element directly (imperative update to avoid re-renders)
+        if (ghostRef.current) {
+            ghostRef.current.style.left = `${currentX}px`;
+            ghostRef.current.style.top = `${currentY}px`;
+        }
     };
 
     const handlePointerUp = (e: React.PointerEvent) => {
         if (e.pointerType === 'mouse') return;
-        if (!isTouchDragging) {
+
+        if (!activeDragPos) {
             // Was just a tap, not a drag - clean up
-            setDragPos(null);
+            pointerDownPosRef.current = null;
             return;
         }
 
@@ -115,13 +134,13 @@ export function DraggableSidebarItem({
         }
 
         // Clean up
-        setIsTouchDragging(false);
-        setDragPos(null);
+        setActiveDragPos(null);
+        pointerDownPosRef.current = null;
     };
 
     const handlePointerCancel = () => {
-        setIsTouchDragging(false);
-        setDragPos(null);
+        setActiveDragPos(null);
+        pointerDownPosRef.current = null;
     };
 
     return (
@@ -152,13 +171,14 @@ export function DraggableSidebarItem({
             </button>
 
             {/* Ghost element during touch drag */}
-            {isTouchDragging && dragPos && typeof document !== 'undefined' && createPortal(
+            {activeDragPos && typeof document !== 'undefined' && createPortal(
                 <div
+                    ref={ghostRef}
                     data-testid="drag-ghost"
                     className="fixed pointer-events-none z-[9999] opacity-80 scale-110"
                     style={{
-                        left: dragPos.x,
-                        top: dragPos.y,
+                        left: activeDragPos.x,
+                        top: activeDragPos.y,
                         transform: 'translate(-50%, -50%)'
                     }}
                 >

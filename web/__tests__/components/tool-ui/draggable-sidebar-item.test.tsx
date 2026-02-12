@@ -98,7 +98,7 @@ describe('DraggableSidebarItem', () => {
             document.elementFromPoint = originalElementFromPoint;
         });
 
-        it('shows ghost element during touch drag', () => {
+        it('shows ghost element during touch drag and updates its position', () => {
             render(
                 <DraggableSidebarItem
                     dragData={defaultDragData}
@@ -116,16 +116,40 @@ describe('DraggableSidebarItem', () => {
                 pointerId: 1
             });
 
-            // During drag, ghost should appear
-            fireEvent.pointerMove(button, {
-                clientX: 200,
-                clientY: 200,
-                pointerType: 'touch'
+            // Trigger drag threshold (dist > 5)
+            // Move from 100,100 to 200,200
+            act(() => {
+                fireEvent.pointerMove(button, {
+                    clientX: 200,
+                    clientY: 200,
+                    pointerType: 'touch'
+                });
             });
 
             // Ghost element should be in the document (via portal)
-            const ghost = document.querySelector('[data-testid="drag-ghost"]');
+            const ghost = document.querySelector('[data-testid="drag-ghost"]') as HTMLElement;
             expect(ghost).toBeInTheDocument();
+
+            // Initial position check (should match the event that triggered the drag start)
+            // Note: Our implementation sets position on pointerMove.
+            // When drag starts, it renders. Does it set style immediately?
+            // The imperative update happens in the `if (ghostRef.current)` block which is after the render cycle.
+            // But since we are in `act`, let's see.
+            // Actually, the `pointerMove` that *starts* the drag (sets state) does *not* execute the imperative update block
+            // because `ghostRef.current` is null at that moment (it's being rendered).
+
+            // So we need another move to verify position update.
+
+            act(() => {
+                fireEvent.pointerMove(button, {
+                    clientX: 250,
+                    clientY: 250,
+                    pointerType: 'touch'
+                });
+            });
+
+            expect(ghost.style.left).toBe('250px');
+            expect(ghost.style.top).toBe('250px');
         });
 
         it('does not show ghost for mouse pointer type', () => {
