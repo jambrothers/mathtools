@@ -10,9 +10,9 @@ Most tools follow a **Scaffolded Layout** pattern:
 2.  **ToolScaffold**: The top-level wrapper that provides structure (Sidebar, Toolbar, Footer).
 3.  **Canvas/Workspace**: The interactive area where the main activity happens.
 
-## Key Components
+## Layout Components
 
-### 1. ToolScaffold
+### ToolScaffold
 `tool-scaffold.tsx`
 
 The primary entry point for any tool layout. It handles:
@@ -38,7 +38,7 @@ export default function MyToolPage() {
 }
 ```
 
-### 2. InteractiveToolLayout
+### InteractiveToolLayout
 `interactive-tool-layout.tsx`
 
 An advanced layout engine used by `ToolScaffold` when `useInteractiveLayout={true}`.
@@ -47,19 +47,74 @@ It provides:
 - **Absolute Positioning**: Allows the canvas to take up the full remaining viewport height without scrolling the page.
 - **Overlay System**: `toolbarOverlay` and `footerOverlay` are placed absolutely over the canvas, preventing layout shifts.
 
-### 3. ResolutionGuard
+## Workspace Components
+
+### Canvas
+`canvas.tsx`
+
+The interactive surface where manipulatives are placed.
+- **Marquee Selection**: Built-in support for rectangular selection (drag on empty space).
+- **Grid Background**: Optional dot/line grid pattern.
+- **Touch Support**: Handles pointer events for reliable interaction on touch devices.
+
+### TrashZone
+`trash-zone.tsx`
+
+A drop target for deleting items.
+- **Visual Feedback**: Expands and turns red when an item is dragged over it.
+- **Positioning**: Fixed to the bottom-right corner of the canvas.
+
+### FloatingPanel
+`floating-panel.tsx`
+
+A primitive for creating overlay panels (like the Fraction/Decimal/Percentage panel).
+- **Styling**: Glassmorphism effect (backdrop blur) with shadows.
+- **Animation**: Entrance animations (fade-in, zoom-in).
+
+## Control Components
+
+### ControlPanel
+`control-panel.tsx`
+
+A set of components for building configuration sidebars.
+- **`ControlSection`**: A collapsible accordion section.
+- **`ControlSlider`**: A range input with increment/decrement buttons.
+- **`ControlToggle`**: A switch for boolean states.
+- **`ControlPresetButton`**: A rich button for selecting modes or presets.
+
+### Toolbar
+`toolbar.tsx`
+
+Standardized button groups for the top overlay.
+- **`ToolbarGroup`**: Container for related buttons.
+- **`ToolbarButton`**: The main action button with support for icons and labels.
+- **`ToolbarSeparator`**: Vertical divider.
+
+### Sidebar
+`sidebar.tsx`
+
+Container for sidebar items, often used with `DraggableSidebarItem` to spawn new manipulatives.
+
+## Utilities
+
+### ResolutionGuard
 `resolution-guard.tsx`
 
 A safety component that detects if the user is on a phone (<768px) and displays a modal suggesting a larger device.
 - The user can dismiss it ("Continue Anyway").
 - The dismissal is remembered for the session via `sessionStorage`.
 
-## Other Components
+### CopyLinkButton
+`copy-link-button.tsx`
 
-- **`toolbar.tsx`**: Standardized button groups for the top overlay.
-- **`sidebar.tsx`**: Container for sidebar items.
-- **`tile-base.tsx`**: A primitive for creating draggable/interactive items (like tiles or counters).
-- **`help-modal.tsx`**: Renders Markdown content in a dialog.
+A specialized button that handles URL state sharing.
+- **Feedback**: Changes state to "Copied!" temporarily.
+- **Async**: Handles the promise returned by the clipboard API.
+
+### HelpModal
+`help-modal.tsx`
+
+Renders Markdown content in a accessible dialog. Automatically used by `ToolScaffold`.
 
 ## Creating a New Tool
 
