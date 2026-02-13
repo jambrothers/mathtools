@@ -7,6 +7,7 @@ import { CopyLinkButton } from '@/components/tool-ui/copy-link-button';
 import { Canvas } from '@/components/tool-ui/canvas';
 import { ResolutionGuard } from '@/components/tool-ui/resolution-guard';
 import { usePercentageGrid } from './_hooks/use-percentage-grid';
+import { useGridLayout } from './_hooks/use-grid-layout';
 import { PercentageGrid } from './_components/percentage-grid';
 import { FdpPanel } from './_components/fdp-panel';
 import { useUrlState } from '@/lib/hooks/use-url-state';
@@ -68,42 +69,12 @@ function PercentageGridPageContent() {
     } = usePercentageGrid();
 
     // Layout Logic (Responsive Sizing)
-    const [gridDimensions, setGridDimensions] = React.useState<{ width: number; height: number } | null>(null);
     const containerRef = React.useRef<HTMLDivElement>(null);
-
-    React.useEffect(() => {
-        if (!containerRef.current) return;
-
-        const observer = new ResizeObserver((entries) => {
-            const entry = entries[0];
-            if (!entry) return;
-
-            const { width: availableWidth, height: availableHeight } = entry.contentRect;
-            const cardPadding = 48;
-            const maxGridWidth = 1000;
-
-            const targetAspectRatio = cols / rows;
-
-            const maxAvailableGridWidth = Math.min(availableWidth - cardPadding, maxGridWidth);
-            const maxAvailableGridHeight = availableHeight - cardPadding;
-
-            let gridWidth = maxAvailableGridWidth;
-            let gridHeight = gridWidth / targetAspectRatio;
-
-            if (gridHeight > maxAvailableGridHeight) {
-                gridHeight = maxAvailableGridHeight;
-                gridWidth = gridHeight * targetAspectRatio;
-            }
-
-            setGridDimensions({
-                width: gridWidth + cardPadding,
-                height: gridHeight + cardPadding
-            });
-        });
-
-        observer.observe(containerRef.current);
-        return () => observer.disconnect();
-    }, [cols, rows]);
+    const gridDimensions = useGridLayout({
+        containerRef,
+        rows,
+        cols
+    });
 
     const [activeDropdown, setActiveDropdown] = React.useState<'gridMode' | null>(null);
     const [dropdownPos, setDropdownPos] = React.useState<{ top: number; left: number } | null>(null);
