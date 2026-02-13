@@ -27,3 +27,8 @@
 **Vulnerability:** The `parseList` utility used `value.split('')` when handling empty delimiters, which allocates an array of size N for an input string of length N immediately, creating a memory exhaustion DoS vector for large inputs.
 **Learning:** Even simple utility functions can be DoS vectors if they allocate memory proportional to input size before validation or limiting. `split('')` is deceptively expensive for large strings.
 **Prevention:** Use iterative character access (e.g., `value[i]`) instead of `split('')` when processing strings character-by-character to avoid intermediate allocation.
+
+## 2026-02-13 - Unvalidated Component Type Injection (Crash)
+**Vulnerability:** The `circuit-designer` tool accepted arbitrary strings as `componentType` via drag-and-drop or direct function calls, causing a runtime crash (DoS) when rendering the invalid component.
+**Learning:** Runtime type checking is essential even for internal state updates when input originates from external sources (like drag events or potentially manipulated URL state).
+**Prevention:** Validate all enum-like inputs against the allowed set of values before updating state.
