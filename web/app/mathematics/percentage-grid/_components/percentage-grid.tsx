@@ -27,56 +27,150 @@ export function PercentageGrid({
     onDragEnter,
     onDragEnd,
 }: PercentageGridProps) {
+    // ResizeObserver logic to fit grid within available space
+    const [gridDimensions, setGridDimensions] = React.useState<{ width: number; height: number } | null>(null);
+    const wrapperRef = React.useRef<HTMLDivElement>(null);
+
     React.useEffect(() => {
-        const handleMouseUp = () => onDragEnd();
-        window.addEventListener('mouseup', handleMouseUp);
-        return () => window.removeEventListener('mouseup', handleMouseUp);
-    }, [onDragEnd]);
+        if (!wrapperRef.current) return;
+
+        const observer = new ResizeObserver((entries) => {
+            const entry = entries[0];
+            if (!entry) return;
+
+            // Get available dimensions of the wrapper
+            const { width: availableWidth, height: availableHeight } = entry.contentRect;
+
+            // Calculate target aspect ratio
+            const targetAspectRatio = cols / rows;
+
+            // Determine dimensions that fit within available space while maintaining aspect ratio
+            let width = availableWidth;
+            let height = width / targetAspectRatio;
+
+            if (height > availableHeight) {
+                height = availableHeight;
+                width = height * targetAspectRatio;
+            }
+
+            // Cap at max width (600px) if enough space
+            if (width > 600) {
+                width = 600;
+                height = width / targetAspectRatio;
+            }
+
+            setGridDimensions({ width, height });
+        });
+
+        observer.observe(wrapperRef.current);
+        return () => observer.disconnect();
+    }, [cols, rows]);
+
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const lastProcessedIndex = React.useRef<number | null>(null);
+
+    const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+        // Prevent default to avoid potential scrolling or selection issues
+        // (though touch-action: none should handle most of it)
+
+        // Find the square under the pointer
+        // We can use the event target if it's correct, or look up via index
+        const target = e.target as HTMLElement;
+        const squareElement = target.closest('[data-square-index]');
+
+        if (squareElement) {
+            e.preventDefault();
+            const indexStr = squareElement.getAttribute('data-square-index');
+            if (indexStr !== null) {
+                const index = parseInt(indexStr, 10);
+                onDragStart(index);
+                lastProcessedIndex.current = index;
+
+                // Capture the pointer so we receive events even if the pointer moves outside
+                // the initial square or even the grid container
+                e.currentTarget.setPointerCapture(e.pointerId);
+            }
+        }
+    };
+
+    const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (!isDragging) return;
+
+        // With pointer capture, the target is always the captured element (container).
+        // So we MUST use elementFromPoint to find what's under the cursor.
+        const elementUnderCursor = document.elementFromPoint(e.clientX, e.clientY);
+        const squareElement = elementUnderCursor?.closest('[data-square-index]');
+
+        if (squareElement) {
+            const indexStr = squareElement.getAttribute('data-square-index');
+            if (indexStr !== null) {
+                const index = parseInt(indexStr, 10);
+                if (index !== lastProcessedIndex.current) {
+                    onDragEnter(index);
+                    lastProcessedIndex.current = index;
+                }
+            }
+        }
+    };
+
+    const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (isDragging) {
+            onDragEnd();
+            lastProcessedIndex.current = null;
+            e.currentTarget.releasePointerCapture(e.pointerId);
+        }
+    };
 
     return (
-        <div className="relative aspect-square w-full max-w-[600px] mx-auto">
-            <div
-                className="grid gap-1 select-none w-full h-full"
-                style={{
-                    gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-                    gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
-                }}
-                role="grid"
-                aria-label="Percentage grid"
-            >
-                {Array.from({ length: totalCells }, (_, index) => (
-                    <GridSquare
-                        key={index}
-                        index={index}
-                        cols={cols}
-                        selected={selectedIndices.has(index)}
-                        isDragging={isDragging}
-                        onToggle={onToggle}
-                        onDragStart={onDragStart}
-                        onDragEnter={onDragEnter}
-                        onDragEnd={onDragEnd}
-                    />
-                ))}
-            </div>
-
-            {dragPreviewBounds && (
+        <div ref={wrapperRef} className="relative w-full h-full flex items-center justify-center overflow-hidden">
+            {gridDimensions && (
                 <div
-                    className="absolute inset-0 pointer-events-none grid gap-1 w-full h-full"
+                    ref={containerRef}
+                    className="grid gap-1 select-none"
                     style={{
+                        width: gridDimensions.width,
+                        height: gridDimensions.height,
                         gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
                         gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
+                        touchAction: 'none'
                     }}
-                    data-testid="drag-preview-overlay"
+                    role="grid"
+                    aria-label="Percentage grid"
+                    onPointerDown={handlePointerDown}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerCancel={handlePointerUp}
                 >
-                    <div
-                        className="border-2 border-blue-400 rounded-sm"
-                        style={{
-                            gridColumnStart: dragPreviewBounds.colMin + 1,
-                            gridColumnEnd: dragPreviewBounds.colMax + 2,
-                            gridRowStart: dragPreviewBounds.rowMin + 1,
-                            gridRowEnd: dragPreviewBounds.rowMax + 2,
-                        }}
-                    />
+                    {Array.from({ length: totalCells }, (_, index) => (
+                        <GridSquare
+                            key={index}
+                            index={index}
+                            cols={cols}
+                            selected={selectedIndices.has(index)}
+                            onToggle={onToggle}
+                        />
+                    ))}
+
+                    {dragPreviewBounds && (
+                        <div
+                            className="absolute inset-0 pointer-events-none grid gap-1 w-full h-full"
+                            style={{
+                                gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+                                gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
+                            }}
+                            data-testid="drag-preview-overlay"
+                        >
+                            <div
+                                className="border-2 border-blue-400 rounded-sm"
+                                style={{
+                                    gridColumnStart: dragPreviewBounds.colMin + 1,
+                                    gridColumnEnd: dragPreviewBounds.colMax + 2,
+                                    gridRowStart: dragPreviewBounds.rowMin + 1,
+                                    gridRowEnd: dragPreviewBounds.rowMax + 2,
+                                }}
+                            />
+                        </div>
+                    )}
                 </div>
             )}
         </div>

@@ -3,6 +3,25 @@ import { PercentageGrid } from './percentage-grid';
 
 
 describe('PercentageGrid', () => {
+    beforeAll(() => {
+        // Mock ResizeObserver
+        global.ResizeObserver = class ResizeObserver {
+            callback: ResizeObserverCallback;
+            constructor(callback: ResizeObserverCallback) {
+                this.callback = callback;
+            }
+            observe(target: Element) {
+                // Immediately trigger callback with dummy dimensions to render grid
+                this.callback([{
+                    contentRect: { width: 500, height: 500 },
+                    target,
+                } as ResizeObserverEntry], this);
+            }
+            unobserve() { }
+            disconnect() { }
+        };
+    });
+
     it('renders 100 squares for 10x10 grid', () => {
         const { getAllByRole } = render(
             <PercentageGrid
@@ -19,6 +38,7 @@ describe('PercentageGrid', () => {
             />
         );
 
+        // The grid content is conditional on ResizeObserver triggering, which our mock does synchronously.
         expect(getAllByRole('button')).toHaveLength(100);
     });
 
@@ -41,11 +61,21 @@ describe('PercentageGrid', () => {
         expect(getAllByRole('button')).toHaveLength(20);
     });
 
-    it('calls drag handlers on mouse interactions', () => {
+    it('calls drag handlers on pointer interactions', () => {
         const onDragStart = jest.fn();
         const onDragEnter = jest.fn();
+        const onDragEnd = jest.fn();
 
-        const { getAllByRole } = render(
+        // Mock pointer capture methods
+        const originalSetPointerCapture = HTMLElement.prototype.setPointerCapture;
+        const originalReleasePointerCapture = HTMLElement.prototype.releasePointerCapture;
+        const originalElementFromPoint = document.elementFromPoint;
+
+        HTMLElement.prototype.setPointerCapture = jest.fn();
+        HTMLElement.prototype.releasePointerCapture = jest.fn();
+        document.elementFromPoint = jest.fn();
+
+        const { getAllByRole, getByRole } = render(
             <PercentageGrid
                 selectedIndices={new Set()}
                 dragPreviewBounds={null}
@@ -56,16 +86,34 @@ describe('PercentageGrid', () => {
                 onToggle={() => undefined}
                 onDragStart={onDragStart}
                 onDragEnter={onDragEnter}
-                onDragEnd={() => undefined}
+                onDragEnd={onDragEnd}
             />
         );
 
         const squares = getAllByRole('button');
-        fireEvent.mouseDown(squares[0]);
-        fireEvent.mouseEnter(squares[1]);
+        const grid = getByRole('grid');
 
+        // Start Drag
+        fireEvent.pointerDown(squares[0]);
         expect(onDragStart).toHaveBeenCalledWith(0);
+        expect(grid.setPointerCapture).toHaveBeenCalled();
+
+        // Move Drag
+        // Simulate finding the second square under the cursor
+        (document.elementFromPoint as jest.Mock).mockReturnValue(squares[1]);
+
+        fireEvent.pointerMove(grid, { clientX: 100, clientY: 100 });
         expect(onDragEnter).toHaveBeenCalledWith(1);
+
+        // End Drag
+        fireEvent.pointerUp(grid);
+        expect(onDragEnd).toHaveBeenCalled();
+        expect(grid.releasePointerCapture).toHaveBeenCalled();
+
+        // Cleanup
+        HTMLElement.prototype.setPointerCapture = originalSetPointerCapture;
+        HTMLElement.prototype.releasePointerCapture = originalReleasePointerCapture;
+        document.elementFromPoint = originalElementFromPoint;
     });
 
     it('shows the drag preview overlay when bounds are provided', () => {

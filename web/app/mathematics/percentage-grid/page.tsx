@@ -203,7 +203,7 @@ function PercentageGridPageContent() {
 
             <Canvas className="flex-1">
                 <div className="relative flex h-full w-full items-center justify-center p-6 py-12">
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-4 sm:p-6 w-full max-w-2xl">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-4 sm:p-6 w-full max-w-2xl h-full">
                         <PercentageGrid
                             selectedIndices={selectedIndices}
                             dragPreviewBounds={dragPreviewBounds}

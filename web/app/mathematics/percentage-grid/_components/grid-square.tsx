@@ -5,33 +5,17 @@ interface GridSquareProps {
     index: number;
     cols: number;
     selected: boolean;
-    isDragging: boolean;
     onToggle: (index: number) => void;
-    onDragStart: (index: number) => void;
-    onDragEnter: (index: number) => void;
-    onDragEnd: () => void;
 }
 
 export const GridSquare = React.memo(function GridSquare({
     index,
     cols,
     selected,
-    isDragging,
     onToggle,
-    onDragStart,
-    onDragEnter,
-    onDragEnd,
 }: GridSquareProps) {
-    const handleMouseDown = (event: React.MouseEvent<HTMLButtonElement>) => {
-        event.preventDefault();
-        onDragStart(index);
-    };
-
-    const handleMouseEnter = () => {
-        if (isDragging) {
-            onDragEnter(index);
-        }
-    };
+    // Mouse/Pointer interactions are now handled by the parent PercentageGrid component
+    // to support touch drag-selection correctly.
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
         if (event.key === ' ' || event.key === 'Enter') {
@@ -67,10 +51,8 @@ export const GridSquare = React.memo(function GridSquare({
             aria-pressed={selected}
             aria-label={`Square ${index + 1}${selected ? ', selected' : ', not selected'}`}
             data-square-index={index}
-            onMouseDown={handleMouseDown}
-            onMouseEnter={handleMouseEnter}
-            onMouseUp={onDragEnd}
             onKeyDown={handleKeyDown}
+            style={{ touchAction: 'none' }}
         />
     );
 });
