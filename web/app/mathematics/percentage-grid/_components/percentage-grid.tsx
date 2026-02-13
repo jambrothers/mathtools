@@ -27,45 +27,6 @@ export function PercentageGrid({
     onDragEnter,
     onDragEnd,
 }: PercentageGridProps) {
-    // ResizeObserver logic to fit grid within available space
-    const [gridDimensions, setGridDimensions] = React.useState<{ width: number; height: number } | null>(null);
-    const wrapperRef = React.useRef<HTMLDivElement>(null);
-
-    React.useEffect(() => {
-        if (!wrapperRef.current) return;
-
-        const observer = new ResizeObserver((entries) => {
-            const entry = entries[0];
-            if (!entry) return;
-
-            // Get available dimensions of the wrapper
-            const { width: availableWidth, height: availableHeight } = entry.contentRect;
-
-            // Calculate target aspect ratio
-            const targetAspectRatio = cols / rows;
-
-            // Determine dimensions that fit within available space while maintaining aspect ratio
-            let width = availableWidth;
-            let height = width / targetAspectRatio;
-
-            if (height > availableHeight) {
-                height = availableHeight;
-                width = height * targetAspectRatio;
-            }
-
-            // Cap at max width (600px) if enough space
-            if (width > 600) {
-                width = 600;
-                height = width / targetAspectRatio;
-            }
-
-            setGridDimensions({ width, height });
-        });
-
-        observer.observe(wrapperRef.current);
-        return () => observer.disconnect();
-    }, [cols, rows]);
-
     const containerRef = React.useRef<HTMLDivElement>(null);
     const lastProcessedIndex = React.useRef<number | null>(null);
 
@@ -122,57 +83,53 @@ export function PercentageGrid({
     };
 
     return (
-        <div ref={wrapperRef} className="relative w-full h-full flex items-center justify-center overflow-hidden">
-            {gridDimensions && (
-                <div
-                    ref={containerRef}
-                    className="grid gap-1 select-none"
-                    style={{
-                        width: gridDimensions.width,
-                        height: gridDimensions.height,
-                        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-                        gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
-                        touchAction: 'none'
-                    }}
-                    role="grid"
-                    aria-label="Percentage grid"
-                    onPointerDown={handlePointerDown}
-                    onPointerMove={handlePointerMove}
-                    onPointerUp={handlePointerUp}
-                    onPointerCancel={handlePointerUp}
-                >
-                    {Array.from({ length: totalCells }, (_, index) => (
-                        <GridSquare
-                            key={index}
-                            index={index}
-                            cols={cols}
-                            selected={selectedIndices.has(index)}
-                            onToggle={onToggle}
-                        />
-                    ))}
+        <div className="relative w-full h-full flex items-center justify-center">
+            <div
+                ref={containerRef}
+                className="grid gap-1 select-none w-full h-full"
+                style={{
+                    gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+                    gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
+                    touchAction: 'none'
+                }}
+                role="grid"
+                aria-label="Percentage grid"
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerUp}
+            >
+                {Array.from({ length: totalCells }, (_, index) => (
+                    <GridSquare
+                        key={index}
+                        index={index}
+                        cols={cols}
+                        selected={selectedIndices.has(index)}
+                        onToggle={onToggle}
+                    />
+                ))}
 
-                    {dragPreviewBounds && (
+                {dragPreviewBounds && (
+                    <div
+                        className="absolute inset-0 pointer-events-none grid gap-1 w-full h-full"
+                        style={{
+                            gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+                            gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
+                        }}
+                        data-testid="drag-preview-overlay"
+                    >
                         <div
-                            className="absolute inset-0 pointer-events-none grid gap-1 w-full h-full"
+                            className="border-2 border-blue-400 rounded-sm"
                             style={{
-                                gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-                                gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
+                                gridColumnStart: dragPreviewBounds.colMin + 1,
+                                gridColumnEnd: dragPreviewBounds.colMax + 2,
+                                gridRowStart: dragPreviewBounds.rowMin + 1,
+                                gridRowEnd: dragPreviewBounds.rowMax + 2,
                             }}
-                            data-testid="drag-preview-overlay"
-                        >
-                            <div
-                                className="border-2 border-blue-400 rounded-sm"
-                                style={{
-                                    gridColumnStart: dragPreviewBounds.colMin + 1,
-                                    gridColumnEnd: dragPreviewBounds.colMax + 2,
-                                    gridRowStart: dragPreviewBounds.rowMin + 1,
-                                    gridRowEnd: dragPreviewBounds.rowMax + 2,
-                                }}
-                            />
-                        </div>
-                    )}
-                </div>
-            )}
+                        />
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

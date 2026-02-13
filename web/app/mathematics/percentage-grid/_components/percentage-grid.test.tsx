@@ -3,25 +3,6 @@ import { PercentageGrid } from './percentage-grid';
 
 
 describe('PercentageGrid', () => {
-    beforeAll(() => {
-        // Mock ResizeObserver
-        global.ResizeObserver = class ResizeObserver {
-            callback: ResizeObserverCallback;
-            constructor(callback: ResizeObserverCallback) {
-                this.callback = callback;
-            }
-            observe(target: Element) {
-                // Immediately trigger callback with dummy dimensions to render grid
-                this.callback([{
-                    contentRect: { width: 500, height: 500 },
-                    target,
-                } as ResizeObserverEntry], this);
-            }
-            unobserve() { }
-            disconnect() { }
-        };
-    });
-
     it('renders 100 squares for 10x10 grid', () => {
         const { getAllByRole } = render(
             <PercentageGrid
@@ -38,7 +19,6 @@ describe('PercentageGrid', () => {
             />
         );
 
-        // The grid content is conditional on ResizeObserver triggering, which our mock does synchronously.
         expect(getAllByRole('button')).toHaveLength(100);
     });
 

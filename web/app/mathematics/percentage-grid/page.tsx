@@ -67,6 +67,44 @@ function PercentageGridPageContent() {
         toggleSimplifyFraction,
     } = usePercentageGrid();
 
+    // Layout Logic (Responsive Sizing)
+    const [gridDimensions, setGridDimensions] = React.useState<{ width: number; height: number } | null>(null);
+    const containerRef = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        if (!containerRef.current) return;
+
+        const observer = new ResizeObserver((entries) => {
+            const entry = entries[0];
+            if (!entry) return;
+
+            const { width: availableWidth, height: availableHeight } = entry.contentRect;
+            const cardPadding = 48;
+            const maxGridWidth = 1000;
+
+            const targetAspectRatio = cols / rows;
+
+            const maxAvailableGridWidth = Math.min(availableWidth - cardPadding, maxGridWidth);
+            const maxAvailableGridHeight = availableHeight - cardPadding;
+
+            let gridWidth = maxAvailableGridWidth;
+            let gridHeight = gridWidth / targetAspectRatio;
+
+            if (gridHeight > maxAvailableGridHeight) {
+                gridHeight = maxAvailableGridHeight;
+                gridWidth = gridHeight * targetAspectRatio;
+            }
+
+            setGridDimensions({
+                width: gridWidth + cardPadding,
+                height: gridHeight + cardPadding
+            });
+        });
+
+        observer.observe(containerRef.current);
+        return () => observer.disconnect();
+    }, [cols, rows]);
+
     const [activeDropdown, setActiveDropdown] = React.useState<'gridMode' | null>(null);
     const [dropdownPos, setDropdownPos] = React.useState<{ top: number; left: number } | null>(null);
     const gridModeRef = React.useRef<HTMLDivElement>(null);
@@ -202,21 +240,29 @@ function PercentageGridPageContent() {
             </Toolbar>
 
             <Canvas className="flex-1">
-                <div className="relative flex h-full w-full items-center justify-center p-6 py-12">
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-4 sm:p-6 w-full max-w-2xl h-full">
-                        <PercentageGrid
-                            selectedIndices={selectedIndices}
-                            dragPreviewBounds={dragPreviewBounds}
-                            isDragging={isDragging}
-                            rows={rows}
-                            cols={cols}
-                            totalCells={totalCells}
-                            onToggle={toggleSquare}
-                            onDragStart={startDrag}
-                            onDragEnter={dragEnter}
-                            onDragEnd={endDrag}
-                        />
-                    </div>
+                <div ref={containerRef} className="relative flex h-full w-full items-center justify-center p-6 py-12 overflow-hidden">
+                    {gridDimensions && (
+                        <div
+                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-4 sm:p-6 flex flex-col items-center justify-center"
+                            style={{
+                                width: gridDimensions.width,
+                                height: gridDimensions.height,
+                            }}
+                        >
+                            <PercentageGrid
+                                selectedIndices={selectedIndices}
+                                dragPreviewBounds={dragPreviewBounds}
+                                isDragging={isDragging}
+                                rows={rows}
+                                cols={cols}
+                                totalCells={totalCells}
+                                onToggle={toggleSquare}
+                                onDragStart={startDrag}
+                                onDragEnter={dragEnter}
+                                onDragEnd={endDrag}
+                            />
+                        </div>
+                    )}
                     {showPanel && (
                         <FdpPanel
                             percentage={percentageDisplay}
