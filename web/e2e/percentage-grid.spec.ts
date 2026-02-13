@@ -73,4 +73,43 @@ test.describe('Percentage Grid', () => {
         // Box 2 should be smaller than Box 1
         expect(box2.width).toBeLessThan(box1.width);
     });
+
+    test('should maintain consistent grid size across different modes', async ({ page }) => {
+        const grid = page.getByRole('grid');
+
+        // Set a fixed viewport to ensure deterministic sizing
+        await page.setViewportSize({ width: 1000, height: 1000 });
+        await page.waitForTimeout(200);
+
+        // 1. Measure initial 10x10 grid
+        const box10x10 = await grid.boundingBox();
+        if (!box10x10) throw new Error('Grid not visible');
+
+        // Open mode dropdown
+        await page.getByRole('button', { name: '10 × 10' }).first().click();
+
+        // 2. Switch to 10x5
+        await page.getByRole('button', { name: '10 × 5 (50 cells)' }).click();
+        await page.waitForTimeout(100); // Allow for render/layout update
+        const box10x5 = await grid.boundingBox();
+        // Allow small difference for border/layout rounding
+        expect(Math.abs((box10x5?.width || 0) - box10x10.width)).toBeLessThan(2);
+        expect(Math.abs((box10x5?.height || 0) - box10x10.height)).toBeLessThan(2);
+
+        // 3. Switch to 10x2
+        await page.getByRole('button', { name: '10 × 5' }).first().click();
+        await page.getByRole('button', { name: '10 × 2 (20 cells)' }).click();
+        await page.waitForTimeout(100);
+        const box10x2 = await grid.boundingBox();
+        expect(Math.abs((box10x2?.width || 0) - box10x10.width)).toBeLessThan(2);
+        expect(Math.abs((box10x2?.height || 0) - box10x10.height)).toBeLessThan(2);
+
+        // 4. Switch to 10x1
+        await page.getByRole('button', { name: '10 × 2' }).first().click();
+        await page.getByRole('button', { name: '10 × 1 (10 cells)' }).click();
+        await page.waitForTimeout(100);
+        const box10x1 = await grid.boundingBox();
+        expect(Math.abs((box10x1?.width || 0) - box10x10.width)).toBeLessThan(2);
+        expect(Math.abs((box10x1?.height || 0) - box10x10.height)).toBeLessThan(2);
+    });
 });

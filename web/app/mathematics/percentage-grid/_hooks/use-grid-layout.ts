@@ -6,7 +6,7 @@ interface GridDimensions {
 }
 
 interface UseGridLayoutProps {
-    containerRef: RefObject<any>;
+    containerRef: RefObject<HTMLDivElement>;
     rows: number;
     cols: number;
     padding?: number;
@@ -16,30 +16,21 @@ interface UseGridLayoutProps {
 export function calculateGridDimensions(
     availableWidth: number,
     availableHeight: number,
-    rows: number,
-    cols: number,
+
     padding: number = 48,
     maxWidth: number = 1000
 ): GridDimensions {
-    const targetAspectRatio = cols / rows;
-
     // Calculate max available dimensions for the GRID itself (subtracting card padding)
     const maxAvailableGridWidth = Math.min(availableWidth - padding, maxWidth);
     const maxAvailableGridHeight = availableHeight - padding;
 
-    // Start with max width
-    let gridWidth = maxAvailableGridWidth;
-    let gridHeight = gridWidth / targetAspectRatio;
-
-    // If height overflows, scale down based on height
-    if (gridHeight > maxAvailableGridHeight) {
-        gridHeight = maxAvailableGridHeight;
-        gridWidth = gridHeight * targetAspectRatio;
-    }
+    // Always use a square footprint so the card size is consistent
+    // across all grid modes (10x10, 10x5, 10x2, 10x1)
+    const gridSize = Math.min(maxAvailableGridWidth, maxAvailableGridHeight);
 
     return {
-        width: gridWidth + padding,
-        height: gridHeight + padding
+        width: gridSize + padding,
+        height: gridSize + padding
     };
 }
 
@@ -60,7 +51,7 @@ export function useGridLayout({
             if (!entry) return;
 
             const { width, height } = entry.contentRect;
-            const newDimensions = calculateGridDimensions(width, height, rows, cols, padding, maxWidth);
+            const newDimensions = calculateGridDimensions(width, height, padding, maxWidth);
             setDimensions(newDimensions);
         });
 
