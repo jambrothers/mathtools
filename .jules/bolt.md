@@ -13,3 +13,7 @@
 ## 2026-02-12 - Imperative DOM Updates for Drag Ghosts
 **Learning:** React state updates (`useState`) during high-frequency drag events (like touch/pointer moves) cause re-renders on every frame, which can be laggy, especially for simple visual feedback like a "ghost" element following the cursor.
 **Action:** Use `useRef` to store the pointer position and a ref to the DOM element (e.g., the ghost), then update the element's style imperatively in the event handler. Only use state to mount/unmount the element or for low-frequency changes (like start/end of drag).
+
+## 2026-02-12 - Testing Performance Optimizations via State Spies
+**Learning:** To verify optimizations where global state updates are intentionally skipped (e.g., single-item drag using local state), standard behavior verification is insufficient as the visual result is identical.
+**Action:** Use Jest spies on the state setter function (or the hook that wraps it) and assert `not.toHaveBeenCalled()` during the interaction for the optimized case, contrasting with `toHaveBeenCalled()` in the non-optimized (multi-item) scenario. This confirms the optimization logic is active and preventing re-renders.

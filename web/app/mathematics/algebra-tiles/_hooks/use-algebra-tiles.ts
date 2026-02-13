@@ -82,6 +82,10 @@ export function useAlgebraTiles() {
         const isSelected = ids.has(id);
         const idsToMove = isSelected ? ids : new Set([id]);
 
+        // Optimization: For single tile drag, rely on local visual state (useDraggable).
+        // Skip global state update until drag end to prevent re-rendering all tiles.
+        if (idsToMove.size === 1) return;
+
         // Use updateState to avoid polluting history with every pixel move
         updateTilesCurrent(prevTiles => prevTiles.map(t => {
             if (idsToMove.has(t.id)) {
