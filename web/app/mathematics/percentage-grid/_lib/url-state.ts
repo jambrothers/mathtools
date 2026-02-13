@@ -17,6 +17,7 @@ export interface PercentageGridURLState {
     showDecimal: boolean;
     showFraction: boolean;
     simplifyFraction: boolean;
+    showLabels: boolean;
 }
 
 const PARAM_MODE = 'gm';
@@ -26,6 +27,7 @@ const PARAM_PERCENTAGE = 'pc';
 const PARAM_DECIMAL = 'dc';
 const PARAM_FRACTION = 'fr';
 const PARAM_SIMPLIFY = 'sf';
+const PARAM_LABELS = 'lb';
 
 function parseSelectedIndices(value: string | null, maxItems: number): number[] {
     const parsed = parseList(value, (part) => {
@@ -52,6 +54,7 @@ export const percentageGridURLSerializer: URLStateSerializer<PercentageGridURLSt
         params.set(PARAM_DECIMAL, serializeBool(state.showDecimal));
         params.set(PARAM_FRACTION, serializeBool(state.showFraction));
         params.set(PARAM_SIMPLIFY, serializeBool(state.simplifyFraction));
+        params.set(PARAM_LABELS, serializeBool(state.showLabels));
         return params;
     },
     deserialize(params: URLSearchParams): PercentageGridURLState | null {
@@ -63,6 +66,7 @@ export const percentageGridURLSerializer: URLStateSerializer<PercentageGridURLSt
             PARAM_DECIMAL,
             PARAM_FRACTION,
             PARAM_SIMPLIFY,
+            PARAM_LABELS,
         ]);
         if (!hasAny) return null;
 
@@ -79,6 +83,7 @@ export const percentageGridURLSerializer: URLStateSerializer<PercentageGridURLSt
             showDecimal: deserializeBool(params.get(PARAM_DECIMAL), false),
             showFraction: deserializeBool(params.get(PARAM_FRACTION), false),
             simplifyFraction: deserializeBool(params.get(PARAM_SIMPLIFY), false),
+            showLabels: deserializeBool(params.get(PARAM_LABELS), false),
         };
     }
 };

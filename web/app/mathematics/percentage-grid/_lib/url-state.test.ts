@@ -10,6 +10,7 @@ describe('percentageGridURLSerializer', () => {
             showDecimal: false,
             showFraction: false,
             simplifyFraction: false,
+            showLabels: false,
         });
         expect(params.get('s')).toBe('0;5;42');
         expect(params.get('gm')).toBe('10x10');
@@ -26,6 +27,29 @@ describe('percentageGridURLSerializer', () => {
         expect(state?.showDecimal).toBe(false);
         expect(state?.showFraction).toBe(true);
         expect(state?.simplifyFraction).toBe(false);
+        expect(state?.showLabels).toBe(false);
+    });
+
+    it('round-trips showLabels', () => {
+        const state = {
+            gridMode: '10x10' as const,
+            selectedIndices: [],
+            showPanel: true,
+            showPercentage: false,
+            showDecimal: false,
+            showFraction: false,
+            simplifyFraction: false,
+            showLabels: true,
+        };
+        const params = percentageGridURLSerializer.serialize(state);
+        const restored = percentageGridURLSerializer.deserialize(params);
+        expect(restored?.showLabels).toBe(true);
+    });
+
+    it('defaults showLabels to false when missing from URL', () => {
+        const params = new URLSearchParams('s=1;2;3');
+        const state = percentageGridURLSerializer.deserialize(params);
+        expect(state?.showLabels).toBe(false);
     });
 
     it('returns null when no relevant params are present', () => {
@@ -50,5 +74,6 @@ describe('percentageGridURLSerializer', () => {
         expect(state?.showDecimal).toBe(false);
         expect(state?.showFraction).toBe(false);
         expect(state?.simplifyFraction).toBe(false);
+        expect(state?.showLabels).toBe(false);
     });
 });

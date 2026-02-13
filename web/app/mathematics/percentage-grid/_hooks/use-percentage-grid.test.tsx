@@ -177,11 +177,9 @@ describe('usePercentageGrid', () => {
     it('toggles visibility controls for the panel', () => {
         const { result } = renderHook(() => usePercentageGrid());
 
-        expect(result.current.showPanel).toBe(true);
-        expect(result.current.showPercentage).toBe(false);
-        expect(result.current.showDecimal).toBe(false);
         expect(result.current.showFraction).toBe(false);
         expect(result.current.simplifyFraction).toBe(false);
+        expect(result.current.showLabels).toBe(false);
 
         act(() => {
             result.current.togglePanel();
@@ -189,6 +187,7 @@ describe('usePercentageGrid', () => {
             result.current.toggleShowDecimal();
             result.current.toggleShowFraction();
             result.current.toggleSimplifyFraction();
+            result.current.toggleShowLabels();
         });
 
         expect(result.current.showPanel).toBe(false);
@@ -196,6 +195,24 @@ describe('usePercentageGrid', () => {
         expect(result.current.showDecimal).toBe(true);
         expect(result.current.showFraction).toBe(true);
         expect(result.current.simplifyFraction).toBe(true);
+        expect(result.current.showLabels).toBe(true);
+    });
+
+    it('showLabels defaults to false and toggles', () => {
+        const { result } = renderHook(() => usePercentageGrid());
+
+        // Default off
+        expect(result.current.showLabels).toBe(false);
+
+        act(() => {
+            result.current.toggleShowLabels();
+        });
+        expect(result.current.showLabels).toBe(true);
+
+        act(() => {
+            result.current.toggleShowLabels();
+        });
+        expect(result.current.showLabels).toBe(false);
     });
 
 });

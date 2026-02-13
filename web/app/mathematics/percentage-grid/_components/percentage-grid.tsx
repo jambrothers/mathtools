@@ -9,6 +9,7 @@ interface PercentageGridProps {
     rows: number;
     cols: number;
     totalCells: number;
+    showLabels: boolean;
     onToggle: (index: number) => void;
     onDragStart: (index: number) => void;
     onDragEnter: (index: number) => void;
@@ -22,6 +23,7 @@ export function PercentageGrid({
     rows,
     cols,
     totalCells,
+    showLabels,
     onToggle,
     onDragStart,
     onDragEnter,
@@ -83,7 +85,52 @@ export function PercentageGrid({
     };
 
     return (
-        <div className="relative w-full h-full flex items-center justify-center">
+        <div
+            className="relative w-full h-full"
+            style={showLabels ? {
+                display: 'grid',
+                gridTemplateColumns: '24px 1fr',
+                gridTemplateRows: '24px 1fr',
+                gap: '8px',
+            } : {
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}
+        >
+            {showLabels && (
+                <>
+                    {/* Top-left empty corner */}
+                    <div />
+
+                    {/* Column labels */}
+                    <div
+                        data-testid="column-labels"
+                        className="grid gap-1"
+                        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+                    >
+                        {Array.from({ length: cols }, (_, i) => (
+                            <span key={i} className="flex items-center justify-center text-[10px] font-medium text-slate-400 dark:text-slate-500">
+                                {i + 1}
+                            </span>
+                        ))}
+                    </div>
+
+                    {/* Row labels */}
+                    <div
+                        data-testid="row-labels"
+                        className="grid gap-1"
+                        style={{ gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }}
+                    >
+                        {Array.from({ length: rows }, (_, i) => (
+                            <span key={i} className="flex items-center justify-center text-[10px] font-medium text-slate-400 dark:text-slate-500">
+                                {i + 1}
+                            </span>
+                        ))}
+                    </div>
+                </>
+            )}
+
             <div
                 ref={containerRef}
                 className="grid gap-1 select-none w-full h-full"

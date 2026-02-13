@@ -61,11 +61,13 @@ function PercentageGridPageContent() {
         showDecimal,
         showFraction,
         simplifyFraction,
+        showLabels,
         togglePanel,
         toggleShowPercentage,
         toggleShowDecimal,
         toggleShowFraction,
         toggleSimplifyFraction,
+        toggleShowLabels,
     } = usePercentageGrid();
 
     // Layout Logic (Responsive Sizing)
@@ -100,6 +102,7 @@ function PercentageGridPageContent() {
                 showDecimal: state.showDecimal,
                 showFraction: state.showFraction,
                 simplifyFraction: state.simplifyFraction,
+                showLabels: state.showLabels,
             });
         }
     });
@@ -113,9 +116,10 @@ function PercentageGridPageContent() {
             showDecimal,
             showFraction,
             simplifyFraction,
+            showLabels,
         };
         await copyShareableUrl(state);
-    }, [copyShareableUrl, gridMode, selectedIndices, showPanel, showPercentage, showDecimal, showFraction, simplifyFraction]);
+    }, [copyShareableUrl, gridMode, selectedIndices, showPanel, showPercentage, showDecimal, showFraction, simplifyFraction, showLabels]);
 
     return (
         <div className="flex flex-col h-[calc(100vh-81px)] w-full bg-slate-50 dark:bg-slate-950 overflow-hidden">
@@ -206,6 +210,12 @@ function PercentageGridPageContent() {
                         active={simplifyFraction}
                         aria-pressed={simplifyFraction}
                     />
+                    <ToolbarButton
+                        label="Labels"
+                        onClick={toggleShowLabels}
+                        active={showLabels}
+                        aria-pressed={showLabels}
+                    />
                     <CopyLinkButton onCopyLink={handleCopyLink} />
                 </ToolbarGroup>
             </Toolbar>
@@ -227,6 +237,7 @@ function PercentageGridPageContent() {
                                 rows={rows}
                                 cols={cols}
                                 totalCells={totalCells}
+                                showLabels={showLabels}
                                 onToggle={toggleSquare}
                                 onDragStart={startDrag}
                                 onDragEnter={dragEnter}

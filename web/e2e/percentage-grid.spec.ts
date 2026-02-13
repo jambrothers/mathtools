@@ -112,4 +112,34 @@ test.describe('Percentage Grid', () => {
         expect(Math.abs((box10x1?.width || 0) - box10x10.width)).toBeLessThan(2);
         expect(Math.abs((box10x1?.height || 0) - box10x10.height)).toBeLessThan(2);
     });
+
+    test('should toggle row and column labels', async ({ page }) => {
+        // Labels should not be visible by default
+        await expect(page.getByTestId('column-labels')).not.toBeVisible();
+        await expect(page.getByTestId('row-labels')).not.toBeVisible();
+
+        // Click the Labels toolbar button
+        await page.getByRole('button', { name: 'Labels' }).click();
+
+        // Labels should now be visible
+        await expect(page.getByTestId('column-labels')).toBeVisible();
+        await expect(page.getByTestId('row-labels')).toBeVisible();
+
+        // Column labels show 1-10 for default 10x10 grid
+        const colLabels = page.getByTestId('column-labels').locator('span');
+        await expect(colLabels).toHaveCount(10);
+        await expect(colLabels.first()).toHaveText('1');
+        await expect(colLabels.last()).toHaveText('10');
+
+        // Row labels show 1-10 for default 10x10 grid
+        const rowLabels = page.getByTestId('row-labels').locator('span');
+        await expect(rowLabels).toHaveCount(10);
+        await expect(rowLabels.first()).toHaveText('1');
+        await expect(rowLabels.last()).toHaveText('10');
+
+        // Toggle off
+        await page.getByRole('button', { name: 'Labels' }).click();
+        await expect(page.getByTestId('column-labels')).not.toBeVisible();
+        await expect(page.getByTestId('row-labels')).not.toBeVisible();
+    });
 });

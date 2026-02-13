@@ -27,6 +27,7 @@ export function usePercentageGrid() {
     const [showDecimal, setShowDecimal] = useState(false);
     const [showFraction, setShowFraction] = useState(false);
     const [simplifyFraction, setSimplifyFraction] = useState(false);
+    const [showLabels, setShowLabels] = useState(false);
 
     const setGridMode = useCallback((modeId: GridMode) => {
         if (gridMode === modeId) return;
@@ -165,12 +166,14 @@ export function usePercentageGrid() {
         showDecimal?: boolean;
         showFraction?: boolean;
         simplifyFraction?: boolean;
+        showLabels?: boolean;
     }) => {
         if (typeof options.showPanel === 'boolean') setShowPanel(options.showPanel);
         if (typeof options.showPercentage === 'boolean') setShowPercentage(options.showPercentage);
         if (typeof options.showDecimal === 'boolean') setShowDecimal(options.showDecimal);
         if (typeof options.showFraction === 'boolean') setShowFraction(options.showFraction);
         if (typeof options.simplifyFraction === 'boolean') setSimplifyFraction(options.simplifyFraction);
+        if (typeof options.showLabels === 'boolean') setShowLabels(options.showLabels);
     }, []);
 
     const selectedCount = selectedIndices.size;
@@ -218,6 +221,7 @@ export function usePercentageGrid() {
     const toggleShowDecimal = useCallback(() => setShowDecimal(prev => !prev), []);
     const toggleShowFraction = useCallback(() => setShowFraction(prev => !prev), []);
     const toggleSimplifyFraction = useCallback(() => setSimplifyFraction(prev => !prev), []);
+    const toggleShowLabels = useCallback(() => setShowLabels(prev => !prev), []);
 
     return {
         gridMode,
@@ -245,10 +249,12 @@ export function usePercentageGrid() {
         showDecimal,
         showFraction,
         simplifyFraction,
+        showLabels,
         togglePanel,
         toggleShowPercentage,
         toggleShowDecimal,
         toggleShowFraction,
         toggleSimplifyFraction,
+        toggleShowLabels,
     };
 }
