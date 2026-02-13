@@ -57,6 +57,14 @@ The interactive surface where manipulatives are placed.
 - **Grid Background**: Optional dot/line grid pattern.
 - **Touch Support**: Handles pointer events for reliable interaction on touch devices.
 
+### TileBase
+`tile-base.tsx`
+
+A base component for draggable manipulative tiles.
+- **Positioning**: Absolute positioning based on x/y coordinates.
+- **Interaction**: Handles dragging states (cursor, z-index) and selection rings.
+- **Styling**: Standardized shadow, border, and background.
+
 ### TrashZone
 `trash-zone.tsx`
 
@@ -82,6 +90,13 @@ A set of components for building configuration sidebars.
 - **`ControlToggle`**: A switch for boolean states.
 - **`ControlPresetButton`**: A rich button for selecting modes or presets.
 
+### SpeedControl
+`speed-control.tsx`
+
+A floating panel for adjusting animation speeds.
+- **Mapping**: Converts a linear slider (0-100) to a duration in milliseconds.
+- **UI**: Includes Rabbit/Turtle icons for intuitive speed control.
+
 ### Toolbar
 `toolbar.tsx`
 
@@ -94,6 +109,14 @@ Standardized button groups for the top overlay.
 `sidebar.tsx`
 
 Container for sidebar items, often used with `DraggableSidebarItem` to spawn new manipulatives.
+
+### DraggableSidebarItem
+`draggable-sidebar-item.tsx`
+
+A specialized button for spawning new items from the sidebar.
+- **Hybrid Drag**: Supports both HTML5 Drag & Drop (desktop) and custom pointer events (touch).
+- **Ghost Element**: Renders a visual preview during drag operations.
+- **Data Transfer**: Encapsulates item data in the drag payload.
 
 ## Utilities
 
@@ -115,6 +138,13 @@ A specialized button that handles URL state sharing.
 `help-modal.tsx`
 
 Renders Markdown content in a accessible dialog. Automatically used by `ToolScaffold`.
+
+### ExportModal
+`export-modal.tsx`
+
+A dialog for exporting the canvas content.
+- **Formats**: Supports PNG (raster) and SVG (vector) export.
+- **Accessibility**: Focus management and keyboard support.
 
 ## Creating a New Tool
 
