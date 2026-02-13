@@ -37,6 +37,10 @@ export interface URLStateSerializer<T> {
 // List Serialization Helpers
 // ============================================
 
+// Security: Limit total iterations to prevent CPU exhaustion DoS (e.g. millions of delimiters)
+// This limit is generous enough for any legitimate URL (200k items is huge)
+export const MAX_PARSE_ITERATIONS = 200000;
+
 interface ListCodecOptions {
     delimiter?: string;
     maxItems?: number;
@@ -105,7 +109,14 @@ export function parseList<T>(
         return items;
     }
 
+    let iterations = 0;
+
     while (startIndex < len && items.length < maxItems) {
+        if (++iterations > MAX_PARSE_ITERATIONS) {
+            console.warn(`parseList: Exceeded maximum iterations (${MAX_PARSE_ITERATIONS}). Stopping.`);
+            break;
+        }
+
         let delimiterIndex = value.indexOf(delimiter, startIndex);
 
         // If no more delimiters, take the rest of the string
