@@ -85,29 +85,18 @@ export function PercentageGrid({
     };
 
     return (
-        <div
-            className="relative w-full h-full"
-            style={showLabels ? {
-                display: 'grid',
-                gridTemplateColumns: '24px 1fr',
-                gridTemplateRows: '24px 1fr',
-                gap: '8px',
-            } : {
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}
-        >
+        <div className="relative w-full h-full flex items-center justify-center">
             {showLabels && (
                 <>
-                    {/* Top-left empty corner */}
-                    <div />
-
                     {/* Column labels */}
                     <div
                         data-testid="column-labels"
-                        className="grid gap-1"
-                        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+                        className="absolute left-0 right-0 grid gap-1"
+                        style={{
+                            top: '-24px',
+                            height: '20px',
+                            gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`
+                        }}
                     >
                         {Array.from({ length: cols }, (_, i) => (
                             <span key={i} className="flex items-center justify-center text-[10px] font-medium text-slate-400 dark:text-slate-500">
@@ -119,8 +108,12 @@ export function PercentageGrid({
                     {/* Row labels */}
                     <div
                         data-testid="row-labels"
-                        className="grid gap-1"
-                        style={{ gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }}
+                        className="absolute top-0 bottom-0 grid gap-1"
+                        style={{
+                            left: '-24px',
+                            width: '20px',
+                            gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`
+                        }}
                     >
                         {Array.from({ length: rows }, (_, i) => (
                             <span key={i} className="flex items-center justify-center text-[10px] font-medium text-slate-400 dark:text-slate-500">

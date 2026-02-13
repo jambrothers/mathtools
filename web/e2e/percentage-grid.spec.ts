@@ -113,7 +113,13 @@ test.describe('Percentage Grid', () => {
         expect(Math.abs((box10x1?.height || 0) - box10x10.height)).toBeLessThan(2);
     });
 
-    test('should toggle row and column labels', async ({ page }) => {
+    test('should toggle row and column labels without resizing grid', async ({ page }) => {
+        const grid = page.getByRole('grid');
+
+        // Measure grid dimensions before labels
+        const boxBefore = await grid.boundingBox();
+        expect(boxBefore).not.toBeNull();
+
         // Labels should not be visible by default
         await expect(page.getByTestId('column-labels')).not.toBeVisible();
         await expect(page.getByTestId('row-labels')).not.toBeVisible();
@@ -124,6 +130,14 @@ test.describe('Percentage Grid', () => {
         // Labels should now be visible
         await expect(page.getByTestId('column-labels')).toBeVisible();
         await expect(page.getByTestId('row-labels')).toBeVisible();
+
+        // Measure grid dimensions after labels
+        const boxAfter = await grid.boundingBox();
+        expect(boxAfter).not.toBeNull();
+
+        // Dimensions should be the same (within 1px tolerance)
+        expect(Math.abs((boxAfter?.width || 0) - (boxBefore?.width || 0))).toBeLessThan(1);
+        expect(Math.abs((boxAfter?.height || 0) - (boxBefore?.height || 0))).toBeLessThan(1);
 
         // Column labels show 1-10 for default 10x10 grid
         const colLabels = page.getByTestId('column-labels').locator('span');
