@@ -54,8 +54,9 @@ It provides:
 
 The interactive surface where manipulatives are placed.
 - **Marquee Selection**: Built-in support for rectangular selection (drag on empty space).
-- **Grid Background**: Optional dot/line grid pattern.
+- **Grid Background**: Optional dot/line grid pattern via `gridSize` prop.
 - **Touch Support**: Handles pointer events for reliable interaction on touch devices.
+- **Selection Callback**: Exposes `onSelectionEnd` which returns a `DOMRect` of the selected area.
 
 ### TileBase
 `tile-base.tsx`
@@ -85,10 +86,14 @@ A primitive for creating overlay panels (like the Fraction/Decimal/Percentage pa
 `control-panel.tsx`
 
 A set of components for building configuration sidebars.
+
 - **`ControlSection`**: A collapsible accordion section.
+  - Usage: `<ControlSection title="Settings" defaultOpen={true}>...</ControlSection>`
 - **`ControlSlider`**: A range input with increment/decrement buttons.
+  - Features: Supports `min`, `max`, `step`, and custom `displayValue`.
 - **`ControlToggle`**: A switch for boolean states.
 - **`ControlPresetButton`**: A rich button for selecting modes or presets.
+  - Features: Supports `icon`, `description`, and `isActive` styling.
 
 ### SpeedControl
 `speed-control.tsx`
@@ -101,14 +106,19 @@ A floating panel for adjusting animation speeds.
 `toolbar.tsx`
 
 Standardized button groups for the top overlay.
+- **`Toolbar`**: Main container for the toolbar.
 - **`ToolbarGroup`**: Container for related buttons.
-- **`ToolbarButton`**: The main action button with support for icons and labels.
+- **`ToolbarButton`**: The main action button with support for icons, labels, and `variant` ('default', 'primary', 'danger', 'success').
 - **`ToolbarSeparator`**: Vertical divider.
+- **`ToolbarInput`**: A combined input + button component (e.g., for adding equations).
 
 ### Sidebar
 `sidebar.tsx`
 
-Container for sidebar items, often used with `DraggableSidebarItem` to spawn new manipulatives.
+Composable sidebar components.
+- **`Sidebar`**: The main sidebar container.
+- **`SidebarSection`**: A container for grouping sidebar items with an optional title.
+- **`SidebarButton`**: A button component often used within sections (distinct from `DraggableSidebarItem`).
 
 ### DraggableSidebarItem
 `draggable-sidebar-item.tsx`
@@ -138,6 +148,13 @@ A specialized button that handles URL state sharing.
 `help-modal.tsx`
 
 Renders Markdown content in a accessible dialog. Automatically used by `ToolScaffold`.
+
+### HelpButton
+`help-button.tsx`
+
+A circular button positioned in the bottom-left corner (matching `TrashZone` style).
+- **Usage**: Automatically inserted by `ToolScaffold` if `helpContent` is present, but can be used standalone.
+- **Accessibility**: Standardized `aria-label` and focus states.
 
 ### ExportModal
 `export-modal.tsx`
