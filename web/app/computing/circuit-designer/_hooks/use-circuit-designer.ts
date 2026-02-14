@@ -311,7 +311,6 @@ export function useCircuitDesigner() {
     };
 
     const addNode = (type: ComponentTypeName) => {
-        console.log(`[DEBUG] addNode called with type: ${type}`);
         const id = generateId();
         const offset = (nodes.length % 10) * 20;
 
