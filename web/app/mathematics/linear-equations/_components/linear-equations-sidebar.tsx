@@ -5,7 +5,7 @@ import {
     ControlSection, ControlSlider, ControlToggle, ControlPresetButton
 } from "@/components/tool-ui/control-panel"
 import { LineConfig, MAX_LINES, M_MIN, M_MAX, C_MIN, C_MAX } from "../constants"
-import { Sliders, Eye, BookMarked, Plus, Trash2, AlignJustify, Scaling } from "lucide-react"
+import { Sliders, Eye, BookMarked, Plus, Trash2, AlignJustify, Scaling, Link, Check, Download } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface LinearEquationsSidebarProps {
@@ -58,6 +58,14 @@ export function LinearEquationsSidebar({
     onCopyLink
 }: LinearEquationsSidebarProps) {
     const activeLine = lines.find(l => l.id === activeLineId) || lines[0]
+    const [linkCopied, setLinkCopied] = React.useState(false)
+
+    React.useEffect(() => {
+        if (linkCopied) {
+            const timer = setTimeout(() => setLinkCopied(false), 3000)
+            return () => clearTimeout(timer)
+        }
+    }, [linkCopied])
 
     return (
         <div className="flex flex-col h-full bg-white dark:bg-slate-900">
@@ -225,16 +233,27 @@ export function LinearEquationsSidebar({
                     </button>
                     <div className="flex gap-3">
                         <button
-                            onClick={onCopyLink}
-                            className="flex-1 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-md text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors flex items-center justify-center gap-2"
-                            title="Copy Link to Clipboard"
+                            onClick={() => {
+                                onCopyLink();
+                                setLinkCopied(true);
+                            }}
+                            className={cn(
+                                "flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2",
+                                linkCopied
+                                    ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50"
+                                    : "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50"
+                            )}
+                            title={linkCopied ? "Link copied to clipboard" : "Copy Link to Clipboard"}
+                            aria-label={linkCopied ? "Link copied to clipboard" : "Copy shareable link"}
                         >
-                            Copy Link
+                            {linkCopied ? <Check size={16} /> : <Link size={16} />}
+                            {linkCopied ? "Copied!" : "Copy Link"}
                         </button>
                         <button
                             onClick={onExport}
                             className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium shadow-md transition-colors flex items-center justify-center gap-2"
                         >
+                            <Download size={16} />
                             Export
                         </button>
                     </div>
