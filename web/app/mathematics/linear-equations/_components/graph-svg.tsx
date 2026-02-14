@@ -41,6 +41,7 @@ export function GraphSVG({
     onParameterChange
 }: GraphSVGProps) {
     const svgRef = React.useRef<SVGSVGElement>(null)
+    const svgRectRef = React.useRef<DOMRect | null>(null)
     const [dimensions, setDimensions] = React.useState({ width: 800, height: 800 })
 
     // Measure the actual size of the SVG container
@@ -75,7 +76,7 @@ export function GraphSVG({
 
     const getGraphCoordinates = (e: React.PointerEvent | PointerEvent | { clientX: number, clientY: number }) => {
         if (!svgRef.current) return { x: 0, y: 0 }
-        const rect = svgRef.current.getBoundingClientRect()
+        const rect = svgRectRef.current || svgRef.current.getBoundingClientRect()
         const x = e.clientX - rect.left
         const y = e.clientY - rect.top
         return toGraph({ x, y }, currentViewport, dimensions.width, dimensions.height)
@@ -91,6 +92,10 @@ export function GraphSVG({
 
         const activeLine = lines.find(l => l.id === activeLineId)
         if (!activeLine) return
+
+        if (svgRef.current) {
+            svgRectRef.current = svgRef.current.getBoundingClientRect()
+        }
 
         setIsDragging(true)
         setDragStartPos(getGraphCoordinates(e))
@@ -122,6 +127,7 @@ export function GraphSVG({
         setIsDragging(false)
         setDragStartPos(null)
         setInitialLineParams(null)
+        svgRectRef.current = null
         if (e.currentTarget && e.currentTarget.releasePointerCapture && e.currentTarget.hasPointerCapture(e.pointerId)) {
             e.currentTarget.releasePointerCapture(e.pointerId)
         }
