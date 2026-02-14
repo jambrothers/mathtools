@@ -13,14 +13,25 @@ interface SequenceTermProps {
 
 export function SequenceTerm({ n, value, isRevealed, showCounters, onReveal }: SequenceTermProps) {
     // Determine dots to show
-    const dotCount = Math.min(Math.abs(value), 50);
+    const absoluteValue = Math.abs(value);
+    const integerPart = Math.floor(absoluteValue);
+    const decimalPart = Math.round((absoluteValue - integerPart) * 10) / 10;
     const isNegative = value < 0;
     const isZero = value === 0;
+
+    // Total dots to potentially show (integer part + 1 partial if decimal exists)
+    const dotCount = Math.min(integerPart + (decimalPart > 0 ? 1 : 0), 50);
 
     // Arrange dots in rows of 5
     const rows = [];
     for (let i = 0; i < dotCount; i += 5) {
-        rows.push(Array.from({ length: Math.min(5, dotCount - i) }));
+        const rowLength = Math.min(5, dotCount - i);
+        const row = Array.from({ length: rowLength }).map((_, idx) => {
+            const overallIndex = i + idx;
+            const isPartial = overallIndex === integerPart && decimalPart > 0;
+            return { isPartial, decimal: decimalPart };
+        });
+        rows.push(row);
     }
 
     return (
@@ -48,20 +59,24 @@ export function SequenceTerm({ n, value, isRevealed, showCounters, onReveal }: S
                                 <div className="flex flex-col gap-1 items-center justify-center">
                                     {rows.map((row, rowIndex) => (
                                         <div key={rowIndex} className="flex gap-1">
-                                            {row.map((_, dotIndex) => (
+                                            {row.map((dot, dotIndex) => (
                                                 <div
                                                     key={dotIndex}
                                                     className={cn(
-                                                        "w-2.5 h-2.5 rounded-full border shadow-sm",
+                                                        "w-2.5 h-2.5 rounded-full border shadow-sm flex items-center justify-center overflow-hidden",
                                                         isNegative
-                                                            ? "bg-red-500 border-red-600"
-                                                            : "bg-yellow-400 border-yellow-500"
+                                                            ? "bg-red-500 border-red-600 text-red-500"
+                                                            : "bg-yellow-400 border-yellow-500 text-yellow-400"
                                                     )}
+                                                    style={dot.isPartial ? {
+                                                        background: `conic-gradient(currentColor ${dot.decimal * 100}%, transparent 0)`,
+                                                        borderStyle: 'dashed' // Visual hint for partial
+                                                    } : undefined}
                                                 />
                                             ))}
                                         </div>
                                     ))}
-                                    {Math.abs(value) > 50 && (
+                                    {absoluteValue > 50 && (
                                         <span className="text-[10px] text-slate-400 font-bold">...</span>
                                     )}
                                 </div>

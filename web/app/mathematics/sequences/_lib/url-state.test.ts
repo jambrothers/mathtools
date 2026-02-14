@@ -7,11 +7,12 @@ describe('sequencesURLSerializer', () => {
         d: 3,
         r: 2,
         d2: 2,
-        termCount: 6,
-        revealedCount: 6,
+        termCount: 0,
+        revealedCount: 0,
         showCounters: true,
         showRule: false,
-        showNthTerm: false
+        showNthTerm: false,
+        showConfig: false
     };
 
     it('serializes and deserializes correctly', () => {
@@ -28,7 +29,8 @@ describe('sequencesURLSerializer', () => {
             r: 1.5,
             termCount: 10,
             revealedCount: 3,
-            showRule: true
+            showRule: true,
+            showConfig: true
         };
         const params = sequencesURLSerializer.serialize(state);
         const result = sequencesURLSerializer.deserialize(params);
@@ -61,5 +63,6 @@ describe('sequencesURLSerializer', () => {
         expect(result).not.toBeNull();
         expect(result?.a).toBe(2); // default
         expect(result?.sequenceType).toBe('arithmetic');
+        expect(result?.termCount).toBe(0); // new default
     });
 });

@@ -123,3 +123,33 @@ export function getNthTermFormula(
     }
     return '';
 }
+
+/**
+ * Generates random parameters for a sequence.
+ */
+export function generateRandomParams(allowedTypes: SequenceType[] = ['arithmetic', 'geometric', 'quadratic']) {
+    const sequenceType = allowedTypes[Math.floor(Math.random() * allowedTypes.length)];
+    let a = 0;
+    let d = 0;
+    let r = 1;
+    let d2 = 0;
+    const termCount = Math.floor(Math.random() * 5) + 4; // 4 to 8
+
+    switch (sequenceType) {
+        case 'arithmetic':
+            a = Math.floor(Math.random() * 20) - 10;
+            d = (Math.floor(Math.random() * 11) - 5);
+            break;
+        case 'geometric':
+            a = [1, 2, 3, 5, 10][Math.floor(Math.random() * 5)];
+            r = [2, 3, 10, 0.5, 0.1][Math.floor(Math.random() * 5)];
+            break;
+        case 'quadratic':
+            a = Math.floor(Math.random() * 10);
+            d = Math.floor(Math.random() * 5) + 1; // 1st diff
+            d2 = (Math.floor(Math.random() * 3) + 1) * 2; // 2nd diff (keep it even for simple A)
+            break;
+    }
+
+    return { sequenceType, a, d, r, d2, termCount };
+}

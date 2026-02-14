@@ -1,4 +1,4 @@
-import { computeSequence, getWordedRule, getNthTermFormula, SequenceType } from './sequences';
+import { computeSequence, getWordedRule, getNthTermFormula, SequenceType, generateRandomParams } from './sequences';
 
 describe('sequences logic', () => {
     describe('computeSequence', () => {
@@ -15,20 +15,7 @@ describe('sequences logic', () => {
         });
 
         it('computes quadratic sequences', () => {
-            // T(n) = n^2
-            // 1, 4, 9, 16, 25
-            // diffs: 3, 5, 7, 9
-            // 2nd diff: 2
-            // params: a=1, d1=3, d2=2 (using first term and first difference)
             expect(computeSequence('quadratic', 1, 3, 0, 2, 5)).toEqual([1, 4, 9, 16, 25]);
-
-            // T(n) = 2n^2 + n + 1
-            // n=1: 4
-            // n=2: 11
-            // n=3: 22
-            // n=4: 37
-            // diffs: 7, 11, 15
-            // 2nd diff: 4
             expect(computeSequence('quadratic', 4, 7, 0, 4, 4)).toEqual([4, 11, 22, 37]);
         });
     });
@@ -52,11 +39,8 @@ describe('sequences logic', () => {
 
     describe('getNthTermFormula', () => {
         it('formats arithmetic nth term', () => {
-            // a=3, d=2 -> T(n) = 2n + 1
             expect(getNthTermFormula('arithmetic', 3, 2, 0, 0)).toBe('T(n) = 2n + 1');
-            // a=5, d=-1 -> T(n) = -n + 6
             expect(getNthTermFormula('arithmetic', 5, -1, 0, 0)).toBe('T(n) = -n + 6');
-            // a=4, d=0 -> T(n) = 4
             expect(getNthTermFormula('arithmetic', 4, 0, 0, 0)).toBe('T(n) = 4');
         });
 
@@ -66,10 +50,28 @@ describe('sequences logic', () => {
         });
 
         it('formats quadratic nth term', () => {
-            // T(n) = n^2
             expect(getNthTermFormula('quadratic', 1, 3, 0, 2)).toBe('T(n) = n²');
-            // T(n) = 2n^2 + n + 1
             expect(getNthTermFormula('quadratic', 4, 7, 0, 4)).toBe('T(n) = 2n² + n + 1');
+        });
+    });
+
+    describe('generateRandomParams', () => {
+        it('generates valid params without allowedTypes', () => {
+            const params = generateRandomParams();
+            expect(['arithmetic', 'geometric', 'quadratic']).toContain(params.sequenceType);
+            expect(params.termCount).toBeGreaterThanOrEqual(4);
+            expect(params.termCount).toBeLessThanOrEqual(8);
+
+            const terms = computeSequence(params.sequenceType, params.a, params.d, params.r, params.d2, params.termCount);
+            expect(terms.length).toBe(params.termCount);
+        });
+
+        it('respects allowedTypes filter', () => {
+            const params = generateRandomParams(['geometric']);
+            expect(params.sequenceType).toBe('geometric');
+
+            const params2 = generateRandomParams(['arithmetic', 'quadratic']);
+            expect(['arithmetic', 'quadratic']).toContain(params2.sequenceType);
         });
     });
 });

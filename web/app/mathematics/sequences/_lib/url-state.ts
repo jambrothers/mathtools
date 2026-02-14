@@ -19,6 +19,7 @@ export interface SequencesURLState {
     showCounters: boolean;
     showRule: boolean;
     showNthTerm: boolean;
+    showConfig: boolean;
 }
 
 const PARAM_TYPE = 't';
@@ -31,6 +32,7 @@ const PARAM_REVEALED_COUNT = 'rc';
 const PARAM_COUNTERS = 'sc';
 const PARAM_RULE = 'sr';
 const PARAM_NTH = 'sn';
+const PARAM_CONFIG = 'cfg';
 
 export const sequencesURLSerializer: URLStateSerializer<SequencesURLState> = {
     serialize(state: SequencesURLState): URLSearchParams {
@@ -45,6 +47,7 @@ export const sequencesURLSerializer: URLStateSerializer<SequencesURLState> = {
         params.set(PARAM_COUNTERS, serializeBool(state.showCounters));
         params.set(PARAM_RULE, serializeBool(state.showRule));
         params.set(PARAM_NTH, serializeBool(state.showNthTerm));
+        params.set(PARAM_CONFIG, serializeBool(state.showConfig));
         return params;
     },
     deserialize(params: URLSearchParams): SequencesURLState | null {
@@ -59,6 +62,7 @@ export const sequencesURLSerializer: URLStateSerializer<SequencesURLState> = {
             PARAM_COUNTERS,
             PARAM_RULE,
             PARAM_NTH,
+            PARAM_CONFIG,
         ]);
         if (!hasAny) return null;
 
@@ -73,11 +77,12 @@ export const sequencesURLSerializer: URLStateSerializer<SequencesURLState> = {
             d: deserializeNumber(params.get(PARAM_D), 3),
             r: deserializeNumber(params.get(PARAM_R), 2),
             d2: deserializeNumber(params.get(PARAM_D2), 2),
-            termCount: deserializeNumber(params.get(PARAM_TERM_COUNT), 6),
-            revealedCount: deserializeNumber(params.get(PARAM_REVEALED_COUNT), 6),
+            termCount: deserializeNumber(params.get(PARAM_TERM_COUNT), 0),
+            revealedCount: deserializeNumber(params.get(PARAM_REVEALED_COUNT), 0),
             showCounters: deserializeBool(params.get(PARAM_COUNTERS), true),
             showRule: deserializeBool(params.get(PARAM_RULE), false),
             showNthTerm: deserializeBool(params.get(PARAM_NTH), false),
+            showConfig: deserializeBool(params.get(PARAM_CONFIG), false),
         };
     }
 };

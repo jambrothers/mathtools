@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { SequenceType, computeSequence, getWordedRule, getNthTermFormula } from '../_lib/sequences';
+import { SequenceType, computeSequence, getWordedRule, getNthTermFormula, generateRandomParams } from '../_lib/sequences';
 
 export function useSequences() {
     const [sequenceType, setSequenceType] = useState<SequenceType>('arithmetic');
@@ -7,11 +7,17 @@ export function useSequences() {
     const [d, setD] = useState(3);
     const [r, setR] = useState(2);
     const [d2, setD2] = useState(2);
-    const [termCount, setTermCount] = useState(6);
-    const [revealedCount, setRevealedCount] = useState(6);
+
+    // New: termCount starts at 0
+    const [termCount, setTermCount] = useState(0);
+    const [revealedCount, setRevealedCount] = useState(0);
+
     const [showCounters, setShowCounters] = useState(true);
     const [showRule, setShowRule] = useState(false);
     const [showNthTerm, setShowNthTerm] = useState(false);
+
+    // New: Config panel visibility
+    const [showConfig, setShowConfig] = useState(false);
 
     // Terms and formulas are derived from parameters
     const terms = useMemo(() =>
@@ -30,6 +36,10 @@ export function useSequences() {
     );
 
     // Actions
+    const toggleAllRevealed = useCallback(() => {
+        setRevealedCount(prev => prev === termCount ? 0 : termCount);
+    }, [termCount]);
+
     const revealAll = useCallback(() => {
         setRevealedCount(termCount);
     }, [termCount]);
@@ -42,12 +52,36 @@ export function useSequences() {
         setRevealedCount(prev => Math.min(prev + 1, termCount));
     }, [termCount]);
 
+    const addNextTerm = useCallback(() => {
+        setTermCount(prev => {
+            const newCount = Math.min(prev + 1, 12);
+            // If we were at 12, don't change anything
+            if (newCount === prev) return prev;
+
+            // Auto-reveal the new term
+            setRevealedCount(newCount);
+            return newCount;
+        });
+    }, []);
+
     const handleSetTermCount = useCallback((count: number) => {
-        const newCount = Math.max(1, Math.min(count, 12));
+        const newCount = Math.max(0, Math.min(count, 12));
         setTermCount(newCount);
-        // If we were showing all, keep showing all
-        setRevealedCount(prev => prev === termCount ? newCount : Math.min(prev, newCount));
+        // If we were showing all (and not at 0), keep showing all
+        // If we were at 0, keep it hidden
+        setRevealedCount(prev => (prev === termCount && termCount > 0) ? newCount : Math.min(prev, newCount));
     }, [termCount]);
+
+    const randomize = useCallback((allowedTypes?: SequenceType[]) => {
+        const params = generateRandomParams(allowedTypes);
+        setSequenceType(params.sequenceType);
+        setA(params.a);
+        setD(params.d);
+        setR(params.r);
+        setD2(params.d2);
+        setTermCount(params.termCount);
+        setRevealedCount(0); // Random sequences start hidden
+    }, []);
 
     const setFromState = useCallback((state: {
         sequenceType: SequenceType;
@@ -60,6 +94,7 @@ export function useSequences() {
         showCounters: boolean;
         showRule: boolean;
         showNthTerm: boolean;
+        showConfig?: boolean;
     }) => {
         setSequenceType(state.sequenceType);
         setA(state.a);
@@ -71,6 +106,7 @@ export function useSequences() {
         setShowCounters(state.showCounters);
         setShowRule(state.showRule);
         setShowNthTerm(state.showNthTerm);
+        if (state.showConfig !== undefined) setShowConfig(state.showConfig);
     }, []);
 
     return {
@@ -85,6 +121,7 @@ export function useSequences() {
         showCounters,
         showRule,
         showNthTerm,
+        showConfig,
 
         // Derived
         terms,
@@ -102,11 +139,15 @@ export function useSequences() {
         setShowCounters,
         setShowRule,
         setShowNthTerm,
+        setShowConfig,
 
         // Actions
+        toggleAllRevealed,
         revealAll,
         hideAll,
         revealNext,
+        addNextTerm,
+        randomize,
         setFromState
     };
 }

@@ -2,110 +2,101 @@ import { renderHook, act } from '@testing-library/react';
 import { useSequences } from './use-sequences';
 
 describe('useSequences', () => {
-    it('initializes with default values', () => {
+    it('initializes with empty default state (termCount=0)', () => {
         const { result } = renderHook(() => useSequences());
 
-        expect(result.current.sequenceType).toBe('arithmetic');
-        expect(result.current.a).toBe(2);
-        expect(result.current.d).toBe(3);
-        expect(result.current.termCount).toBe(6);
-        expect(result.current.revealedCount).toBe(6);
-        expect(result.current.showCounters).toBe(true);
-    });
-
-    it('updates parameters and recalculates terms', () => {
-        const { result } = renderHook(() => useSequences());
-
-        act(() => {
-            result.current.setA(5);
-            result.current.setD(2);
-        });
-
-        expect(result.current.terms).toEqual([5, 7, 9, 11, 13, 15]);
-    });
-
-    it('switches sequence type', () => {
-        const { result } = renderHook(() => useSequences());
-
-        act(() => {
-            result.current.setSequenceType('geometric');
-            result.current.setA(3);
-            result.current.setR(2);
-        });
-
-        expect(result.current.sequenceType).toBe('geometric');
-        expect(result.current.terms).toEqual([3, 6, 12, 24, 48, 96]);
-    });
-
-    it('handles quadratic sequences', () => {
-        const { result } = renderHook(() => useSequences());
-
-        act(() => {
-            result.current.setSequenceType('quadratic');
-            result.current.setA(1);
-            result.current.setD(3);
-            result.current.setD2(2);
-        });
-
-        expect(result.current.terms).toEqual([1, 4, 9, 16, 25, 36]);
-    });
-
-    it('manages term visibility', () => {
-        const { result } = renderHook(() => useSequences());
-
-        // Default all revealed
-        expect(result.current.revealedCount).toBe(6);
-
-        act(() => {
-            result.current.hideAll();
-        });
+        expect(result.current.termCount).toBe(0);
+        expect(result.current.terms).toEqual([]);
         expect(result.current.revealedCount).toBe(0);
-
-        act(() => {
-            result.current.revealNext();
-        });
-        expect(result.current.revealedCount).toBe(1);
-
-        act(() => {
-            result.current.revealAll();
-        });
-        expect(result.current.revealedCount).toBe(6);
+        expect(result.current.showConfig).toBe(false);
     });
 
-    it('updates term count and clamps revealedCount', () => {
+    it('updates parameters and termCount', () => {
         const { result } = renderHook(() => useSequences());
 
         act(() => {
-            result.current.setTermCount(8);
+            result.current.setTermCount(5);
+            result.current.setA(10);
+            result.current.setD(5);
         });
-        expect(result.current.terms.length).toBe(8);
-        expect(result.current.revealedCount).toBe(8);
+
+        expect(result.current.terms).toEqual([10, 15, 20, 25, 30]);
+        // When setting termCount explicitly, revealedCount should match by default or follow existing logic
+        // For teaching, if we manually set a sequence, maybe we reveal all? 
+        // Let's say it stays 0 unless revealed.
+        expect(result.current.revealedCount).toBe(0);
+    });
+
+    it('toggles all terms revealed/hidden', () => {
+        const { result } = renderHook(() => useSequences());
 
         act(() => {
             result.current.setTermCount(4);
         });
-        expect(result.current.terms.length).toBe(4);
+
+        expect(result.current.revealedCount).toBe(0);
+
+        act(() => {
+            result.current.toggleAllRevealed();
+        });
         expect(result.current.revealedCount).toBe(4);
 
         act(() => {
-            result.current.hideAll(); // revealed 0
-            result.current.setTermCount(10);
+            result.current.toggleAllRevealed();
         });
         expect(result.current.revealedCount).toBe(0);
     });
 
-    it('toggles display options', () => {
+    it('addNextTerm() increments termCount and auto-reveals', () => {
         const { result } = renderHook(() => useSequences());
 
-        expect(result.current.showCounters).toBe(true);
-        expect(result.current.showRule).toBe(false);
-
         act(() => {
-            result.current.setShowCounters(false);
-            result.current.setShowRule(true);
+            result.current.setTermCount(2);
+            result.current.toggleAllRevealed(); // revealed 2
         });
 
-        expect(result.current.showCounters).toBe(false);
-        expect(result.current.showRule).toBe(true);
+        act(() => {
+            result.current.addNextTerm();
+        });
+
+        expect(result.current.termCount).toBe(3);
+        expect(result.current.revealedCount).toBe(3);
+    });
+
+    it('addNextTerm() respects max length of 12', () => {
+        const { result } = renderHook(() => useSequences());
+
+        act(() => {
+            result.current.setTermCount(12);
+        });
+
+        act(() => {
+            result.current.addNextTerm();
+        });
+
+        expect(result.current.termCount).toBe(12);
+    });
+
+    it('toggles config panel visibility', () => {
+        const { result } = renderHook(() => useSequences());
+
+        expect(result.current.showConfig).toBe(false);
+
+        act(() => {
+            result.current.setShowConfig(true);
+        });
+
+        expect(result.current.showConfig).toBe(true);
+    });
+
+    it('randomize() sets parameters and termCount', () => {
+        const { result } = renderHook(() => useSequences());
+
+        act(() => {
+            result.current.randomize();
+        });
+
+        expect(result.current.termCount).toBeGreaterThan(0);
+        expect(result.current.revealedCount).toBe(0); // Random sequence hidden by default
     });
 });
