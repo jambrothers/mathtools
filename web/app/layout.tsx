@@ -19,8 +19,11 @@ const merriweather = Merriweather({
 });
 
 export const metadata: Metadata = {
-  title: "MathTools",
+  title: "TeachMaths.net | Interactive mathematics in the classroom",
   description: "A collection of interactive mathematics teaching tools.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({

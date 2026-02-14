@@ -10,7 +10,7 @@ test.describe('Homepage', () => {
     });
 
     test('should display the page title', async ({ page }) => {
-        await expect(page).toHaveTitle(/MathTools/);
+        await expect(page).toHaveTitle("TeachMaths.net | Interactive mathematics in the classroom");
     });
 
     test('should display the hero heading', async ({ page }) => {
