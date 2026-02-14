@@ -41,14 +41,15 @@ export function useDraggable(
         positionRef.current = position;
     }, [position]);
 
-    const { x: initialX, y: initialY } = initialPos;
-    // Sync visual position if external reset happens (e.g. undo)
-    useEffect(() => {
-        if (!isDragging && (position.x !== initialX || position.y !== initialY)) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setPosition({ x: initialX, y: initialY });
-        }
-    }, [initialX, initialY, isDragging, position.x, position.y]);
+    // Track previous initialPos to detect changes during render
+    const [prevInitialPos, setPrevInitialPos] = useState(initialPos);
+
+    // Derived State Pattern: Sync position when initialPos changes (and not dragging)
+    // This avoids a double render cycle (render -> effect -> setState -> render)
+    if (!isDragging && (initialPos.x !== prevInitialPos.x || initialPos.y !== prevInitialPos.y)) {
+        setPrevInitialPos(initialPos);
+        setPosition(initialPos);
+    }
 
     const handlePointerDown = useCallback((e: React.PointerEvent) => {
         if (optionsRef.current.disabled) return;
