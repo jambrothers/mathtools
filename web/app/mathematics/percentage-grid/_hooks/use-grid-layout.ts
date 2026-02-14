@@ -6,7 +6,7 @@ interface GridDimensions {
 }
 
 interface UseGridLayoutProps {
-    containerRef: RefObject<HTMLDivElement>;
+    containerRef: RefObject<HTMLDivElement | null>;
     rows: number;
     cols: number;
     padding?: number;
