@@ -32,8 +32,7 @@ test.describe('Algebra Tiles', () => {
 
     test('should add tile when clicking sidebar option', async ({ page }) => {
         // Click on the unit tile (1x1) in sidebar to add it
-        // The sidebar contains clickable tile representations
-        const sidebarTile = page.locator('aside div, [class*="sidebar"] div').filter({ hasText: '1' }).first();
+        const sidebarTile = page.locator('aside button[title*="+1 tile"]').first();
 
         if (await sidebarTile.isVisible()) {
             await sidebarTile.click();
@@ -47,8 +46,7 @@ test.describe('Algebra Tiles', () => {
     });
 
     test('should add negative tile', async ({ page }) => {
-        const negativeSection = page.locator('aside').filter({ hasText: 'Add Negative' });
-        const sidebarTile = negativeSection.locator('div').filter({ hasText: '1' }).first();
+        const sidebarTile = page.locator('aside button[title*="-1 tile"]').first();
 
         if (await sidebarTile.isVisible()) {
             await sidebarTile.click();
@@ -61,7 +59,7 @@ test.describe('Algebra Tiles', () => {
 
     test('Labels toggle should change visual', async ({ page }) => {
         // Add a tile first
-        const sidebarTile = page.locator('aside div').filter({ hasText: '1' }).first();
+        const sidebarTile = page.locator('aside button[title*="+1 tile"]').first();
         await sidebarTile.click();
         const tile = page.locator('[data-testid="tile"]').first();
 
@@ -70,17 +68,13 @@ test.describe('Algebra Tiles', () => {
         await labelsToggle.click();
         await page.waitForTimeout(200);
 
-        // Check text visibility logic (if text disappears or changes class)
-        // Since we don't have direct selector for label text inside tile in this test without more changes,
-        // we assume button working ensures state change. 
-        // Ideally we would check for innerText visibility.
-        // Let's assume tile innerText '1' is present initially.
-        await expect(tile).toContainText('1');
+        // Check text disappears (assuming labels are on by default and toggle turns them off)
+        await expect(tile).not.toContainText('1');
     });
 
     test('Clear button should remove all tiles', async ({ page }) => {
         // Add tile
-        const sidebarTile = page.locator('aside div').filter({ hasText: '1' }).first();
+        const sidebarTile = page.locator('aside button[title*="+1 tile"]').first();
         await sidebarTile.click();
         await expect(page.locator('[data-testid="tile"]')).toHaveCount(1);
 
@@ -94,7 +88,7 @@ test.describe('Algebra Tiles', () => {
 
     test('trash zone should be functional', async ({ page }) => {
         // Add tile
-        const sidebarTile = page.locator('aside div').filter({ hasText: '1' }).first();
+        const sidebarTile = page.locator('aside button[title*="+1 tile"]').first();
         await sidebarTile.click();
         const tile = page.locator('[data-testid="tile"]').first();
 
@@ -131,8 +125,7 @@ test.describe('Algebra Tiles - Interactions', () => {
     });
 
     test('should allow adding multiple tiles and selecting them', async ({ page }) => {
-        const sidebar = page.locator('aside').first();
-        const tileOption = sidebar.locator('div').first();
+        const tileOption = page.locator('aside button[title*="+1 tile"]').first();
 
         // Add 2 tiles
         await tileOption.click();
@@ -143,7 +136,7 @@ test.describe('Algebra Tiles - Interactions', () => {
 
     test('keyboard shortcuts should rotate tile', async ({ page }) => {
         // Add x-tile (rectangular) to see rotation
-        const xTileBtn = page.locator('aside div').filter({ hasText: 'x' }).first();
+        const xTileBtn = page.locator('aside button[title*="vertical +x tile"]').first();
         await xTileBtn.click();
 
         const tile = page.locator('[data-testid="tile"]').first();

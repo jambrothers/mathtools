@@ -42,7 +42,7 @@ test.describe('Circuit Designer - URL State', () => {
 
         // Check for node on canvas using data-testid
         // We look for a node that contains the text "A"
-        await expect(newPage.locator('[data-testid="circuit-node"]').filter({ hasText: 'A' })).toBeVisible();
+        await expect(newPage.locator('[data-testid="circuit-node"]').filter({ hasText: 'A' }).first()).toBeVisible();
         // Let's add specific test IDs in implementation to make this robust? 
         // For now, checks if we can find elements that look like nodes.
 

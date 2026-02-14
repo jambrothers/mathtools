@@ -29,7 +29,7 @@ test.describe('Double Sided Counters - URL State', () => {
         await page.waitForTimeout(500); // Allow counters to render
 
         // Count the counter elements directly (they have absolute positioning and rounded-full class)
-        const counterElements = page.locator('[data-testid="counter"]');
+        const counterElements = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
         await expect(counterElements).toHaveCount(3);
 
         // 2. Click the Link button to generate URL
@@ -49,7 +49,7 @@ test.describe('Double Sided Counters - URL State', () => {
         await newPage.waitForLoadState('networkidle');
 
         // 5. Verify same number of counters
-        const newCounterElements = newPage.locator('[data-testid="counter"]');
+        const newCounterElements = newPage.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
         await expect(newCounterElements).toHaveCount(3);
 
         await newPage.close();
@@ -131,7 +131,7 @@ test.describe('Double Sided Counters - URL State', () => {
         await newPage.waitForLoadState('networkidle');
 
         // Counter exists (visible as '+' on the counter itself)
-        const counters = newPage.locator('[data-testid="counter"]');
+        const counters = newPage.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
         await expect(counters).toHaveCount(1);
 
         await newPage.close();
@@ -190,7 +190,7 @@ test.describe('Double Sided Counters - URL State', () => {
         await page.waitForTimeout(500);
 
         // Verify counter count
-        const counters = page.locator('[data-testid="counter"]');
+        const counters = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
         await expect(counters).toHaveCount(15);
 
         // Generate link
@@ -203,7 +203,7 @@ test.describe('Double Sided Counters - URL State', () => {
         await newPage.waitForLoadState('networkidle');
 
         // Verify same counter count
-        const newCounters = newPage.locator('[data-testid="counter"]');
+        const newCounters = newPage.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
         await expect(newCounters).toHaveCount(15);
 
         await newPage.close();
@@ -242,7 +242,7 @@ test.describe('Double Sided Counters - URL State', () => {
         // Sort button still visible (button says "Sort")
         await expect(newPage.getByRole('button', { name: 'Sort', exact: true })).toBeVisible();
         // Counters exist
-        const newCounters = newPage.locator('[data-testid="counter"]');
+        const newCounters = newPage.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
         await expect(newCounters).toHaveCount(2);
 
         await newPage.close();
@@ -258,7 +258,7 @@ test.describe('Double Sided Counters - URL State', () => {
         await page.waitForTimeout(500);
 
         // Get original counter count
-        const originalCount = await page.locator('[data-testid="counter"]').count();
+        const originalCount = await page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])').count();
         expect(originalCount).toBe(5);
 
         // Generate URL
@@ -271,7 +271,7 @@ test.describe('Double Sided Counters - URL State', () => {
         await newPage.waitForLoadState('networkidle');
 
         // Verify identical count
-        const newCount = await newPage.locator('[data-testid="counter"]').count();
+        const newCount = await newPage.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])').count();
         expect(newCount).toBe(originalCount);
 
         await newPage.close();

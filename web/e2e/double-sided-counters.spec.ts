@@ -28,7 +28,7 @@ test.describe('Double Sided Counters - Core Functionality', () => {
         await page.click('text=Add +1');
         await page.waitForTimeout(300);
 
-        const counters = page.locator('[data-testid="counter"]');
+        const counters = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
         await expect(counters).toHaveCount(1);
     });
 
@@ -36,7 +36,7 @@ test.describe('Double Sided Counters - Core Functionality', () => {
         await page.click('text=Add -1');
         await page.waitForTimeout(300);
 
-        const counters = page.locator('[data-testid="counter"]');
+        const counters = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
         await expect(counters).toHaveCount(1);
     });
 
@@ -44,7 +44,7 @@ test.describe('Double Sided Counters - Core Functionality', () => {
         await page.click('text=Zero Pair');
         await page.waitForTimeout(300);
 
-        const counters = page.locator('[data-testid="counter"]');
+        const counters = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
         await expect(counters).toHaveCount(2);
     });
 
@@ -54,7 +54,7 @@ test.describe('Double Sided Counters - Core Functionality', () => {
         await page.waitForTimeout(300);
 
         // Counter should be visible, confirming stats panel is showing count
-        const counter = page.locator('[data-testid="counter"]').first();
+        const counter = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])').first();
         await expect(counter).toBeVisible();
     });
 
@@ -130,7 +130,7 @@ test.describe('Double Sided Counters - Core Functionality', () => {
             await page.waitForTimeout(500);
 
             // Should have added counters
-            const counters = page.locator('[data-testid="counter"]');
+            const counters = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
             const count = await counters.count();
             expect(count).toBeGreaterThan(0);
         }
@@ -166,12 +166,12 @@ test.describe('Double Sided Counters - Counter Interactions', () => {
         await page.waitForTimeout(500);
 
         // Double-click on the counter to flip it
-        const counter = page.locator('[data-testid="counter"]').first();
+        const counter = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])').first();
         await counter.dblclick();
         await page.waitForTimeout(500);
 
         // Counter should still exist (flipped)
-        const counters = page.locator('[data-testid="counter"]');
+        const counters = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
         await expect(counters).toHaveCount(1);
     });
 
@@ -184,7 +184,7 @@ test.describe('Double Sided Counters - Counter Interactions', () => {
         await page.waitForTimeout(500);
 
         // Get counter element
-        const counter = page.locator('[data-testid="counter"]').first();
+        const counter = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])').first();
         await expect(counter).toBeVisible();
 
         // Get initial position
@@ -201,7 +201,7 @@ test.describe('Double Sided Counters - Counter Interactions', () => {
         }
 
         // Counter should still exist
-        await expect(page.locator('[data-testid="counter"]')).toHaveCount(1);
+        await expect(page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])')).toHaveCount(1);
     });
 
     test('Cancel Pairs should animate pairs disappearing', async ({ page }) => {
@@ -234,7 +234,7 @@ test.describe('Double Sided Counters - Counter Interactions', () => {
         // Add a counter
         await page.click('text=Add +1');
         await page.waitForTimeout(300);
-        await expect(page.locator('[data-testid="counter"]')).toHaveCount(1);
+        await expect(page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])')).toHaveCount(1);
 
         // Click Undo
         await page.click('button:has-text("Undo")');
@@ -251,7 +251,7 @@ test.describe('Double Sided Counters - Counter Interactions', () => {
         // Add a counter
         await page.click('text=Add +1');
         await page.waitForTimeout(300);
-        await expect(page.locator('[data-testid="counter"]')).toHaveCount(1);
+        await expect(page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])')).toHaveCount(1);
 
         // Press Ctrl+Z
         await page.keyboard.press('Control+z');
@@ -278,7 +278,7 @@ test.describe('Double Sided Counters - Counter Interactions', () => {
         await page.click('text=Add +1');
         await page.waitForTimeout(300);
 
-        const counter = page.locator('[data-testid="counter"]').first();
+        const counter = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])').first();
         // Check yellow class presence
         await expect(counter).toHaveClass(/bg-yellow-400/);
 
@@ -297,7 +297,7 @@ test.describe('Double Sided Counters - Counter Interactions', () => {
         await page.click('text=Add +1');
         await page.waitForTimeout(200);
 
-        const counter = page.locator('[data-testid="counter"]').first();
+        const counter = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])').first();
         await counter.click(); // Select
         await page.waitForTimeout(200);
 
@@ -308,6 +308,6 @@ test.describe('Double Sided Counters - Counter Interactions', () => {
         await page.keyboard.press('Delete');
         await page.waitForTimeout(300);
 
-        await expect(page.locator('[data-testid="counter"]')).toHaveCount(0);
+        await expect(page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])')).toHaveCount(0);
     });
 });
