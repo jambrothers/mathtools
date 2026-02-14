@@ -91,7 +91,7 @@ export function Navbar() {
                             )}
                         </div>
 
-                        <div className="hidden md:flex ml-auto items-center space-x-8 z-10 bg-[var(--theme-page)]/0">
+                        <div className="hidden lg:flex ml-auto items-center space-x-8 z-10 bg-[var(--theme-page)]/0">
                             <Link
                                 href="/"
                                 className={`text-sm font-medium transition-colors ${isActive("/") ? "text-[var(--theme-main)]" : "text-[var(--theme-muted)] hover:text-[var(--theme-main)]"}`}
@@ -163,7 +163,7 @@ export function Navbar() {
                             </button>
                         </div>
 
-                        <div className="-mr-2 flex md:hidden">
+                        <div className="-mr-2 flex lg:hidden">
                             <button
                                 onClick={() => setIsOpen(!isOpen)}
                                 className="inline-flex items-center justify-center p-2 rounded-md text-[var(--theme-muted)] hover:text-[var(--theme-main)] hover:bg-[var(--theme-card)] focus:outline-none"
@@ -177,7 +177,7 @@ export function Navbar() {
 
                 {/* Mobile menu */}
                 {isOpen && (
-                    <div className="md:hidden bg-[var(--theme-page)] border-b border-[var(--theme-border)]">
+                    <div className="lg:hidden bg-[var(--theme-page)] border-b border-[var(--theme-border)]">
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                             <Link href="/" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-[var(--theme-muted)] hover:text-[var(--theme-main)] hover:bg-[var(--theme-card)]">
                                 Home

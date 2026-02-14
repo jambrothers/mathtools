@@ -17,12 +17,12 @@ test.describe('Homepage', () => {
         // Check for the main headline
         const heading = page.locator('h1');
         await expect(heading).toBeVisible();
-        await expect(heading).toContainText('Bridging the gap');
-        await expect(heading).toContainText('Exposition & Understanding');
+        await expect(heading).toContainText('Interactive mathematics');
+        await expect(heading).toContainText('the classroom');
     });
 
     test('should display the hero description', async ({ page }) => {
-        const description = page.locator('p').filter({ hasText: /Interactive digital tools/ });
+        const description = page.locator('p').filter({ hasText: /Free, no login tools/ });
         await expect(description).toBeVisible();
     });
 

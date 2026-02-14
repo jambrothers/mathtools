@@ -19,6 +19,7 @@ export const TrashZone = React.forwardRef<HTMLDivElement, TrashZoneProps>(
         return (
             <div
                 ref={ref}
+                data-testid="trash-zone"
                 className={cn(
                     "absolute bottom-4 right-4 p-4 rounded-full transition-all duration-200 z-40 border-2",
                     isHovered

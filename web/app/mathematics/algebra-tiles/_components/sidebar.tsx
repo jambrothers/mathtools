@@ -58,6 +58,7 @@ function DraggableTileButton({
             onDragStart={handleDragStart}
             onClick={handleClick}
             className="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-2 rounded-md w-full transition-colors group text-left cursor-grab active:cursor-grabbing"
+            title={`Drag or click to add ${value > 0 ? '+' : ''}${label} tile`}
         >
             <div className="shrink-0 flex items-center justify-center">
                 <div
@@ -115,7 +116,8 @@ function TileRow({
                 onDragStart={(e) => handleDragStart(e, verticalType)}
                 onClick={() => onAddTile(verticalType, value)}
                 className="shrink-0 cursor-grab active:cursor-grabbing"
-                title={`Drag ${value > 0 ? '+' : ''}${label} (vertical)`}
+                title={`Drag or click to add vertical ${value > 0 ? '+' : ''}${label} tile`}
+                aria-label={`Add vertical ${value > 0 ? '+' : ''}${label} tile`}
             >
                 <div
                     className={cn(
@@ -135,7 +137,8 @@ function TileRow({
                     onDragStart={(e) => handleDragStart(e, horizontalType!)}
                     onClick={() => onAddTile(horizontalType!, value)}
                     className="shrink-0 cursor-grab active:cursor-grabbing"
-                    title={`Drag ${value > 0 ? '+' : ''}${label} (horizontal)`}
+                    title={`Drag or click to add horizontal ${value > 0 ? '+' : ''}${label} tile`}
+                    aria-label={`Add horizontal ${value > 0 ? '+' : ''}${label} tile`}
                 >
                     <div
                         className={cn(

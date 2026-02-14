@@ -185,6 +185,7 @@ function AlgebraTilesPageContent() {
                 <ToolScaffold helpContent={helpContent} className="flex-1 overflow-hidden">
                     <Canvas
                         ref={canvasRef}
+                        data-testid="canvas"
                         gridSize={snapToGrid ? 50 : undefined}
                         className="relative"
                         onClick={clearSelection}

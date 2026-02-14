@@ -337,6 +337,12 @@ export function useCircuitDesigner() {
     };
 
     const addNodeAtPosition = (type: ComponentTypeName, x: number, y: number) => {
+        // Validate type to prevent crash/DoS
+        if (!COMPONENT_TYPES[type]) {
+            console.warn(`[Security] Attempted to add invalid component type: ${type}`);
+            return;
+        }
+
         const id = generateId();
 
         // Label logic duplicated from addNode (could be extracted)

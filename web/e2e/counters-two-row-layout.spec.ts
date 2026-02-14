@@ -26,7 +26,7 @@ test.describe('Double Sided Counters - Two-Row Layout', () => {
         await page.waitForTimeout(300);
 
         // Get counter position
-        const counter = page.locator('[data-testid^="counter-"]').first();
+        const counter = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])').first();
         const box = await counter.boundingBox();
 
         expect(box).not.toBeNull();
@@ -35,8 +35,8 @@ test.describe('Double Sided Counters - Two-Row Layout', () => {
         await page.click('text=Add -1');
         await page.waitForTimeout(300);
 
-        const positiveCounter = page.locator('[data-testid^="counter-"]').first();
-        const negativeCounter = page.locator('[data-testid^="counter-"]').last();
+        const positiveCounter = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])').first();
+        const negativeCounter = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])').last();
 
         const posBox = await positiveCounter.boundingBox();
         const negBox = await negativeCounter.boundingBox();
@@ -54,7 +54,7 @@ test.describe('Double Sided Counters - Two-Row Layout', () => {
         await page.click('text=Add -1');
         await page.waitForTimeout(300);
 
-        const counters = page.locator('[data-testid^="counter-"]');
+        const counters = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
         await expect(counters).toHaveCount(2);
 
         // Get positions
@@ -75,7 +75,7 @@ test.describe('Double Sided Counters - Two-Row Layout', () => {
         await page.click('text=Zero Pair');
         await page.waitForTimeout(300);
 
-        const counters = page.locator('[data-testid^="counter-"]');
+        const counters = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
         await expect(counters).toHaveCount(2);
 
         // Get all counter Y positions
@@ -101,7 +101,7 @@ test.describe('Double Sided Counters - Two-Row Layout', () => {
         await page.waitForTimeout(500);
 
         // Drag one counter out of position
-        const counter = page.locator('[data-testid^="counter-"]').first();
+        const counter = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])').first();
         const box = await counter.boundingBox();
         if (box) {
             await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -116,7 +116,7 @@ test.describe('Double Sided Counters - Two-Row Layout', () => {
         await page.waitForTimeout(500);
 
         // Verify counters are organized
-        const counters = page.locator('[data-testid^="counter-"]');
+        const counters = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
         const count = await counters.count();
         const yPositions: number[] = [];
 
@@ -210,7 +210,7 @@ test.describe('Double Sided Counters - Drag from Sidebar', () => {
             await page.waitForTimeout(300);
 
             // Should have added a counter
-            const counters = page.locator('[data-testid^="counter-"]');
+            const counters = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
             await expect(counters).toHaveCount(1);
         }
     });
@@ -236,7 +236,7 @@ test.describe('Double Sided Counters - Drag from Sidebar', () => {
             await page.waitForTimeout(300);
 
             // Should have added a counter
-            const counters = page.locator('[data-testid^="counter-"]');
+            const counters = page.locator('[data-testid^="counter-"]:not([data-testid="counter-canvas"]):not([data-testid="counter-type-select"])');
             await expect(counters).toHaveCount(1);
         }
     });

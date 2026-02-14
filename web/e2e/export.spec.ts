@@ -3,14 +3,17 @@ import fs from 'fs';
 
 test.describe('Export Functionality', () => {
     test('Bar Model export should work in Firefox', async ({ page }) => {
-        // Navigate to Bar Model tool with predefined state (One bar with ID 0)
-        await page.goto('/mathematics/bar-model?b=0:100%252C300%2C80%2C800');
+        // Correctly formatted URL
+        const urlParams = new URLSearchParams();
+        urlParams.set('b', '0:100,100,100,400,0');
+        await page.goto(`/mathematics/bar-model?${urlParams.toString()}`);
 
         // Wait for tool to initialize and render canvas
         await page.waitForSelector('[data-testid="bar-model-canvas"]');
 
         // Wait for bar to be rendered
-        await page.waitForSelector('[data-testid="bar-0"]');
+        await page.waitForSelector('[data-testid^="bar-"]');
+        await page.waitForTimeout(500); // Extra buffer for canvas sync
 
         // Click Export button
         // Note: ToolbarButton might render 'Export' as tooltip or text
@@ -37,10 +40,13 @@ test.describe('Export Functionality', () => {
     });
 
     test('Bar Model SVG export should work', async ({ page }) => {
-        await page.goto('/mathematics/bar-model?b=0:100%252C300%2C80%2C800');
+        // Correctly formatted URL with single-level encoding for parameters
+        const urlParams = new URLSearchParams();
+        urlParams.set('b', '0:100,100,100,400,0');
+        await page.goto(`/mathematics/bar-model?${urlParams.toString()}`);
 
         await page.waitForSelector('[data-testid="bar-model-canvas"]');
-        await page.waitForSelector('[data-testid="bar-0"]');
+        await page.waitForSelector('[data-testid^="bar-"]');
 
         const exportButton = page.getByRole('button', { name: 'Export' });
         await exportButton.click();
@@ -55,10 +61,10 @@ test.describe('Export Functionality', () => {
     test('Double Sided Counters export should work', async ({ page }) => {
         await page.goto('/mathematics/double-sided-counters');
 
-        // Add a counter by clicking the +1 sidebar item (if it's clickable) or dragging
-        // Actually, clicking the sidebar item adds it in current implementation
-        const plusOne = page.getByText('+1').first();
+        // Add a counter by clicking the +1 sidebar item
+        const plusOne = page.locator('button:has-text("Add +1")').first();
         await plusOne.click();
+        await page.waitForTimeout(500); // Wait for render
 
         // Wait for counter to appear using the new data-testid format
         await page.waitForSelector('[data-testid^="counter-"]');

@@ -49,8 +49,10 @@ describe('ResolutionGuard', () => {
 
         // Should show banner
         expect(screen.getByText(/designed for larger screens/i)).toBeInTheDocument()
-        // Should NOT show children initially
-        expect(screen.queryByTestId('child')).not.toBeInTheDocument()
+        // Should NOT show children initially (they are hidden via CSS class)
+        // We check for the hidden class on the wrapper
+        const child = screen.getByTestId('child')
+        expect(child.parentElement).toHaveClass('hidden')
     })
 
     it('shows children when "Continue" is clicked', () => {

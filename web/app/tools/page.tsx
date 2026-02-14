@@ -1,5 +1,5 @@
 import { ToolCard } from "@/components/tool-card"
-import { Grid2x2, Calculator, Cpu, Percent } from "lucide-react"
+import { Grid2x2, Calculator, Cpu, Percent, Hash } from "lucide-react"
 
 export default function ToolsPage() {
     return (
@@ -52,6 +52,13 @@ export default function ToolsPage() {
                                 href="/mathematics/percentage-grid"
                                 gradient="from-blue-500 to-sky-500"
                                 icon={<Percent className="w-8 h-8 text-blue-500" />}
+                            />
+                            <ToolCard
+                                title="Sequences"
+                                description="Explore arithmetic, geometric, and quadratic sequences. Reveal terms one by one and find the nth term rule."
+                                href="/mathematics/sequences"
+                                gradient="from-indigo-500 to-purple-500"
+                                icon={<Hash className="w-8 h-8 text-indigo-500" />}
                             />
                         </div>
                     </div>
