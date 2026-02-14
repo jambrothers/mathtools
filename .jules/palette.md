@@ -9,3 +9,7 @@
 ## 2026-02-11 - Accessible Collapsible Sections
 **Learning:** Collapsible sections (`ControlSection`) require `aria-expanded` on the trigger and `aria-controls` pointing to the content ID to be fully accessible to screen readers.
 **Action:** When building collapsibles, always generate a unique ID (via `useId`) for the content and link it to the trigger button using ARIA attributes.
+
+## 2026-02-13 - Accessible Names for Graphical Tiles
+**Learning:** Draggable graphical items (like algebra tiles) often lack text labels, making them inaccessible to screen readers. Relying solely on `title` attributes is insufficient.
+**Action:** Always provide explicit `aria-label` or visible text for graphical buttons. Use descriptive names like 'Add vertical +x tile' instead of generic labels.
