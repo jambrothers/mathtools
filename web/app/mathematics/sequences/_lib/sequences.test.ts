@@ -14,6 +14,17 @@ describe('sequences logic', () => {
             expect(computeSequence('geometric', 5, 0, -1, 0, 3)).toEqual([5, -5, 5]);
         });
 
+        it('handles floating point precision in geometric sequences', () => {
+            // Case reported by user: a=2, r=0.1
+            const seq = computeSequence('geometric', 2, 0, 0.1, 0, 5);
+            // Without fix, this might contain 0.20000000000000004 etc.
+            expect(seq).toEqual([2, 0.2, 0.02, 0.002, 0.0002]);
+
+            // Another case: a=1, r=0.3
+            const seq2 = computeSequence('geometric', 1, 0, 0.3, 0, 3);
+            expect(seq2).toEqual([1, 0.3, 0.09]);
+        });
+
         it('computes quadratic sequences', () => {
             expect(computeSequence('quadratic', 1, 3, 0, 2, 5)).toEqual([1, 4, 9, 16, 25]);
             expect(computeSequence('quadratic', 4, 7, 0, 4, 4)).toEqual([4, 11, 22, 37]);

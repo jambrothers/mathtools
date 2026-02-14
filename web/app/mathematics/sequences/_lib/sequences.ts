@@ -26,7 +26,12 @@ export function computeSequence(
         }
     } else if (type === 'geometric') {
         for (let n = 0; n < length; n++) {
-            terms.push(a * Math.pow(r, n));
+            // Handle floating point precision issues (e.g. 2 * 0.1^n)
+            // We round to 10 decimal places to strip out floating point artifacts
+            const term = a * Math.pow(r, n);
+            terms.push(Number(term.toPrecision(12)));
+            // Note: toPrecision(12) handles small numbers better than fixed rounding for this scale
+            // Alternatively, a robust round function: Math.round(term * 1e10) / 1e10
         }
     } else if (type === 'quadratic') {
         // T(n) = An^2 + Bn + C
