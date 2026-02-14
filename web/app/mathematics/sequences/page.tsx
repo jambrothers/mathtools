@@ -12,9 +12,8 @@ import { SequenceDisplay } from './_components/sequence-display';
 import { sequencesURLSerializer, SequencesURLState } from './_lib/url-state';
 import { SEQUENCE_TYPES } from './constants';
 import { HelpModal } from '@/components/tool-ui/help-modal';
-import { HelpButton } from '@/components/tool-ui/help-button';
 import helpContent from './HELP.md';
-import { ChevronDown, RotateCcw, Eye, EyeOff, Calculator, Type, Settings, Dices, Check, Plus } from "lucide-react";
+import { ChevronDown, RotateCcw, Eye, EyeOff, Calculator, Type, Settings, Dices, Check, Plus, Info, X } from "lucide-react";
 import { cn } from '@/lib/utils';
 import { SequenceType } from './_lib/sequences';
 
@@ -104,7 +103,7 @@ function SequencesPageContent() {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-81px)] w-full bg-slate-50 dark:bg-slate-950 overflow-hidden">
+        <div className="flex flex-col h-[calc(100vh-81px)] w-full bg-slate-50 dark:bg-slate-950 overflow-hidden text-slate-900 dark:text-slate-100 uppercase-buttons">
             <SetPageTitle title="Sequences Tool" />
 
             <Toolbar className="sticky top-0">
@@ -132,20 +131,20 @@ function SequencesPageContent() {
                         {isRandomDropdownOpen && (
                             <>
                                 <div className="fixed inset-0 z-[100]" onClick={() => setIsRandomDropdownOpen(false)} />
-                                <div className="absolute top-full left-0 mt-1 z-[101] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg min-w-[180px] p-2 flex flex-col gap-1">
+                                <div className="absolute top-full left-0 mt-1 z-[101] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg min-w-[200px] p-2 flex flex-col gap-1">
                                     {SEQUENCE_TYPES.map((type) => (
                                         <button
                                             key={type.id}
-                                            className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors rounded-md w-full text-left"
+                                            className="flex items-center gap-2 px-3 py-3 text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors rounded-md w-full text-left"
                                             onClick={() => toggleRandomType(type.id)}
                                         >
                                             <div className={cn(
-                                                "w-4 h-4 border rounded flex items-center justify-center transition-colors",
+                                                "w-5 h-5 border rounded flex items-center justify-center transition-colors",
                                                 selectedRandomTypes.includes(type.id)
                                                     ? "bg-indigo-600 border-indigo-600 text-white"
                                                     : "border-slate-300 dark:border-slate-600"
                                             )}>
-                                                {selectedRandomTypes.includes(type.id) && <Check size={12} />}
+                                                {selectedRandomTypes.includes(type.id) && <Check size={14} />}
                                             </div>
                                             {type.label}
                                         </button>
@@ -153,7 +152,7 @@ function SequencesPageContent() {
                                     <div className="h-px bg-slate-100 dark:bg-slate-700 my-1" />
                                     <button
                                         disabled={selectedRandomTypes.length === 0}
-                                        className="w-full py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         onClick={() => {
                                             randomize(selectedRandomTypes);
                                             setIsRandomDropdownOpen(false);
@@ -207,6 +206,13 @@ function SequencesPageContent() {
                     />
 
                     <ToolbarSeparator />
+                    <ToolbarButton
+                        icon={<Info size={18} />}
+                        label="Help"
+                        onClick={() => setIsHelpOpen(true)}
+                    />
+
+                    <ToolbarSeparator />
                     <CopyLinkButton onCopyLink={handleCopyLink} />
                 </ToolbarGroup>
             </Toolbar>
@@ -214,14 +220,22 @@ function SequencesPageContent() {
             <Canvas className="flex-1 relative">
                 {/* Floating Config Panel */}
                 {showConfig && (
-                    <div className="absolute top-4 left-4 z-20 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl p-4 min-w-[240px] animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="flex flex-col gap-4">
+                    <div className="absolute top-4 left-4 z-40 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl p-5 min-w-[280px] sm:min-w-[320px] max-w-[90vw] animate-in fade-in slide-in-from-top-2 duration-200">
+                        <button
+                            onClick={() => setShowConfig(false)}
+                            className="absolute top-3 right-3 p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors"
+                            aria-label="Close"
+                        >
+                            <X size={20} className="text-slate-400" />
+                        </button>
+
+                        <div className="flex flex-col gap-5">
                             <div className="flex flex-col gap-1">
                                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Sequence Type</span>
                                 <select
                                     value={sequenceType}
                                     onChange={(e) => setSequenceType(e.target.value as SequenceType)}
-                                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md px-2 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                                 >
                                     {SEQUENCE_TYPES.map(t => (
                                         <option key={t.id} value={t.id}>{t.label}</option>
@@ -238,7 +252,7 @@ function SequencesPageContent() {
                                             type="number"
                                             value={a}
                                             onChange={(e) => setA(Number(e.target.value))}
-                                            className="w-full px-2 py-1 text-sm border rounded-md dark:bg-slate-900 dark:border-slate-700"
+                                            className="w-full px-2 py-2 text-sm border rounded-md dark:bg-slate-900 dark:border-slate-700"
                                         />
                                     </div>
 
@@ -249,7 +263,7 @@ function SequencesPageContent() {
                                                 type="number"
                                                 value={d}
                                                 onChange={(e) => setD(Number(e.target.value))}
-                                                className="w-full px-2 py-1 text-sm border rounded-md dark:bg-slate-900 dark:border-slate-700"
+                                                className="w-full px-2 py-2 text-sm border rounded-md dark:bg-slate-900 dark:border-slate-700"
                                             />
                                         </div>
                                     )}
@@ -262,7 +276,7 @@ function SequencesPageContent() {
                                                 step="0.1"
                                                 value={r}
                                                 onChange={(e) => setR(Number(e.target.value))}
-                                                className="w-full px-2 py-1 text-sm border rounded-md dark:bg-slate-900 dark:border-slate-700"
+                                                className="w-full px-2 py-2 text-sm border rounded-md dark:bg-slate-900 dark:border-slate-700"
                                             />
                                         </div>
                                     )}
@@ -275,7 +289,7 @@ function SequencesPageContent() {
                                                     type="number"
                                                     value={d}
                                                     onChange={(e) => setD(Number(e.target.value))}
-                                                    className="w-full px-2 py-1 text-sm border rounded-md dark:bg-slate-900 dark:border-slate-700"
+                                                    className="w-full px-2 py-2 text-sm border rounded-md dark:bg-slate-900 dark:border-slate-700"
                                                 />
                                             </div>
                                             <div className="flex flex-col gap-1">
@@ -284,7 +298,7 @@ function SequencesPageContent() {
                                                     type="number"
                                                     value={d2}
                                                     onChange={(e) => setD2(Number(e.target.value))}
-                                                    className="w-full px-2 py-1 text-sm border rounded-md dark:bg-slate-900 dark:border-slate-700"
+                                                    className="w-full px-2 py-2 text-sm border rounded-md dark:bg-slate-900 dark:border-slate-700"
                                                 />
                                             </div>
                                         </>
@@ -298,17 +312,11 @@ function SequencesPageContent() {
                                             max="12"
                                             value={termCount}
                                             onChange={(e) => setTermCount(Number(e.target.value))}
-                                            className="w-full px-2 py-1 text-sm border rounded-md dark:bg-slate-900 dark:border-slate-700"
+                                            className="w-full px-2 py-2 text-sm border rounded-md dark:bg-slate-900 dark:border-slate-700"
                                         />
                                     </div>
                                 </div>
                             </div>
-                            <button
-                                onClick={() => setShowConfig(false)}
-                                className="mt-2 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-tighter hover:underline text-center"
-                            >
-                                Close Panel
-                            </button>
                         </div>
                     </div>
                 )}
@@ -335,8 +343,6 @@ function SequencesPageContent() {
                         onRevealTerm={(index) => setRevealedCount(index + 1)}
                     />
                 )}
-
-                <HelpButton onClick={() => setIsHelpOpen(true)} />
             </Canvas>
 
             {isHelpOpen && (
