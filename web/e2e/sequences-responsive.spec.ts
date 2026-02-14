@@ -81,4 +81,39 @@ test.describe('Sequences Tool Responsive & Touch', () => {
             expect(box.height).toBeGreaterThanOrEqual(32); // Current might be smaller
         }
     });
+
+    test('State Persistence: Resize to Mobile and Back', async ({ page }) => {
+        // 1. Setup initial state (Desktop)
+        await page.setViewportSize({ width: 1024, height: 768 });
+
+        // Open Config
+        await page.getByRole('button', { name: /config/i }).click();
+
+        // Change terms to 5
+        const termsInput = page.locator('label:has-text("Terms") + input');
+        await termsInput.fill('5');
+
+        // Generate a sequence (to ensure terms are rendered)
+        await page.getByRole('button', { name: /counters/i }).click();
+
+        // 2. Resize to Mobile (Trigger ResolutionGuard)
+        await page.setViewportSize({ width: 375, height: 667 });
+
+        // Verify Guard is present
+        await expect(page.getByText('Designed for Larger Screens')).toBeVisible();
+
+        // 3. Resize back to Desktop
+        await page.setViewportSize({ width: 1024, height: 768 });
+
+        // 4. Verify State Persistence
+        const configBtn = page.getByRole('button', { name: /config/i });
+        if (await configBtn.isVisible()) {
+            const panel = page.locator('div').filter({ hasText: 'Sequence Type' }).last();
+            if (!await panel.isVisible()) {
+                await configBtn.click();
+            }
+        }
+
+        await expect(termsInput).toHaveValue('5');
+    });
 });
