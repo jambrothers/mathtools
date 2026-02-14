@@ -17,3 +17,7 @@
 ## 2026-02-12 - Testing Performance Optimizations via State Spies
 **Learning:** To verify optimizations where global state updates are intentionally skipped (e.g., single-item drag using local state), standard behavior verification is insufficient as the visual result is identical.
 **Action:** Use Jest spies on the state setter function (or the hook that wraps it) and assert `not.toHaveBeenCalled()` during the interaction for the optimized case, contrasting with `toHaveBeenCalled()` in the non-optimized (multi-item) scenario. This confirms the optimization logic is active and preventing re-renders.
+
+## 2026-02-19 - Memoizing Styles and Classes in Dragged Components
+**Learning:** In high-frequency render scenarios (like drag operations), even "cheap" operations like creating object literals (`style={{...}}`) or merging classes (`cn(...)` / `tailwind-merge`) add up. `tailwind-merge` in particular is computationally expensive to run 60 times per second.
+**Action:** Use `React.useMemo` to cache `style` objects and `className` strings in the draggable component. This ensures that when the component re-renders due to position updates, the expensive class merging logic is skipped if the visual state (like `isSelected`) hasn't changed.

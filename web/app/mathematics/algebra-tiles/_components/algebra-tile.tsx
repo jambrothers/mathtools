@@ -77,6 +77,20 @@ export const AlgebraTile = React.memo(function AlgebraTile({
     const bgClasses = `${bgColor} dark:${bgColor}`;
     const borderClasses = `${borderColor} dark:${borderColor}`;
 
+    // Optimization: Memoize tile-specific classes to prevent re-computation/merge on drag
+    const tileClassName = React.useMemo(() => cn(
+        bgClasses,
+        "border-2",
+        borderClasses,
+        "flex items-center justify-center font-bold text-white shadow-sm"
+    ), [bgClasses, borderClasses]);
+
+    // Optimization: Memoize style object to prevent new object creation on drag
+    const tileStyle = React.useMemo(() => ({
+        width: def.width,
+        height: def.height
+    }), [def.width, def.height]);
+
     const handlePointerDown = (e: React.PointerEvent) => {
         // Stop bubbling so canvas doesn't clear selection when clicking a tile
         e.stopPropagation();
@@ -116,16 +130,8 @@ export const AlgebraTile = React.memo(function AlgebraTile({
             onPointerDown={handlePointerDown}
             onDoubleClick={handleDoubleClick}
             onClick={handleClick}
-            className={cn(
-                bgClasses,
-                "border-2",
-                borderClasses,
-                "flex items-center justify-center font-bold text-white shadow-sm"
-            )}
-            style={{
-                width: def.width,
-                height: def.height
-            }}
+            className={tileClassName}
+            style={tileStyle}
             data-testid="tile"
             data-tile-type={type}
             data-tile-value={value}

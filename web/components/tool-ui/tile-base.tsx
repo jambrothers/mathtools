@@ -36,15 +36,19 @@ export function TileBase({
     children,
     ...props
 }: TileBaseProps) {
+    // Optimization: Memoize the className computation to avoid twMerge overhead on every drag frame.
+    // Dependencies are limited to state that changes visuals (not position).
+    const finalClassName = React.useMemo(() => cn(
+        "absolute cursor-grab active:cursor-grabbing select-none will-change-transform",
+        "bg-white dark:bg-slate-800 shadow-sm rounded border border-slate-300 dark:border-slate-600", // Default styles (can be overridden)
+        isSelected && "ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-900 z-10",
+        isDragging && "z-50 cursor-grabbing", // Remove scale/shadow pop
+        className
+    ), [isSelected, isDragging, className]);
+
     return (
         <div
-            className={cn(
-                "absolute cursor-grab active:cursor-grabbing select-none will-change-transform",
-                "bg-white dark:bg-slate-800 shadow-sm rounded border border-slate-300 dark:border-slate-600", // Default styles (can be overridden)
-                isSelected && "ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-900 z-10",
-                isDragging && "z-50 cursor-grabbing", // Remove scale/shadow pop
-                className
-            )}
+            className={finalClassName}
             style={{
                 transform: `translate(${position.x}px, ${position.y}px) rotate(${rotation}deg)`,
                 left: 0,
