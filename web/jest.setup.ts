@@ -130,3 +130,11 @@ jest.mock('react-markdown', () => ({
         return React.createElement('div', null, ...elements)
     }
 }))
+
+// Polyfill ResizeObserver for JSDOM
+class MockResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+}
+(global as unknown as { ResizeObserver: typeof MockResizeObserver }).ResizeObserver = MockResizeObserver;

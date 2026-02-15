@@ -44,6 +44,7 @@ export const MAX_PARSE_ITERATIONS = 200000;
 interface ListCodecOptions {
     delimiter?: string;
     maxItems?: number;
+    maxItemLength?: number;
     trim?: boolean;
 }
 
@@ -79,6 +80,7 @@ export function serializeList<T>(
  * @param options - Configuration options.
  * @param options.delimiter - The character used to separate items (default: ';').
  * @param options.maxItems - The maximum number of items to parse (default: 1000).
+ * @param options.maxItemLength - The maximum length of a single item string (default: 2048). Items exceeding this are skipped.
  * @param options.trim - Whether to trim whitespace from each part (default: true).
  * @returns An array of successfully parsed items.
  */
@@ -90,7 +92,7 @@ export function parseList<T>(
     if (!value || value.trim() === '') return [];
     // SECURITY: Default maxItems to 1000 to prevent DoS via unbounded deserialization
     // Use an iterative approach instead of split() to avoid allocation spikes
-    const { delimiter = ';', maxItems = 1000, trim = true } = options;
+    const { delimiter = ';', maxItems = 1000, maxItemLength = 2048, trim = true } = options;
 
     const items: T[] = [];
     let startIndex = 0;
@@ -122,6 +124,14 @@ export function parseList<T>(
         // If no more delimiters, take the rest of the string
         if (delimiterIndex === -1) {
             delimiterIndex = len;
+        }
+
+        // SECURITY: Check length before substring allocation to prevent DoS
+        const segmentLength = delimiterIndex - startIndex;
+        if (maxItemLength && segmentLength > maxItemLength) {
+            // Skip this item entirely
+            startIndex = delimiterIndex + delimiterLen;
+            continue;
         }
 
         const raw = value.substring(startIndex, delimiterIndex);

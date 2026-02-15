@@ -11,3 +11,7 @@
 ## 2026-02-10 - Tool UI Documentation Gap
 **Learning:** Shared UI components in `web/components/tool-ui/` were undocumented, making it hard to understand the "Scaffolded Layout" pattern.
 **Action:** Created `web/components/tool-ui/README.md` and added JSDoc to core layout components. Future shared libraries must have a README explanation.
+
+## 2026-02-14 - Silent Tool Addition
+**Learning:** New tools (like `Sequences`) can be fully implemented and deployed but missing from the main `README.md`, making them invisible to contributors.
+**Action:** Audit `web/app/tools/page.tsx` against `README.md` periodically. The "Definition of Done" for new tools must include a README entry.
