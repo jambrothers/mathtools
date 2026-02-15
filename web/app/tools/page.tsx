@@ -1,5 +1,5 @@
 import { ToolCard } from "@/components/tool-card"
-import { Grid2x2, Calculator, Cpu, Percent, Hash, Gamepad2 } from "lucide-react"
+import { Grid2x2, Calculator, Cpu, Percent, Hash } from "lucide-react"
 
 export default function ToolsPage() {
     return (
@@ -76,18 +76,6 @@ export default function ToolsPage() {
                         </div>
                     </div>
 
-                    <div id="games" className="mt-16">
-                        <h2 className="text-2xl font-bold text-[var(--theme-main)] mb-8 font-[family-name:var(--font-heading)]">Games</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            <ToolCard
-                                title="Pointless"
-                                description="A classroom game where students aim for obscurity. Can you find the correct answer that nobody else thought of?"
-                                href="/games/pointless"
-                                gradient="from-indigo-600 to-violet-600"
-                                icon={<Gamepad2 className="w-8 h-8 text-indigo-600" />}
-                            />
-                        </div>
-                    </div>
                 </div>
             </section>
         </div>
