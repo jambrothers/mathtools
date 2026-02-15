@@ -171,7 +171,6 @@ function CountersPageContent() {
             counterType
         };
         await copyShareableUrl(state);
-        // TODO: Could add a toast notification here to confirm copy
     }, [counters, sortState, isOrdered, isSequentialMode, animSpeed, showNumberLine, showStats, counterType, copyShareableUrl]);
 
     /**

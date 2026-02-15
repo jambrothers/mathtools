@@ -3,6 +3,7 @@
 import * as React from "react"
 import { Link, Check } from "lucide-react"
 import { ToolbarButton } from "./toolbar"
+import { Toast } from "./toast"
 
 interface CopyLinkButtonProps {
     onCopyLink: () => void | Promise<void>
@@ -11,6 +12,7 @@ interface CopyLinkButtonProps {
 
 export function CopyLinkButton({ onCopyLink, variant = 'default' }: CopyLinkButtonProps) {
     const [linkCopied, setLinkCopied] = React.useState(false)
+    const [showToast, setShowToast] = React.useState(false)
 
     React.useEffect(() => {
         if (linkCopied) {
@@ -20,29 +22,37 @@ export function CopyLinkButton({ onCopyLink, variant = 'default' }: CopyLinkButt
     }, [linkCopied])
 
     const handleLinkClick = async () => {
-        await onCopyLink();
-        setLinkCopied(true);
+        try {
+            await onCopyLink();
+            setLinkCopied(true);
+            setShowToast(true);
+        } catch (error) {
+            console.error("Failed to copy link:", error);
+        }
     };
 
+    const handleToastClose = React.useCallback(() => {
+        setShowToast(false);
+    }, []);
+
     return (
-        <div className="relative">
-            <ToolbarButton
-                icon={linkCopied ? <Check size={16} /> : <Link size={16} />}
-                label={linkCopied ? "Copied!" : "Link"}
-                onClick={handleLinkClick}
-                variant={linkCopied ? 'success' : variant}
-                aria-label={linkCopied ? "Link copied" : "Copy shareable link"}
-                title="Copy shareable link"
+        <>
+            <div className="relative">
+                <ToolbarButton
+                    icon={linkCopied ? <Check size={16} /> : <Link size={16} />}
+                    label={linkCopied ? "Copied!" : "Link"}
+                    onClick={handleLinkClick}
+                    variant={linkCopied ? 'success' : variant}
+                    aria-label={linkCopied ? "Link copied" : "Copy shareable link"}
+                    title="Copy shareable link"
+                />
+            </div>
+
+            <Toast
+                message="Link copied"
+                isVisible={showToast}
+                onClose={handleToastClose}
             />
-            {linkCopied && (
-                <div
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-1 whitespace-nowrap text-xs text-green-600 dark:text-green-400 bg-white dark:bg-slate-800 px-2 py-1 rounded shadow-md border border-green-200 dark:border-green-800 z-50"
-                    role="status"
-                    aria-live="polite"
-                >
-                    Link copied
-                </div>
-            )}
-        </div>
+        </>
     )
 }
