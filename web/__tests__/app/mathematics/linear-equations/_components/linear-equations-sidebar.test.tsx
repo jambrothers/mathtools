@@ -11,11 +11,7 @@ jest.mock('lucide-react', () => ({
     Trash2: () => <div data-testid="icon-trash" />,
     AlignJustify: () => <div data-testid="icon-align-justify" />,
     Scaling: () => <div data-testid="icon-scaling" />,
-    Link: () => <div data-testid="icon-link" />,
-    Check: () => <div data-testid="icon-check" />,
     Download: () => <div data-testid="icon-download" />,
-    ChevronDown: () => <div data-testid="icon-chevron-down" />,
-    Minus: () => <div data-testid="icon-minus" />
 }))
 
 // Mock ControlPanel components to simplify testing
@@ -24,6 +20,13 @@ jest.mock('@/components/tool-ui/control-panel', () => ({
     ControlSlider: ({ label, onValueChange, ...props }: any) => <input type="range" aria-label={label} {...props} />,
     ControlToggle: ({ label, ...props }: any) => <input type="checkbox" aria-label={label} {...props} />,
     ControlPresetButton: ({ label, onClick }: any) => <button onClick={onClick}>{label}</button>
+}))
+
+// Mock CopyLinkButton
+jest.mock('@/components/tool-ui/copy-link-button', () => ({
+    CopyLinkButton: ({ onCopyLink }: any) => (
+        <button onClick={onCopyLink}>Copy Link</button>
+    )
 }))
 
 const mockLines: LineConfig[] = [
@@ -56,45 +59,16 @@ describe('LinearEquationsSidebar', () => {
         onCopyLink: jest.fn()
     }
 
-    it('renders copy link button with initial state', () => {
+    it('renders copy link button via CopyLinkButton component', () => {
         render(<LinearEquationsSidebar {...defaultProps} />)
-
-        const copyButton = screen.getByTitle('Copy Link to Clipboard')
+        const copyButton = screen.getByText('Copy Link')
         expect(copyButton).toBeInTheDocument()
-        expect(copyButton).toHaveTextContent('Copy Link')
-        expect(screen.getByTestId('icon-link')).toBeInTheDocument()
-    })
-
-    it('updates copy link button state on click', () => {
-        jest.useFakeTimers()
-        render(<LinearEquationsSidebar {...defaultProps} />)
-
-        const copyButton = screen.getByTitle('Copy Link to Clipboard')
-
         fireEvent.click(copyButton)
-
         expect(defaultProps.onCopyLink).toHaveBeenCalled()
-
-        // Check updated state
-        expect(copyButton).toHaveTextContent('Copied!')
-        expect(screen.getByTestId('icon-check')).toBeInTheDocument()
-        expect(copyButton).toHaveClass('bg-green-100') // Check for success class
-
-        // Fast-forward timer
-        act(() => {
-            jest.advanceTimersByTime(3000)
-        })
-
-        // Check reset state
-        expect(copyButton).toHaveTextContent('Copy Link')
-        expect(screen.getByTestId('icon-link')).toBeInTheDocument()
-
-        jest.useRealTimers()
     })
 
     it('renders export button with download icon', () => {
         render(<LinearEquationsSidebar {...defaultProps} />)
-
         const exportButton = screen.getByText('Export').closest('button')
         expect(exportButton).toBeInTheDocument()
         expect(screen.getByTestId('icon-download')).toBeInTheDocument()

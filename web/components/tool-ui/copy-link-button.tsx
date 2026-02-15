@@ -3,13 +3,18 @@
 import * as React from "react"
 import { Link, Check } from "lucide-react"
 import { ToolbarButton } from "./toolbar"
+import { cn } from "@/lib/utils"
+import { Toast } from "./toast"
 
 interface CopyLinkButtonProps {
     onCopyLink: () => void | Promise<void>
     variant?: 'default' | 'danger' | 'primary' | 'success'
+    className?: string
+    /** Custom label for the button (default: "Link") */
+    label?: string
 }
 
-export function CopyLinkButton({ onCopyLink, variant = 'default' }: CopyLinkButtonProps) {
+export function CopyLinkButton({ onCopyLink, variant = 'default', className, label = "Link" }: CopyLinkButtonProps) {
     const [linkCopied, setLinkCopied] = React.useState(false)
 
     React.useEffect(() => {
@@ -25,24 +30,24 @@ export function CopyLinkButton({ onCopyLink, variant = 'default' }: CopyLinkButt
     };
 
     return (
-        <div className="relative">
+        <>
             <ToolbarButton
                 icon={linkCopied ? <Check size={16} /> : <Link size={16} />}
-                label={linkCopied ? "Copied!" : "Link"}
+                label={linkCopied ? "Copied!" : label}
                 onClick={handleLinkClick}
                 variant={linkCopied ? 'success' : variant}
                 aria-label={linkCopied ? "Link copied" : "Copy shareable link"}
                 title="Copy shareable link"
+                className={cn(
+                    className,
+                    linkCopied && "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50 border-green-200 dark:border-green-800"
+                )}
             />
-            {linkCopied && (
-                <div
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-1 whitespace-nowrap text-xs text-green-600 dark:text-green-400 bg-white dark:bg-slate-800 px-2 py-1 rounded shadow-md border border-green-200 dark:border-green-800 z-50"
-                    role="status"
-                    aria-live="polite"
-                >
-                    Link copied
-                </div>
-            )}
-        </div>
+            <Toast
+                message="Link copied to clipboard"
+                isVisible={linkCopied}
+                variant="success"
+            />
+        </>
     )
 }
