@@ -38,17 +38,20 @@ describe('Canvas', () => {
             const { container } = render(<Canvas data-testid="canvas" />);
             const canvas = screen.getByTestId('canvas');
 
-            jest.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
-                left: 0, top: 0, right: 500, bottom: 500,
-                width: 500, height: 500, x: 0, y: 0, toJSON: () => { }
-            });
+            // Note: getBoundingClientRect is no longer used, so we don't need to mock it.
+            // Instead, we pass offsetX/offsetY in the event options (supported by our jest.setup.ts polyfill).
 
-            fireEvent.pointerDown(canvas, { clientX: 100, clientY: 100, target: canvas });
-            fireEvent.pointerMove(canvas, { clientX: 200, clientY: 200 });
+            fireEvent.pointerDown(canvas, {
+                clientX: 100, clientY: 100, target: canvas,
+                offsetX: 100, offsetY: 100
+            });
+            fireEvent.pointerMove(canvas, {
+                clientX: 200, clientY: 200,
+                offsetX: 200, offsetY: 200
+            });
 
             const marquee = container.querySelector('[class*="border-indigo"]');
             expect(marquee).toBeVisible();
-            // Should not have hidden class (checking style because we override class with inline style)
         });
 
         it('calls onSelectionEnd with rect when drag exceeds threshold', () => {
@@ -56,14 +59,18 @@ describe('Canvas', () => {
             render(<Canvas data-testid="canvas" onSelectionEnd={onSelectionEnd} />);
             const canvas = screen.getByTestId('canvas');
 
-            jest.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
-                left: 0, top: 0, right: 500, bottom: 500,
-                width: 500, height: 500, x: 0, y: 0, toJSON: () => { }
+            fireEvent.pointerDown(canvas, {
+                clientX: 50, clientY: 50, target: canvas,
+                offsetX: 50, offsetY: 50
             });
-
-            fireEvent.pointerDown(canvas, { clientX: 50, clientY: 50, target: canvas });
-            fireEvent.pointerMove(canvas, { clientX: 150, clientY: 150 });
-            fireEvent.pointerUp(canvas, { clientX: 150, clientY: 150 });
+            fireEvent.pointerMove(canvas, {
+                clientX: 150, clientY: 150,
+                offsetX: 150, offsetY: 150
+            });
+            fireEvent.pointerUp(canvas, {
+                clientX: 150, clientY: 150,
+                offsetX: 150, offsetY: 150
+            });
 
             expect(onSelectionEnd).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -80,14 +87,18 @@ describe('Canvas', () => {
             render(<Canvas data-testid="canvas" onSelectionEnd={onSelectionEnd} />);
             const canvas = screen.getByTestId('canvas');
 
-            jest.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
-                left: 0, top: 0, right: 500, bottom: 500,
-                width: 500, height: 500, x: 0, y: 0, toJSON: () => { }
+            fireEvent.pointerDown(canvas, {
+                clientX: 50, clientY: 50, target: canvas,
+                offsetX: 50, offsetY: 50
             });
-
-            fireEvent.pointerDown(canvas, { clientX: 50, clientY: 50, target: canvas });
-            fireEvent.pointerMove(canvas, { clientX: 52, clientY: 52 });
-            fireEvent.pointerUp(canvas, { clientX: 52, clientY: 52 });
+            fireEvent.pointerMove(canvas, {
+                clientX: 52, clientY: 52,
+                offsetX: 52, offsetY: 52
+            });
+            fireEvent.pointerUp(canvas, {
+                clientX: 52, clientY: 52,
+                offsetX: 52, offsetY: 52
+            });
 
             expect(onSelectionEnd).not.toHaveBeenCalled();
         });
@@ -96,17 +107,21 @@ describe('Canvas', () => {
             const { container } = render(<Canvas data-testid="canvas" />);
             const canvas = screen.getByTestId('canvas');
 
-            jest.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
-                left: 0, top: 0, right: 500, bottom: 500,
-                width: 500, height: 500, x: 0, y: 0, toJSON: () => { }
+            fireEvent.pointerDown(canvas, {
+                clientX: 100, clientY: 100, target: canvas,
+                offsetX: 100, offsetY: 100
             });
-
-            fireEvent.pointerDown(canvas, { clientX: 100, clientY: 100, target: canvas });
-            fireEvent.pointerMove(canvas, { clientX: 200, clientY: 200 });
+            fireEvent.pointerMove(canvas, {
+                clientX: 200, clientY: 200,
+                offsetX: 200, offsetY: 200
+            });
 
             expect(container.querySelector('[class*="border-indigo"]')).toBeVisible();
 
-            fireEvent.pointerUp(canvas, { clientX: 200, clientY: 200 });
+            fireEvent.pointerUp(canvas, {
+                clientX: 200, clientY: 200,
+                offsetX: 200, offsetY: 200
+            });
 
             expect(container.querySelector('[class*="border-indigo"]')).not.toBeVisible();
         });
@@ -115,13 +130,14 @@ describe('Canvas', () => {
             const { container } = render(<Canvas data-testid="canvas" />);
             const canvas = screen.getByTestId('canvas');
 
-            jest.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
-                left: 0, top: 0, right: 500, bottom: 500,
-                width: 500, height: 500, x: 0, y: 0, toJSON: () => { }
+            fireEvent.pointerDown(canvas, {
+                clientX: 100, clientY: 100, target: canvas,
+                offsetX: 100, offsetY: 100
             });
-
-            fireEvent.pointerDown(canvas, { clientX: 100, clientY: 100, target: canvas });
-            fireEvent.pointerMove(canvas, { clientX: 200, clientY: 200 });
+            fireEvent.pointerMove(canvas, {
+                clientX: 200, clientY: 200,
+                offsetX: 200, offsetY: 200
+            });
 
             expect(container.querySelector('[class*="border-indigo"]')).toBeVisible();
 
@@ -138,6 +154,7 @@ describe('Canvas', () => {
             );
             const child = screen.getByTestId('child');
 
+            // Event on child should not trigger marquee start on canvas
             fireEvent.pointerDown(child, { clientX: 25, clientY: 25 });
             fireEvent.pointerMove(container, { clientX: 100, clientY: 100 });
 
@@ -162,17 +179,28 @@ describe('Canvas', () => {
             render(<Canvas data-testid="canvas" onClick={onClick} onSelectionEnd={onSelectionEnd} />);
             const canvas = screen.getByTestId('canvas');
 
-            jest.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
-                left: 0, top: 0, right: 500, bottom: 500,
-                width: 500, height: 500, x: 0, y: 0, toJSON: () => { }
+            // Perform a selection
+            fireEvent.pointerDown(canvas, {
+                clientX: 50, clientY: 50, target: canvas,
+                offsetX: 50, offsetY: 50
+            });
+            fireEvent.pointerMove(canvas, {
+                clientX: 150, clientY: 150,
+                offsetX: 150, offsetY: 150
+            });
+            fireEvent.pointerUp(canvas, {
+                clientX: 150, clientY: 150,
+                offsetX: 150, offsetY: 150
             });
 
-            // Perform a selection
-            fireEvent.pointerDown(canvas, { clientX: 50, clientY: 50, target: canvas });
-            fireEvent.pointerMove(canvas, { clientX: 150, clientY: 150 });
-            fireEvent.pointerUp(canvas, { clientX: 150, clientY: 150 });
-
             expect(onSelectionEnd).toHaveBeenCalled();
+
+            // Wait for setTimeout (50ms) in component if verifying ignoring click...
+            // Actually the component ignores click immediately after pointerUp.
+            // fireEvent.click happens after pointerUp usually.
+
+            fireEvent.click(canvas);
+            expect(onClick).not.toHaveBeenCalled();
         });
     });
 
@@ -181,13 +209,14 @@ describe('Canvas', () => {
             const { container } = render(<Canvas data-testid="canvas" />);
             const canvas = screen.getByTestId('canvas');
 
-            jest.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
-                left: 0, top: 0, right: 500, bottom: 500,
-                width: 500, height: 500, x: 0, y: 0, toJSON: () => { }
+            fireEvent.pointerDown(canvas, {
+                clientX: 100, clientY: 100, target: canvas,
+                offsetX: 100, offsetY: 100
             });
-
-            fireEvent.pointerDown(canvas, { clientX: 100, clientY: 100, target: canvas });
-            fireEvent.pointerMove(canvas, { clientX: 200, clientY: 200 });
+            fireEvent.pointerMove(canvas, {
+                clientX: 200, clientY: 200,
+                offsetX: 200, offsetY: 200
+            });
 
             const marquee = container.querySelector('[class*="border-indigo"]');
             expect(marquee).toBeInTheDocument();
@@ -198,23 +227,21 @@ describe('Canvas', () => {
             render(<Canvas data-testid="canvas" onSelectionEnd={onSelectionEnd} />);
             const canvas = screen.getByTestId('canvas');
 
-            jest.spyOn(canvas, 'getBoundingClientRect').mockReturnValue({
-                left: 0, top: 0, right: 500, bottom: 500,
-                width: 500, height: 500, x: 0, y: 0, toJSON: () => { }
-            });
-
             fireEvent.pointerDown(canvas, {
                 clientX: 50, clientY: 50,
                 target: canvas,
-                pointerType: 'touch'
+                pointerType: 'touch',
+                offsetX: 50, offsetY: 50
             });
             fireEvent.pointerMove(canvas, {
                 clientX: 150, clientY: 150,
-                pointerType: 'touch'
+                pointerType: 'touch',
+                offsetX: 150, offsetY: 150
             });
             fireEvent.pointerUp(canvas, {
                 clientX: 150, clientY: 150,
-                pointerType: 'touch'
+                pointerType: 'touch',
+                offsetX: 150, offsetY: 150
             });
 
             expect(onSelectionEnd).toHaveBeenCalled();

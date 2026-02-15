@@ -1,6 +1,20 @@
 import '@testing-library/jest-dom'
 import React from 'react'
 
+// Helper to support offsetX/offsetY in JSDOM events
+Object.defineProperties(MouseEvent.prototype, {
+    offsetX: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        get() { return (this as any)._offsetX || 0; },
+        configurable: true
+    },
+    offsetY: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        get() { return (this as any)._offsetY || 0; },
+        configurable: true
+    }
+});
+
 // Polyfill PointerEvent for JSDOM (not natively supported)
 class MockPointerEvent extends MouseEvent {
     public readonly pointerId: number;
@@ -9,13 +23,17 @@ class MockPointerEvent extends MouseEvent {
     public readonly width: number;
     public readonly height: number;
 
-    constructor(type: string, props: PointerEventInit = {}) {
+    constructor(type: string, props: PointerEventInit & { offsetX?: number; offsetY?: number } = {}) {
         super(type, props);
         this.pointerId = props.pointerId ?? 1;
         this.pointerType = props.pointerType ?? 'mouse';
         this.pressure = props.pressure ?? 0;
         this.width = props.width ?? 1;
         this.height = props.height ?? 1;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (props.offsetX !== undefined) (this as any)._offsetX = props.offsetX;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (props.offsetY !== undefined) (this as any)._offsetY = props.offsetY;
     }
 }
 (global as unknown as { PointerEvent: typeof MockPointerEvent }).PointerEvent = MockPointerEvent;
