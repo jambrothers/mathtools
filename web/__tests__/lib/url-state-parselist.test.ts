@@ -54,4 +54,21 @@ describe('parseList', () => {
          const result = parseList(largeString, (part) => part);
          expect(result.length).toBe(1000);
     });
+
+    it('skips items exceeding maxItemLength', () => {
+        const longItem = 'a'.repeat(3000);
+        const input = `normal;${longItem};short`;
+        // Default maxItemLength is 2048, so longItem should be skipped
+        const result = parseList(input, (part) => part);
+        expect(result).toEqual(['normal', 'short']);
+    });
+
+    it('respects custom maxItemLength', () => {
+        const input = 'a;b;c';
+        // maxItemLength 0 means anything > 0 is skipped (essentially empty strings only?)
+        // Wait, length > 0.
+        // Let's use maxItemLength 1. 'abc' is length 3, should be skipped.
+        const result = parseList('a;abc;b', (part) => part, { maxItemLength: 2 });
+        expect(result).toEqual(['a', 'b']);
+    });
 });
