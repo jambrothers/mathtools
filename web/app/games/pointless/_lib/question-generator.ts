@@ -14,30 +14,33 @@ export interface Question {
     parameters: Record<string, number | string>;
 }
 
-export function generateQuestion(category: QuestionCategory): Question {
+export function generateQuestion(
+    category: QuestionCategory,
+    manualParams?: Record<string, number | string>
+): Question {
     switch (category) {
         case "factors":
-            return generateFactorsQuestion();
+            return generateFactorsQuestion(manualParams);
         case "multiples-in-range":
-            return generateMultiplesQuestion();
+            return generateMultiplesQuestion(manualParams);
         case "primes-in-range":
-            return generatePrimesQuestion();
+            return generatePrimesQuestion(manualParams);
         case "squares-in-range":
-            return generateSquaresQuestion();
+            return generateSquaresQuestion(manualParams);
         case "cubes-in-range":
-            return generateCubesQuestion();
+            return generateCubesQuestion(manualParams);
         case "powers-of-2":
-            return generatePowersOf2Question();
+            return generatePowersOf2Question(manualParams);
         case "triangular-numbers":
-            return generateTriangularNumbersQuestion();
+            return generateTriangularNumbersQuestion(manualParams);
         default:
             throw new Error(`Unknown category: ${category}`);
     }
 }
 
-function generateFactorsQuestion(): Question {
+function generateFactorsQuestion(params?: Record<string, number | string>): Question {
     const options = [48, 60, 72, 84, 90, 96, 120, 144, 180, 240];
-    const n = options[Math.floor(Math.random() * options.length)];
+    const n = (params?.n as number) ?? options[Math.floor(Math.random() * options.length)];
     const answers: number[] = [];
     for (let i = 1; i <= n; i++) {
         if (n % i === 0) answers.push(i);
@@ -50,10 +53,10 @@ function generateFactorsQuestion(): Question {
     };
 }
 
-function generateMultiplesQuestion(): Question {
-    const multiplier = Math.floor(Math.random() * 9) + 2; // 2-10
-    const min = Math.floor(Math.random() * 50);
-    const max = min + 100 + Math.floor(Math.random() * 100);
+function generateMultiplesQuestion(params?: Record<string, number | string>): Question {
+    const multiplier = (params?.multiplier as number) ?? (Math.floor(Math.random() * 9) + 2); // 2-10
+    const min = (params?.min as number) ?? Math.floor(Math.random() * 50);
+    const max = (params?.max as number) ?? (min + 100 + Math.floor(Math.random() * 100));
 
     const answers: number[] = [];
     for (let i = Math.ceil(min / multiplier) * multiplier; i <= max; i += multiplier) {
@@ -68,8 +71,8 @@ function generateMultiplesQuestion(): Question {
     };
 }
 
-function generatePrimesQuestion(): Question {
-    const max = 50 + Math.floor(Math.random() * 150); // 50-200
+function generatePrimesQuestion(params?: Record<string, number | string>): Question {
+    const max = (params?.max as number) ?? (50 + Math.floor(Math.random() * 150)); // 50-200
     const answers: number[] = [];
     for (let i = 2; i <= max; i++) {
         if (isPrime(i)) answers.push(i);
@@ -82,8 +85,8 @@ function generatePrimesQuestion(): Question {
     };
 }
 
-function generateSquaresQuestion(): Question {
-    const max = 100 + Math.floor(Math.random() * 900); // 100-1000
+function generateSquaresQuestion(params?: Record<string, number | string>): Question {
+    const max = (params?.max as number) ?? (100 + Math.floor(Math.random() * 900)); // 100-1000
     const answers: number[] = [];
     for (let i = 1; i * i <= max; i++) {
         answers.push(i * i);
@@ -96,8 +99,8 @@ function generateSquaresQuestion(): Question {
     };
 }
 
-function generateCubesQuestion(): Question {
-    const max = 200 + Math.floor(Math.random() * 800); // 200-1000
+function generateCubesQuestion(params?: Record<string, number | string>): Question {
+    const max = (params?.max as number) ?? (200 + Math.floor(Math.random() * 800)); // 200-1000
     const answers: number[] = [];
     for (let i = 1; i * i * i <= max; i++) {
         answers.push(i * i * i);
@@ -110,8 +113,9 @@ function generateCubesQuestion(): Question {
     };
 }
 
-function generatePowersOf2Question(): Question {
-    const max = [128, 256, 512, 1024, 2048][Math.floor(Math.random() * 5)];
+function generatePowersOf2Question(params?: Record<string, number | string>): Question {
+    const options = [128, 256, 512, 1024, 2048];
+    const max = (params?.max as number) ?? options[Math.floor(Math.random() * options.length)];
     const answers: number[] = [];
     for (let i = 1; i <= max; i *= 2) {
         answers.push(i);
@@ -124,8 +128,8 @@ function generatePowersOf2Question(): Question {
     };
 }
 
-function generateTriangularNumbersQuestion(): Question {
-    const max = 50 + Math.floor(Math.random() * 150); // 50-200
+function generateTriangularNumbersQuestion(params?: Record<string, number | string>): Question {
+    const max = (params?.max as number) ?? (50 + Math.floor(Math.random() * 150)); // 50-200
     const answers: number[] = [];
     let n = 1;
     while (true) {
