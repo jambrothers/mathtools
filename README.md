@@ -64,7 +64,19 @@ An interactive grid for exploring the relationship between percentages, fraction
 *Status: Stable. Core functionality and URL sharing implemented.*
 [Documentation](./web/app/mathematics/percentage-grid/HELP.md)
 
-### 6. Circuit Designer
+### 6. Sequences
+An interactive environment for exploring arithmetic, geometric, and quadratic sequences.
+- **Sequence Types**: Arithmetic, Geometric, Quadratic.
+- **Features**:
+    - Random generation.
+    - Progressive reveal of terms.
+    - $n^{th}$ term rule display.
+    - Visual representation with counters.
+
+*Status: Stable. Core functionality and URL sharing implemented.*
+[Documentation](./web/app/mathematics/sequences/HELP.md)
+
+### 7. Circuit Designer
 A logic gate simulator for Computer Science students.
 - **Components**: Switches, Bulbs, AND, OR, NOT, XOR gates.
 - **Features**:
