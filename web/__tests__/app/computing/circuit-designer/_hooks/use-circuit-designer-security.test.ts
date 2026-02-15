@@ -40,4 +40,18 @@ describe('useCircuitDesigner - Security', () => {
         // Should be 0, but will fail if not validated
         expect(result.current.nodes).toHaveLength(0);
     });
+
+    it('should protect against Prototype Pollution attacks (e.g. "constructor")', () => {
+        const { result } = renderHook(() => useCircuitDesigner());
+
+        // Attempt to exploit prototype properties
+        // COMPONENT_TYPES['constructor'] would return the Function constructor (truthy)
+        // creating a vulnerability if not checking hasOwnProperty
+        act(() => {
+            // @ts-expect-error Testing invalid input
+            result.current.addNodeAtPosition('constructor', 100, 100);
+        });
+
+        expect(result.current.nodes).toHaveLength(0);
+    });
 });
