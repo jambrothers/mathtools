@@ -38,11 +38,16 @@ export const Canvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
             // Only start marquee if clicking directly on canvas (not on children)
             if (e.target !== internalRef.current && e.target !== e.currentTarget) return;
 
-            const rect = internalRef.current?.getBoundingClientRect();
-            if (!rect) return;
+            // PERFORMANCE: Use pointer capture and offsetX/Y to avoid expensive getBoundingClientRect() calls
+            // This prevents layout thrashing during the drag
+            try {
+                e.currentTarget.setPointerCapture(e.pointerId);
+            } catch {
+                // Ignore errors (e.g. in environments not supporting capture)
+            }
 
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            const x = e.nativeEvent.offsetX;
+            const y = e.nativeEvent.offsetY;
 
             selectionStartRef.current = { x, y };
             currentPosRef.current = { x, y };
@@ -60,11 +65,10 @@ export const Canvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
 
         const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
             if (!selectionStartRef.current) return;
-            const rect = internalRef.current?.getBoundingClientRect();
-            if (!rect) return;
 
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            // Use captured pointer event's offsetX/Y relative to canvas
+            const x = e.nativeEvent.offsetX;
+            const y = e.nativeEvent.offsetY;
 
             currentPosRef.current = { x, y };
 
@@ -90,7 +94,16 @@ export const Canvas = React.forwardRef<HTMLDivElement, ManipulativeCanvasProps>(
             currentPosRef.current = null;
         }
 
-        const handlePointerUp = () => {
+        const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+            // Explicitly release capture (though often automatic)
+            try {
+                if (internalRef.current?.hasPointerCapture(e.pointerId)) {
+                    internalRef.current.releasePointerCapture(e.pointerId);
+                }
+            } catch {
+                // Ignore
+            }
+
             if (selectionStartRef.current && currentPosRef.current && onSelectionEnd) {
                 // Calculate rect
                 const start = selectionStartRef.current;
