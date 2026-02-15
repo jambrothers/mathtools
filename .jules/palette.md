@@ -13,3 +13,11 @@
 ## 2026-02-13 - Accessible Names for Graphical Tiles
 **Learning:** Draggable graphical items (like algebra tiles) often lack text labels, making them inaccessible to screen readers. Relying solely on `title` attributes is insufficient.
 **Action:** Always provide explicit `aria-label` or visible text for graphical buttons. Use descriptive names like 'Add vertical +x tile' instead of generic labels.
+
+## 2026-02-14 - Modal Accessibility Essentials
+**Learning:** Modals (like `HelpModal`) must manage keyboard focus and ARIA roles to be accessible. Critical missing features were: Escape key support, `role="dialog"`, `aria-modal="true"`, and initial focus management.
+**Action:** When building modals, always implement:
+1. `useEffect` for Escape key listener.
+2. `role="dialog"` and `aria-modal="true"` on the container.
+3. `aria-labelledby` pointing to the title ID.
+4. Focus a key interactive element (like Close button) on mount.

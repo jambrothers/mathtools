@@ -16,6 +16,26 @@ interface HelpModalProps {
  * Renders markdown content with proper styling.
  */
 export function HelpModal({ content, onClose }: HelpModalProps) {
+    const titleId = React.useId()
+    const closeButtonRef = React.useRef<HTMLButtonElement>(null)
+
+    React.useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose()
+            }
+        }
+        document.addEventListener('keydown', handleKeyDown)
+        return () => document.removeEventListener('keydown', handleKeyDown)
+    }, [onClose])
+
+    React.useEffect(() => {
+        // Focus the close button when the modal mounts
+        if (closeButtonRef.current) {
+            closeButtonRef.current.focus()
+        }
+    }, [])
+
     return (
         <div
             data-testid="help-modal-backdrop"
@@ -23,16 +43,23 @@ export function HelpModal({ content, onClose }: HelpModalProps) {
             onClick={onClose}
         >
             <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby={titleId}
                 data-testid="help-modal-content"
                 className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-600 max-w-2xl w-full max-h-[80vh] flex flex-col"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 rounded-t-xl">
-                    <h2 className="text-xl font-bold flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                    <h2
+                        id={titleId}
+                        className="text-xl font-bold flex items-center gap-2 text-indigo-600 dark:text-indigo-400"
+                    >
                         <HelpCircle size={20} /> Help Guide
                     </h2>
                     <button
+                        ref={closeButtonRef}
                         onClick={onClose}
                         aria-label="Close"
                         className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white"
