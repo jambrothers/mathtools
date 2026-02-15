@@ -126,7 +126,6 @@ function AlgebraTilesPageContent() {
             snapToGrid
         };
         await copyShareableUrl(state);
-        // TODO: Could add a toast notification here to confirm copy
     }, [tiles, showLabels, showY, snapToGrid, copyShareableUrl]);
 
     const { handleDrop, handleDragOver } = useCanvasDrop<{ type: string; value: number }>({
