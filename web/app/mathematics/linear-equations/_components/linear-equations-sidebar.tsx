@@ -5,8 +5,9 @@ import {
     ControlSection, ControlSlider, ControlToggle, ControlPresetButton
 } from "@/components/tool-ui/control-panel"
 import { LineConfig, MAX_LINES, M_MIN, M_MAX, C_MIN, C_MAX } from "../constants"
-import { Sliders, Eye, BookMarked, Plus, Trash2, AlignJustify, Scaling } from "lucide-react"
+import { Sliders, Eye, BookMarked, Plus, Trash2, AlignJustify, Scaling, Download } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { CopyLinkButton } from "@/components/tool-ui/copy-link-button"
 
 interface LinearEquationsSidebarProps {
     lines: LineConfig[]
@@ -224,17 +225,16 @@ export function LinearEquationsSidebar({
                         Reset Tool
                     </button>
                     <div className="flex gap-3">
-                        <button
-                            onClick={onCopyLink}
-                            className="flex-1 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-md text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors flex items-center justify-center gap-2"
-                            title="Copy Link to Clipboard"
-                        >
-                            Copy Link
-                        </button>
+                        <CopyLinkButton
+                            onCopyLink={onCopyLink}
+                            label="Copy Link"
+                            className="flex-1 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 border-transparent"
+                        />
                         <button
                             onClick={onExport}
                             className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium shadow-md transition-colors flex items-center justify-center gap-2"
                         >
+                            <Download size={16} />
                             Export
                         </button>
                     </div>

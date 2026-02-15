@@ -1,34 +1,52 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import { CopyLinkButton } from '@/components/tool-ui/copy-link-button'
-import React from 'react'
+
+// Mock ToolbarButton to capture props
+jest.mock('@/components/tool-ui/toolbar', () => ({
+    ToolbarButton: ({ label, onClick, className }: any) => (
+        <button onClick={onClick} className={className}>{label}</button>
+    )
+}))
+
+// Mock Toast to capture props
+jest.mock('@/components/tool-ui/toast', () => ({
+    Toast: ({ message, isVisible }: any) => (
+        isVisible ? <div role="status">{message}</div> : null
+    )
+}))
 
 describe('CopyLinkButton', () => {
-    it('renders correctly with initial state', () => {
+    it('renders with initial state', () => {
         render(<CopyLinkButton onCopyLink={() => {}} />)
-        const button = screen.getByRole('button', { name: /copy shareable link/i })
-        expect(button).toBeInTheDocument()
         expect(screen.getByText('Link')).toBeInTheDocument()
+        expect(screen.queryByRole('status')).not.toBeInTheDocument()
     })
 
-    it('handles click and shows feedback', async () => {
+    it('shows feedback on click', async () => {
+        jest.useFakeTimers()
         const onCopyLink = jest.fn()
         render(<CopyLinkButton onCopyLink={onCopyLink} />)
-        const button = screen.getByRole('button', { name: /copy shareable link/i })
 
-        fireEvent.click(button)
-
-        expect(onCopyLink).toHaveBeenCalled()
-
-        // Wait for button state change
-        await waitFor(() => {
-            expect(screen.getByRole('button', { name: /link copied/i })).toBeInTheDocument()
+        await act(async () => {
+            fireEvent.click(screen.getByText('Link'))
         })
 
-        // Check visual label change
+        expect(onCopyLink).toHaveBeenCalled()
         expect(screen.getByText('Copied!')).toBeInTheDocument()
+        expect(screen.getByRole('status')).toHaveTextContent('Link copied to clipboard')
 
-        // Check toast feedback
-        const toast = screen.getByRole('status')
-        expect(toast).toHaveTextContent('Link copied')
+        act(() => {
+            jest.advanceTimersByTime(3000)
+        })
+
+        expect(screen.getByText('Link')).toBeInTheDocument()
+        expect(screen.queryByRole('status')).not.toBeInTheDocument()
+
+        jest.useRealTimers()
+    })
+
+    it('passes className to ToolbarButton', () => {
+        render(<CopyLinkButton onCopyLink={() => {}} className="custom-class" />)
+        expect(screen.getByText('Link')).toHaveClass('custom-class')
     })
 })
