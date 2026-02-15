@@ -14,7 +14,7 @@ export function PointlessCanvas({
     isRevealed
 }: PointlessCanvasProps) {
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center select-none overflow-hidden bg-slate-50 dark:bg-slate-950">
+        <div className="w-full h-full flex flex-col items-center p-8 pt-12 text-center select-none overflow-y-auto bg-slate-50 dark:bg-slate-950 pb-32 custom-scrollbar">
             {/* Question Text */}
             <div className={cn(
                 "transition-all duration-700 ease-out",
