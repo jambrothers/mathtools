@@ -3,8 +3,8 @@ import { parseList } from '@/lib/url-state';
 describe('parseList Security Tests', () => {
     // 2026-02-09 - Allocation-Based DoS in URL State Parsing
     it('should handle large input with empty delimiter without allocation DoS', () => {
-        // Create a large string (e.g. 1MB)
-        const hugeString = 'a'.repeat(1000000);
+        // Create a large string (e.g. 90k chars)
+        const hugeString = 'a'.repeat(90000);
         const maxItems = 10;
 
         const startTime = process.hrtime();

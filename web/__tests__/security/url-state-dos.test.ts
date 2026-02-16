@@ -1,10 +1,24 @@
-import { parseList, MAX_PARSE_ITERATIONS } from '../../lib/url-state';
+import { parseList, MAX_PARSE_ITERATIONS, MAX_INPUT_LENGTH } from '../../lib/url-state';
 
 describe('parseList DoS', () => {
+    it('rejects input exceeding MAX_INPUT_LENGTH', () => {
+        const largeString = 'a'.repeat(MAX_INPUT_LENGTH + 1);
+        const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+        const result = parseList(largeString, (part) => part);
+
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(`Input length (${largeString.length}) exceeds maximum (${MAX_INPUT_LENGTH})`));
+        expect(result.length).toBe(0);
+
+        consoleSpy.mockRestore();
+    });
+
     it('handles massive empty delimiters without freezing and stops early', () => {
-        // Create a large string with 1 million delimiters
-        // The implementation should stop at MAX_PARSE_ITERATIONS (200,000)
-        const largeString = ';'.repeat(1000000);
+        // Create a string that fits in length limit but exceeds iteration limit
+        // MAX_INPUT_LENGTH = 100,000
+        // MAX_PARSE_ITERATIONS = 20,000
+        // 30,000 delimiters = 30,000 length (OK) and 30,000 iterations (Too many)
+        const largeString = ';'.repeat(30000);
 
         const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
@@ -12,7 +26,7 @@ describe('parseList DoS', () => {
         const result = parseList(largeString, (part) => part, { maxItems: 10 });
         const end = performance.now();
 
-        console.log(`Time taken for 1m delimiters (should be limited): ${end - start}ms`);
+        console.log(`Time taken for 30k delimiters: ${end - start}ms`);
 
         expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(`Exceeded maximum iterations (${MAX_PARSE_ITERATIONS})`));
 
@@ -24,8 +38,9 @@ describe('parseList DoS', () => {
 
     it('handles massive number of invalid items and stops early', () => {
          // Items that are parsed but return null
-         // 300k items > 200k limit
-         const largeString = 'invalid;'.repeat(300000);
+         // 'a;' is 2 chars. 30,000 items = 60,000 chars (OK < 100k)
+         // 30,000 iterations > 20,000 limit
+         const largeString = 'a;'.repeat(30000);
 
          const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
@@ -33,7 +48,7 @@ describe('parseList DoS', () => {
          const result = parseList(largeString, () => null, { maxItems: 10 });
          const end = performance.now();
 
-         console.log(`Time taken for 300k invalid items: ${end - start}ms`);
+         console.log(`Time taken for 30k invalid items: ${end - start}ms`);
          expect(result.length).toBe(0);
          expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining(`Exceeded maximum iterations (${MAX_PARSE_ITERATIONS})`));
 
