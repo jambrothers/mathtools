@@ -107,7 +107,9 @@ export function ControlSlider({
                     type="button"
                     onClick={() => {
                         // Round to the nearest multiple of 'step' to avoid floating point drift
-                        const finalValue = Math.max(min, Math.round((value - step) / step) * step);
+                        const rawValue = Math.max(min, Math.round((value - step) / step) * step);
+                        // Final safety round to handle cases like 0.7 * 1 = 0.7000000000000001
+                        const finalValue = parseFloat(rawValue.toFixed(10));
                         if (onValueChange) {
                             onValueChange(finalValue)
                         }
@@ -139,7 +141,8 @@ export function ControlSlider({
                 <button
                     type="button"
                     onClick={() => {
-                        const finalValue = Math.min(max, Math.round((value + step) / step) * step);
+                        const rawValue = Math.min(max, Math.round((value + step) / step) * step);
+                        const finalValue = parseFloat(rawValue.toFixed(10));
                         if (onValueChange) {
                             onValueChange(finalValue)
                         }

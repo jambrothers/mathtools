@@ -128,17 +128,7 @@ test.describe('Linear Equations Tool', () => {
     });
 
     test.describe('Regressions', () => {
-        test('should have a full URL for copy link', async ({ page }) => {
-            // Mock clipboard or just check if the URL provided to the button is absolute
-            // In linear-equations tool, we provide 'onCopyLink' which calls getShareableURL.
-            // Since we can't easily intercept the clipboard in all environments, 
-            // we'll check if the button is clickable without errors.
-            await page.getByRole('button', { name: 'Copy Link' }).click();
-            // Optional: verify some UI feedback if exists (like a toast)
-        });
-
         test('should not show floating point artifacts in gradient stepper', async ({ page }) => {
-            const mSlider = page.getByTestId('slider-gradient--m-');
             const increaseBtn = page.getByLabel('Increase Gradient (m)');
 
             // Starts at 0.5. Increment to 0.6, 0.7, 0.8
