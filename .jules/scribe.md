@@ -15,3 +15,7 @@
 ## 2026-02-14 - Silent Tool Addition
 **Learning:** New tools (like `Sequences`) can be fully implemented and deployed but missing from the main `README.md`, making them invisible to contributors.
 **Action:** Audit `web/app/tools/page.tsx` against `README.md` periodically. The "Definition of Done" for new tools must include a README entry.
+
+## 2026-02-15 - Centralized Contributor Guide
+**Learning:** The project lacked a centralized entry point for new developers, with critical info scattered across `README.md`, `web/DESIGN.md`, and component docs.
+**Action:** Created `CONTRIBUTING.md` to consolidate setup, architecture, and tool creation workflows. Future process changes must be reflected here first.
