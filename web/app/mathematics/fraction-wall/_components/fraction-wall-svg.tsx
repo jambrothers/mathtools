@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShadedSegment, LabelMode } from '../_lib/url-state';
 import { SVG_COLORS, SVG_SHADED_COLORS } from '../constants';
-import { fractionToDecimal, fractionToPercent } from '../_lib/fraction-wall';
+import { fractionToDecimal, fractionToPercent, getShadedCount } from '../_lib/fraction-wall';
 
 interface FractionWallSVGProps {
     visibleDenominators: number[];
@@ -25,6 +25,7 @@ export function FractionWallSVG({
     const width = 1000;
     const height = sortedDenominators.length * rowHeight;
     const padding = 20;
+    const rightMargin = 120; // Space for row totals
 
     const isShaded = (d: number, i: number) =>
         shadedSegments.some(s => s.d === d && s.i === i);
@@ -41,15 +42,18 @@ export function FractionWallSVG({
 
     return (
         <svg
-            viewBox={`0 0 ${width + padding * 2} ${height + padding * 2}`}
+            viewBox={`0 0 ${width + padding * 2 + rightMargin} ${height + padding * 2}`}
             className="w-full h-auto select-none"
             data-testid="fraction-wall-svg"
         >
             <g transform={`translate(${padding}, ${padding})`}>
                 {sortedDenominators.map((d, rowIndex) => {
                     const segmentWidth = width / d;
+                    const shadedCount = getShadedCount(d, shadedSegments);
+
                     return (
                         <g key={d} transform={`translate(0, ${rowIndex * rowHeight})`}>
+                            {/* Row Segments */}
                             {Array.from({ length: d }).map((_, i) => {
                                 const shaded = isShaded(d, i);
                                 const comparing = isComparing(d, i);
@@ -87,11 +91,24 @@ export function FractionWallSVG({
                                             className={`text-sm font-medium pointer-events-none ${shaded ? 'fill-white' : 'fill-slate-600 dark:fill-slate-400'
                                                 }`}
                                         >
-                                            {getLabel(1, d)}
+                                            {getLabel(i + 1, d)}
                                         </text>
                                     </g>
                                 );
                             })}
+
+                            {/* Row Total Annotation */}
+                            {shadedCount > 0 && (
+                                <text
+                                    x={width + 20}
+                                    y={rowHeight / 2}
+                                    dominantBaseline="middle"
+                                    className="text-lg font-bold fill-slate-900 dark:fill-slate-100"
+                                    data-testid={`row-total-${d}`}
+                                >
+                                    {getLabel(shadedCount, d)}
+                                </text>
+                            )}
                         </g>
                     );
                 })}

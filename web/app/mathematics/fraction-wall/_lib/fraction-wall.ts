@@ -75,3 +75,10 @@ export function fractionToDecimal(n: number, d: number, precision: number = 3): 
 export function fractionToPercent(n: number, d: number): string {
     return Math.round((n / d) * 100) + '%';
 }
+
+/**
+ * Counts the number of shaded segments for a given denominator.
+ */
+export function getShadedCount(denominator: number, shadedSegments: { d: number, i: number }[]): number {
+    return shadedSegments.filter(s => s.d === denominator).length;
+}

@@ -4,7 +4,8 @@ import {
     compareFractions,
     getEquivalentFractions,
     fractionToDecimal,
-    fractionToPercent
+    fractionToPercent,
+    getShadedCount
 } from './fraction-wall';
 
 describe('fraction-wall logic', () => {
@@ -55,5 +56,16 @@ describe('fraction-wall logic', () => {
         expect(fractionToPercent(1, 4)).toBe('25%');
         expect(fractionToPercent(1, 2)).toBe('50%');
         expect(fractionToPercent(3, 4)).toBe('75%');
+    });
+
+    test('getShadedCount', () => {
+        const segments = [
+            { d: 4, i: 0 }, { d: 4, i: 1 }, { d: 4, i: 2 },
+            { d: 8, i: 0 }
+        ];
+        expect(getShadedCount(4, segments)).toBe(3);
+        expect(getShadedCount(8, segments)).toBe(1);
+        expect(getShadedCount(2, segments)).toBe(0);
+        expect(getShadedCount(4, [])).toBe(0);
     });
 });
