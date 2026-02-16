@@ -179,6 +179,13 @@ npm run build
 
 This generates a static export in `web/out/` which is deployed to Cloudflare Pages.
 
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
+- Setting up the development environment.
+- Adding new tools.
+- Coding conventions and testing.
+
 ## Development Guidelines
 
 ### Documentation
