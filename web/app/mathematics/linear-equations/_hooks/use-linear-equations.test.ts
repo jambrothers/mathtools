@@ -11,6 +11,16 @@ jest.mock('next/navigation', () => ({
 }));
 
 describe('useLinearEquations', () => {
+    beforeAll(() => {
+        Object.defineProperty(window, 'location', {
+            value: {
+                origin: 'http://localhost:3000',
+                pathname: '/mathematics/linear-equations',
+            },
+            writable: true
+        });
+    });
+
     it('initializes with default state', async () => {
         const { result } = renderHook(() => useLinearEquations());
 
@@ -113,6 +123,26 @@ describe('useLinearEquations', () => {
         expect(result.current.lines[1].c).not.toBe(result.current.lines[0].c);
     });
 
+    it('applies perpendicular preset', async () => {
+        const { result } = renderHook(() => useLinearEquations());
+
+        await waitFor(() => expect(result.current.isInitialized).toBe(true));
+
+        // Set initial line to have m=2 for easy testing
+        const id = result.current.lines[0].id;
+        act(() => {
+            result.current.updateLine(id, { m: 2 });
+        });
+
+        act(() => {
+            result.current.applyPreset('perpendicular');
+        });
+
+        expect(result.current.lines).toHaveLength(2);
+        // m1 * m2 = -1 => m2 = -1/2 = -0.5
+        expect(result.current.lines[1].m).toBe(-0.5);
+    });
+
     it('regression: adding a line sets it as active correctly', async () => {
         const { result } = renderHook(() => useLinearEquations());
 
@@ -144,5 +174,15 @@ describe('useLinearEquations', () => {
 
         expect(result.current.lines).toHaveLength(1);
         expect(result.current.activeLineId).toBe(line1Id);
+    });
+
+    it('regression: getShareableURL returns an absolute URL', async () => {
+        const { result } = renderHook(() => useLinearEquations());
+
+        await waitFor(() => expect(result.current.isInitialized).toBe(true));
+
+        const url = result.current.getShareableURL();
+        expect(url.startsWith('http://localhost:3000/mathematics/linear-equations')).toBe(true);
+        expect(url).toContain('lines=');
     });
 });
