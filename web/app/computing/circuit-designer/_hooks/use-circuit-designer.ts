@@ -89,6 +89,8 @@ export function useCircuitDesigner() {
                 if (node.type === 'INPUT') return;
 
                 const def = COMPONENT_TYPES[node.type];
+                if (!def) return;
+
                 const nodeInputs: boolean[] = [];
 
                 // Gather inputs for this node
@@ -311,6 +313,12 @@ export function useCircuitDesigner() {
     };
 
     const addNode = (type: ComponentTypeName) => {
+        // Validate type to prevent crash/DoS
+        if (!COMPONENT_TYPES[type]) {
+            console.warn(`[Security] Attempted to add invalid component type: ${type}`);
+            return;
+        }
+
         const id = generateId();
         const offset = (nodes.length % 10) * 20;
 

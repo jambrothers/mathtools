@@ -1,0 +1,693 @@
+
+> scarlet-halley@0.1.0 test
+> jest --watchAll=false
+
+watchman warning:  Recrawled this watch 1 time, most recently because:
+MustScanSubDirs UserDroppedTo resolve, please review the information on
+https://facebook.github.io/watchman/docs/troubleshooting.html#recrawl
+To clear this warning, run:
+`watchman watch-del '/Users/joseph/Projects/web/mathtools' ; watchman watch-project '/Users/joseph/Projects/web/mathtools'`
+
+FAIL __tests__/security/unbounded-split.test.ts
+  ● Security: Unbounded String Splitting › Circuit Designer › should handle excessive delimiters in parseNodeString
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      14 |
+      15 |             const result = parseNodeString(input);
+    > 16 |             expect(result).toHaveLength(1);
+         |                            ^
+      17 |             expect(result[0].id).toBe('n1');
+      18 |             expect(result[0].label).toBe('Label');
+      19 |         });
+
+      at Object.toHaveLength (__tests__/security/unbounded-split.test.ts:16:28)
+
+  ● Security: Unbounded String Splitting › Circuit Designer › should handle excessive delimiters in parseConnectionString
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      27 |
+      28 |             const result = parseConnectionString(input);
+    > 29 |             expect(result).toHaveLength(1);
+         |                            ^
+      30 |             expect(result[0].from).toBe('n1');
+      31 |             expect(result[0].to).toBe('n2');
+      32 |             expect(result[0].inputIndex).toBe(0);
+
+      at Object.toHaveLength (__tests__/security/unbounded-split.test.ts:29:28)
+
+  ● Security: Unbounded String Splitting › Circuit Designer › should handle excessive arrows in parseConnectionString
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      49 |
+      50 |             // So it should still work!
+    > 51 |             expect(result).toHaveLength(1);
+         |                            ^
+      52 |             expect(result[0].from).toBe('n1');
+      53 |             expect(result[0].to).toBe('n2');
+      54 |             expect(result[0].inputIndex).toBe(0);
+
+      at Object.toHaveLength (__tests__/security/unbounded-split.test.ts:51:28)
+
+  ● Security: Unbounded String Splitting › Bar Model › should handle excessive commas in parseBarsString
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      65 |
+      66 |             const result = parseBarsString(input);
+    > 67 |             expect(result).toHaveLength(1);
+         |                            ^
+      68 |             expect(result[0].x).toBe(10);
+      69 |             expect(result[0].width).toBe(100);
+      70 |         });
+
+      at Object.toHaveLength (__tests__/security/unbounded-split.test.ts:67:28)
+
+  ● Security: Unbounded String Splitting › Linear Equations › should handle excessive commas in deserializeLines
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0.5
+
+      85 |             if (state) {
+      86 |                 expect(state.lines).toHaveLength(1);
+    > 87 |                 expect(state.lines[0].m).toBe(1);
+         |                                          ^
+      88 |                 expect(state.lines[0].c).toBe(2);
+      89 |             }
+      90 |         });
+
+      at Object.toBe (__tests__/security/unbounded-split.test.ts:87:42)
+
+PASS components/tool-ui/speed-control.test.tsx
+PASS __tests__/app/mathematics/linear-equations/graph-svg-optimization.test.tsx
+PASS __tests__/app/computing/circuit-designer/_hooks/use-circuit-designer-drag.test.ts
+PASS __tests__/app/mathematics/linear-equations/_components/linear-equations-sidebar.test.tsx
+PASS components/tool-ui/control-panel.accessibility.test.tsx
+  ● Console
+
+    console.error
+      You provided a `value` prop to a form field without an `onChange` handler. This will render a read-only field. If the field should be mutable use `defaultValue`. Otherwise, set either `onChange` or `readOnly`.
+
+      47 |     describe('ControlSlider', () => {
+      48 |         it('buttons have focus-visible styles', () => {
+    > 49 |             render(
+         |                   ^
+      50 |                 <ControlSlider
+      51 |                     label="Test Slider"
+      52 |                     value={50}
+
+      at checkControlledValueProps (node_modules/react-dom/cjs/react-dom-client.development.js:1425:21)
+      at setInitialProperties (node_modules/react-dom/cjs/react-dom-client.development.js:20534:11)
+      at completeWork (node_modules/react-dom/cjs/react-dom-client.development.js:12662:18)
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at completeUnitOfWork (node_modules/react-dom/cjs/react-dom-client.development.js:17777:19)
+      at performUnitOfWork (node_modules/react-dom/cjs/react-dom-client.development.js:17658:11)
+      at workLoopSync (node_modules/react-dom/cjs/react-dom-client.development.js:17469:41)
+      at renderRootSync (node_modules/react-dom/cjs/react-dom-client.development.js:17450:11)
+      at performWorkOnRoot (node_modules/react-dom/cjs/react-dom-client.development.js:16504:11)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-dom/cjs/react-dom-client.development.js:18957:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at node_modules/@testing-library/react/dist/act-compat.js:46:25
+      at renderRoot (node_modules/@testing-library/react/dist/pure.js:189:26)
+      at render (node_modules/@testing-library/react/dist/pure.js:291:10)
+      at Object.<anonymous> (components/tool-ui/control-panel.accessibility.test.tsx:49:19)
+
+PASS __tests__/app/tools/page.test.tsx
+PASS components/tool-ui/__tests__/resolution-guard.test.tsx
+FAIL __tests__/app/computing/circuit-designer/_hooks/use-circuit-designer-security.test.ts
+  ● Console
+
+    console.warn
+      [Security] Attempted to add invalid component type: INVALID_TYPE
+
+      340 |         // Validate type to prevent crash/DoS
+      341 |         if (!COMPONENT_TYPES[type]) {
+    > 342 |             console.warn(`[Security] Attempted to add invalid component type: ${type}`);
+          |                     ^
+      343 |             return;
+      344 |         }
+      345 |
+
+      at Object.warn [as addNodeAtPosition] (app/computing/circuit-designer/_hooks/use-circuit-designer.ts:342:21)
+      at addNodeAtPosition (__tests__/app/computing/circuit-designer/_hooks/use-circuit-designer-security.test.ts:37:28)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:24
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:814:22)
+      at node_modules/@testing-library/react/dist/act-compat.js:46:25
+      at Object.<anonymous> (__tests__/app/computing/circuit-designer/_hooks/use-circuit-designer-security.test.ts:35:12)
+
+  ● useCircuitDesigner - Security › should not add a node with an invalid type via addNode
+
+    TypeError: Cannot read properties of undefined (reading 'inputs')
+
+      93 |
+      94 |                 // Gather inputs for this node
+    > 95 |                 for (let i = 0; i < def.inputs; i++) {
+         |                                         ^
+      96 |                     const conn = currentConnections.find(c => c.to === node.id && c.inputIndex === i);
+      97 |                     if (conn && values[conn.from] !== undefined) {
+      98 |                         nodeInputs[i] = values[conn.from];
+
+      at inputs (app/computing/circuit-designer/_hooks/use-circuit-designer.ts:95:41)
+          at Array.forEach (<anonymous>)
+      at forEach (app/computing/circuit-designer/_hooks/use-circuit-designer.ts:88:26)
+      at simulate (app/computing/circuit-designer/_hooks/use-circuit-designer.ts:117:25)
+      at Object.react_stack_bottom_frame (node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at commitHookEffectListMount (node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+      at commitHookPassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+      at recursivelyTraversePassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:15439:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15519:11)
+      at flushPassiveEffects (node_modules/react-dom/cjs/react-dom-client.development.js:18432:9)
+      at node_modules/react-dom/cjs/react-dom-client.development.js:17923:15
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at node_modules/@testing-library/react/dist/act-compat.js:46:25
+      at Object.<anonymous> (__tests__/app/computing/circuit-designer/_hooks/use-circuit-designer-security.test.ts:23:12)
+
+FAIL __tests__/app/mathematics/algebra-tiles/page.test.tsx
+  ● AlgebraTiles Page › matches snapshot
+
+    expect(received).toMatchSnapshot()
+
+    Snapshot name: `AlgebraTiles Page matches snapshot 1`
+
+    - Snapshot  - 34
+    + Received  + 30
+
+    @@ -318,46 +318,42 @@
+                    class="hidden lg:inline"
+                  >
+                    Clear
+                  </span>
+                </button>
+    -           <div
+    -             class="relative"
+    +           <button
+    +             aria-label="Copy shareable link"
+    +             class="px-3 py-2 border text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed h-10 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700"
+    +             title="Copy shareable link"
+    +             type="button"
+                >
+    -             <button
+    -               aria-label="Copy shareable link"
+    -               class="px-3 py-2 border text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed h-10 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700"
+    -               title="Copy shareable link"
+    -               type="button"
+    +             <svg
+    +               aria-hidden="true"
+    +               class="lucide lucide-link"
+    +               fill="none"
+    +               height="16"
+    +               stroke="currentColor"
+    +               stroke-linecap="round"
+    +               stroke-linejoin="round"
+    +               stroke-width="2"
+    +               viewBox="0 0 24 24"
+    +               width="16"
+    +               xmlns="http://www.w3.org/2000/svg"
+    +             >
+    +               <path
+    +                 d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+    +               />
+    +               <path
+    +                 d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+    +               />
+    +             </svg>
+    +             <span
+    +               class="hidden lg:inline"
+                  >
+    -               <svg
+    -                 aria-hidden="true"
+    -                 class="lucide lucide-link"
+    -                 fill="none"
+    -                 height="16"
+    -                 stroke="currentColor"
+    -                 stroke-linecap="round"
+    -                 stroke-linejoin="round"
+    -                 stroke-width="2"
+    -                 viewBox="0 0 24 24"
+    -                 width="16"
+    -                 xmlns="http://www.w3.org/2000/svg"
+    -               >
+    -                 <path
+    -                   d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+    -                 />
+    -                 <path
+    -                   d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+    -                 />
+    -               </svg>
+    -               <span
+    -                 class="hidden lg:inline"
+    -               >
+    -                 Link
+    -               </span>
+    -             </button>
+    -           </div>
+    +               Link
+    +             </span>
+    +           </button>
+              </div>
+            </div>
+          </div>
+          <div
+            class="flex flex-1 overflow-hidden relative"
+
+      23 |     it('matches snapshot', () => {
+      24 |         const { container } = render(<AlgebraTilesPage />)
+    > 25 |         expect(container).toMatchSnapshot()
+         |                           ^
+      26 |     })
+      27 | })
+      28 |
+
+      at Object.toMatchSnapshot (__tests__/app/mathematics/algebra-tiles/page.test.tsx:25:27)
+
+ › 1 snapshot failed.
+PASS __tests__/components/navbar.test.tsx
+PASS __tests__/app/mathematics/bar-model/use-bar-model.test.ts
+FAIL __tests__/app/computing/circuit-designer/page.test.tsx
+  ● Circuit Designer Page › matches snapshot
+
+    expect(received).toMatchSnapshot()
+
+    Snapshot name: `Circuit Designer Page matches snapshot 1`
+
+    - Snapshot  - 4
+    + Received  + 0
+
+    @@ -169,13 +169,10 @@
+                class="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"
+              />
+              <div
+                class="flex flex-wrap items-center gap-2"
+              >
+    -           <div
+    -             class="relative"
+    -           >
+                <button
+                  aria-label="Copy shareable link"
+                  class="px-3 py-2 border text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed h-10 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700"
+                  title="Copy shareable link"
+                  type="button"
+    @@ -204,11 +201,10 @@
+                    class="hidden lg:inline"
+                  >
+                    Link
+                  </span>
+                </button>
+    -           </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="flex flex-1 overflow-hidden relative"
+
+      13 |     it('matches snapshot', () => {
+      14 |         const { container } = render(<CircuitDesignerPage />)
+    > 15 |         expect(container).toMatchSnapshot()
+         |                           ^
+      16 |     })
+      17 |
+      18 |     it('renders the toolbar with clear and truth table buttons', () => {
+
+      at Object.toMatchSnapshot (__tests__/app/computing/circuit-designer/page.test.tsx:15:27)
+
+ › 1 snapshot failed.
+PASS __tests__/app/mathematics/algebra-tiles/drag-optimization.test.tsx
+PASS __tests__/components/tool-ui/help-button.test.tsx
+PASS __tests__/components/tool-ui/help-modal.test.tsx
+PASS __tests__/components/tool-ui/canvas.test.tsx
+PASS __tests__/app/computing/circuit-designer/truth-table-modal.test.tsx
+PASS __tests__/components/tool-ui/timer-widget.test.tsx
+PASS __tests__/app/mathematics/algebra-tiles/sidebar.test.tsx
+PASS __tests__/app/mathematics/double-sided-counters/page.test.tsx
+PASS app/mathematics/linear-equations/_hooks/use-linear-equations.test.ts
+PASS __tests__/games/pointless/use-pointless.test.ts
+PASS app/mathematics/percentage-grid/_components/percentage-grid.test.tsx
+PASS __tests__/components/tool-ui/export-modal.test.tsx
+PASS __tests__/components/tool-ui/toolbar.test.tsx
+PASS app/mathematics/linear-equations/_lib/line-graph.test.ts
+PASS __tests__/app/about/page.test.tsx
+PASS __tests__/components/tool-ui/draggable-sidebar-item.test.tsx
+PASS __tests__/games/pointless/question-generator.test.ts
+PASS __tests__/app/mathematics/bar-model/touch-interaction.test.tsx
+PASS __tests__/app/mathematics/double-sided-counters/interaction.test.tsx
+PASS __tests__/components/tool-ui/speed-control.test.tsx
+PASS __tests__/components/footer.test.tsx
+PASS __tests__/app/mathematics/algebra-tiles/_hooks/use-algebra-tiles.test.ts
+PASS app/mathematics/bar-model/_hooks/use-bar-model.repro.test.tsx
+PASS __tests__/components/tool-ui/tile-base.test.tsx
+PASS __tests__/app/mathematics/bar-model/new-features.test.ts
+PASS __tests__/lib/hooks/use-draggable.test.ts
+PASS components/tool-ui/__tests__/toolbar.test.tsx
+PASS __tests__/app/computing/circuit-designer/logic.test.ts
+PASS components/tool-ui/interactive-tool-layout.test.tsx
+PASS __tests__/app/mathematics/bar-model/bar-component-interaction.test.tsx
+PASS __tests__/components/tool-ui/copy-link-button.test.tsx
+PASS __tests__/components/tool-card.test.tsx
+PASS app/mathematics/bar-model/_hooks/use-bar-model.test.tsx
+PASS __tests__/app/mathematics/double-sided-counters/url-state.test.ts
+PASS components/tool-ui/control-panel.test.tsx
+PASS __tests__/lib/hooks/use-canvas-drop.test.ts
+PASS __tests__/lib/hooks/use-history.test.ts
+PASS __tests__/app/mathematics/double-sided-counters/layout.test.ts
+PASS __tests__/app/computing/circuit-designer/_hooks/use-circuit-designer.test.ts
+PASS __tests__/app/mathematics/double-sided-counters/use-counters.test.tsx
+PASS app/mathematics/percentage-grid/_hooks/use-percentage-grid.test.tsx
+PASS __tests__/components/icons/bluesky-icon.test.tsx
+PASS lib/export/canvas-export.test.ts
+PASS __tests__/security/url-state-dos.test.ts
+  ● Console
+
+    console.log
+      Time taken for 1m delimiters (should be limited): 4.173209000000043ms
+
+      at Object.log (__tests__/security/url-state-dos.test.ts:15:17)
+
+    console.log
+      Time taken for 300k invalid items: 10.608041999999841ms
+
+      at Object.log (__tests__/security/url-state-dos.test.ts:36:18)
+
+PASS __tests__/app/computing/circuit-designer/url-state.test.ts
+PASS app/mathematics/sequences/_lib/sequences.test.ts
+PASS __tests__/app/page.test.tsx
+PASS __tests__/lib/circuit-url-state.test.ts
+PASS app/mathematics/sequences/_hooks/use-sequences.test.tsx
+PASS app/mathematics/sequences/_lib/url-state.test.ts
+PASS lib/export/canvas-export.retry.test.ts
+PASS __tests__/app/mathematics/double-sided-counters/drag-optimization.test.tsx
+PASS app/mathematics/bar-model/_lib/compute-relative-label.test.ts
+PASS __tests__/app/mathematics/double-sided-counters/_hooks/use-counters.test.ts
+PASS app/mathematics/percentage-grid/_lib/url-state.test.ts
+PASS __tests__/app/mathematics/algebra-tiles/url-state.test.ts
+PASS __tests__/app/mathematics/algebra-tiles/_hooks/algebra-logic.test.ts
+PASS app/mathematics/linear-equations/_lib/url-state.test.ts
+PASS __tests__/games/pointless/url-state.test.ts
+PASS __tests__/app/mathematics/bar-model/url-state.test.ts
+PASS app/mathematics/bar-model/_lib/url-state.test.ts
+PASS __tests__/lib/url-state.test.ts
+PASS app/mathematics/percentage-grid/_hooks/use-grid-layout.test.ts
+PASS __tests__/app/mathematics/bar-model/compute-relative-label.test.ts
+PASS __tests__/lib/url-state-parselist.test.ts
+PASS __tests__/lib/url-state-empty-delimiter.test.ts
+PASS app/mathematics/double-sided-counters/_lib/url-state.test.ts
+
+Summary of all failing tests
+FAIL __tests__/security/unbounded-split.test.ts
+  ● Security: Unbounded String Splitting › Circuit Designer › should handle excessive delimiters in parseNodeString
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      14 |
+      15 |             const result = parseNodeString(input);
+    > 16 |             expect(result).toHaveLength(1);
+         |                            ^
+      17 |             expect(result[0].id).toBe('n1');
+      18 |             expect(result[0].label).toBe('Label');
+      19 |         });
+
+      at Object.toHaveLength (__tests__/security/unbounded-split.test.ts:16:28)
+
+  ● Security: Unbounded String Splitting › Circuit Designer › should handle excessive delimiters in parseConnectionString
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      27 |
+      28 |             const result = parseConnectionString(input);
+    > 29 |             expect(result).toHaveLength(1);
+         |                            ^
+      30 |             expect(result[0].from).toBe('n1');
+      31 |             expect(result[0].to).toBe('n2');
+      32 |             expect(result[0].inputIndex).toBe(0);
+
+      at Object.toHaveLength (__tests__/security/unbounded-split.test.ts:29:28)
+
+  ● Security: Unbounded String Splitting › Circuit Designer › should handle excessive arrows in parseConnectionString
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      49 |
+      50 |             // So it should still work!
+    > 51 |             expect(result).toHaveLength(1);
+         |                            ^
+      52 |             expect(result[0].from).toBe('n1');
+      53 |             expect(result[0].to).toBe('n2');
+      54 |             expect(result[0].inputIndex).toBe(0);
+
+      at Object.toHaveLength (__tests__/security/unbounded-split.test.ts:51:28)
+
+  ● Security: Unbounded String Splitting › Bar Model › should handle excessive commas in parseBarsString
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 0
+    Received array:  []
+
+      65 |
+      66 |             const result = parseBarsString(input);
+    > 67 |             expect(result).toHaveLength(1);
+         |                            ^
+      68 |             expect(result[0].x).toBe(10);
+      69 |             expect(result[0].width).toBe(100);
+      70 |         });
+
+      at Object.toHaveLength (__tests__/security/unbounded-split.test.ts:67:28)
+
+  ● Security: Unbounded String Splitting › Linear Equations › should handle excessive commas in deserializeLines
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0.5
+
+      85 |             if (state) {
+      86 |                 expect(state.lines).toHaveLength(1);
+    > 87 |                 expect(state.lines[0].m).toBe(1);
+         |                                          ^
+      88 |                 expect(state.lines[0].c).toBe(2);
+      89 |             }
+      90 |         });
+
+      at Object.toBe (__tests__/security/unbounded-split.test.ts:87:42)
+
+FAIL __tests__/app/computing/circuit-designer/_hooks/use-circuit-designer-security.test.ts
+  ● useCircuitDesigner - Security › should not add a node with an invalid type via addNode
+
+    TypeError: Cannot read properties of undefined (reading 'inputs')
+
+      93 |
+      94 |                 // Gather inputs for this node
+    > 95 |                 for (let i = 0; i < def.inputs; i++) {
+         |                                         ^
+      96 |                     const conn = currentConnections.find(c => c.to === node.id && c.inputIndex === i);
+      97 |                     if (conn && values[conn.from] !== undefined) {
+      98 |                         nodeInputs[i] = values[conn.from];
+
+      at inputs (app/computing/circuit-designer/_hooks/use-circuit-designer.ts:95:41)
+          at Array.forEach (<anonymous>)
+      at forEach (app/computing/circuit-designer/_hooks/use-circuit-designer.ts:88:26)
+      at simulate (app/computing/circuit-designer/_hooks/use-circuit-designer.ts:117:25)
+      at Object.react_stack_bottom_frame (node_modules/react-dom/cjs/react-dom-client.development.js:25989:20)
+      at runWithFiberInDEV (node_modules/react-dom/cjs/react-dom-client.development.js:874:13)
+      at commitHookEffectListMount (node_modules/react-dom/cjs/react-dom-client.development.js:13249:29)
+      at commitHookPassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:13336:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15484:13)
+      at recursivelyTraversePassiveMountEffects (node_modules/react-dom/cjs/react-dom-client.development.js:15439:11)
+      at commitPassiveMountOnFiber (node_modules/react-dom/cjs/react-dom-client.development.js:15519:11)
+      at flushPassiveEffects (node_modules/react-dom/cjs/react-dom-client.development.js:18432:9)
+      at node_modules/react-dom/cjs/react-dom-client.development.js:17923:15
+      at flushActQueue (node_modules/react/cjs/react.development.js:590:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act (node_modules/react/cjs/react.development.js:884:10)
+      at node_modules/@testing-library/react/dist/act-compat.js:46:25
+      at Object.<anonymous> (__tests__/app/computing/circuit-designer/_hooks/use-circuit-designer-security.test.ts:23:12)
+
+FAIL __tests__/app/mathematics/algebra-tiles/page.test.tsx
+  ● AlgebraTiles Page › matches snapshot
+
+    expect(received).toMatchSnapshot()
+
+    Snapshot name: `AlgebraTiles Page matches snapshot 1`
+
+    - Snapshot  - 34
+    + Received  + 30
+
+    @@ -318,46 +318,42 @@
+                    class="hidden lg:inline"
+                  >
+                    Clear
+                  </span>
+                </button>
+    -           <div
+    -             class="relative"
+    +           <button
+    +             aria-label="Copy shareable link"
+    +             class="px-3 py-2 border text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed h-10 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700"
+    +             title="Copy shareable link"
+    +             type="button"
+                >
+    -             <button
+    -               aria-label="Copy shareable link"
+    -               class="px-3 py-2 border text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed h-10 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700"
+    -               title="Copy shareable link"
+    -               type="button"
+    +             <svg
+    +               aria-hidden="true"
+    +               class="lucide lucide-link"
+    +               fill="none"
+    +               height="16"
+    +               stroke="currentColor"
+    +               stroke-linecap="round"
+    +               stroke-linejoin="round"
+    +               stroke-width="2"
+    +               viewBox="0 0 24 24"
+    +               width="16"
+    +               xmlns="http://www.w3.org/2000/svg"
+    +             >
+    +               <path
+    +                 d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+    +               />
+    +               <path
+    +                 d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+    +               />
+    +             </svg>
+    +             <span
+    +               class="hidden lg:inline"
+                  >
+    -               <svg
+    -                 aria-hidden="true"
+    -                 class="lucide lucide-link"
+    -                 fill="none"
+    -                 height="16"
+    -                 stroke="currentColor"
+    -                 stroke-linecap="round"
+    -                 stroke-linejoin="round"
+    -                 stroke-width="2"
+    -                 viewBox="0 0 24 24"
+    -                 width="16"
+    -                 xmlns="http://www.w3.org/2000/svg"
+    -               >
+    -                 <path
+    -                   d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+    -                 />
+    -                 <path
+    -                   d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+    -                 />
+    -               </svg>
+    -               <span
+    -                 class="hidden lg:inline"
+    -               >
+    -                 Link
+    -               </span>
+    -             </button>
+    -           </div>
+    +               Link
+    +             </span>
+    +           </button>
+              </div>
+            </div>
+          </div>
+          <div
+            class="flex flex-1 overflow-hidden relative"
+
+      23 |     it('matches snapshot', () => {
+      24 |         const { container } = render(<AlgebraTilesPage />)
+    > 25 |         expect(container).toMatchSnapshot()
+         |                           ^
+      26 |     })
+      27 | })
+      28 |
+
+      at Object.toMatchSnapshot (__tests__/app/mathematics/algebra-tiles/page.test.tsx:25:27)
+
+FAIL __tests__/app/computing/circuit-designer/page.test.tsx
+  ● Circuit Designer Page › matches snapshot
+
+    expect(received).toMatchSnapshot()
+
+    Snapshot name: `Circuit Designer Page matches snapshot 1`
+
+    - Snapshot  - 4
+    + Received  + 0
+
+    @@ -169,13 +169,10 @@
+                class="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"
+              />
+              <div
+                class="flex flex-wrap items-center gap-2"
+              >
+    -           <div
+    -             class="relative"
+    -           >
+                <button
+                  aria-label="Copy shareable link"
+                  class="px-3 py-2 border text-sm font-medium rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed h-10 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700"
+                  title="Copy shareable link"
+                  type="button"
+    @@ -204,11 +201,10 @@
+                    class="hidden lg:inline"
+                  >
+                    Link
+                  </span>
+                </button>
+    -           </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="flex flex-1 overflow-hidden relative"
+
+      13 |     it('matches snapshot', () => {
+      14 |         const { container } = render(<CircuitDesignerPage />)
+    > 15 |         expect(container).toMatchSnapshot()
+         |                           ^
+      16 |     })
+      17 |
+      18 |     it('renders the toolbar with clear and truth table buttons', () => {
+
+      at Object.toMatchSnapshot (__tests__/app/computing/circuit-designer/page.test.tsx:15:27)
+
+
+Snapshot Summary
+ › 2 snapshots failed from 2 test suites. Inspect your code changes or run `npm test -- -u` to update them.
+
+Test Suites: 4 failed, 76 passed, 80 total
+Tests:       8 failed, 2 skipped, 576 passed, 586 total
+Snapshots:   2 failed, 3 passed, 5 total
+Time:        2.894 s
+Ran all test suites.

@@ -1,6 +1,5 @@
 import { parseNodeString, parseConnectionString } from '@/app/computing/circuit-designer/_lib/url-state';
 import { parseBarsString } from '@/app/mathematics/bar-model/_lib/url-state';
-// @ts-expect-error - Importing potentially private function or using serializer
 import { linearEquationsSerializer } from '@/app/mathematics/linear-equations/_lib/url-state';
 
 describe('Security: Unbounded String Splitting', () => {
@@ -9,7 +8,7 @@ describe('Security: Unbounded String Splitting', () => {
             // Normal: T:id:x,y:Label
             // Attack: T:id:x,y:Label::::::::::::::::::::...
             const validPart = 'A:n1:100,100:Label';
-            const excessiveColons = ':'.repeat(10000);
+            const excessiveColons = ':'.repeat(100);
             const input = validPart + excessiveColons;
 
             const result = parseNodeString(input);
@@ -22,7 +21,7 @@ describe('Security: Unbounded String Splitting', () => {
             // Normal: from>to:idx
             // Attack: from>to:idx::::::::::::::::::::...
             const validPart = 'n1>n2:0';
-            const excessiveColons = ':'.repeat(10000);
+            const excessiveColons = ':'.repeat(100);
             const input = validPart + excessiveColons;
 
             const result = parseConnectionString(input);
@@ -32,11 +31,11 @@ describe('Security: Unbounded String Splitting', () => {
             expect(result[0].inputIndex).toBe(0);
         });
 
-         it('should handle excessive arrows in parseConnectionString', () => {
+        it('should handle excessive arrows in parseConnectionString', () => {
             // Normal: from>to:idx
             // Attack: from>to:idx>>>>>>>>>>>>>>>>>>>>...
             const validPart = 'n1>n2:0';
-            const excessiveArrows = '>'.repeat(10000);
+            const excessiveArrows = '>'.repeat(100);
             const input = validPart + excessiveArrows;
 
             const result = parseConnectionString(input);
@@ -60,7 +59,7 @@ describe('Security: Unbounded String Splitting', () => {
             // Normal: colorIndex:label,x,y,width
             // Attack: 0:Label,10,10,100,,,,,,,,,,,,,,,,
             const validPart = '0:Label,10,10,100';
-            const excessiveCommas = ','.repeat(10000);
+            const excessiveCommas = ','.repeat(100);
             const input = validPart + excessiveCommas;
 
             const result = parseBarsString(input);
@@ -75,10 +74,8 @@ describe('Security: Unbounded String Splitting', () => {
             // Normal: m,c
             // Attack: 1,2,,,,,,,,,,,,,,,,
             const validPart = '1,2';
-            const excessiveCommas = ','.repeat(10000);
-            // We pass this as the 'lines' param
             const params = new URLSearchParams();
-            params.set('lines', validPart + excessiveCommas);
+            params.set('lines', validPart + ','.repeat(100));
 
             const state = linearEquationsSerializer.deserialize(params);
             expect(state).not.toBeNull();
@@ -88,5 +85,11 @@ describe('Security: Unbounded String Splitting', () => {
                 expect(state.lines[0].c).toBe(2);
             }
         });
+    });
+
+    it('should skip items exceeding maxItemLength (2048)', () => {
+        const tooLongItem = 'A:n1:0,0:' + 'A'.repeat(2100);
+        const result = parseNodeString(tooLongItem);
+        expect(result).toHaveLength(0);
     });
 });

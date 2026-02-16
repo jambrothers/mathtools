@@ -1,0 +1,160 @@
+
+> scarlet-halley@0.1.0 test:e2e
+> playwright test
+
+
+Running 147 tests using 7 workers
+
+[1A[2K[1/147] [chromium] › e2e/algebra-tiles-drag-repro.spec.ts:7:9 › Algebra Tiles - Drag Interaction › should add tile when dragging from sidebar to canvas
+[1A[2K[2/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:19:9 › Algebra Tiles - URL State › should have Link button in toolbar
+[1A[2K[3/147] [chromium] › e2e/about.spec.ts:26:9 › About Page › should display the Our Mission section
+[1A[2K[4/147] [chromium] › e2e/about.spec.ts:19:9 › About Page › should display the introduction paragraph
+[1A[2K[5/147] [chromium] › e2e/about.spec.ts:36:9 › About Page › should have proper page structure with card styling
+[1A[2K[6/147] [chromium] › e2e/about.spec.ts:12:9 › About Page › should display the page heading
+[1A[2K[7/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:24:9 › Algebra Tiles - URL State › should generate URL when clicking Link button
+[1A[2K[8/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:42:9 › Algebra Tiles - URL State › should preserve labels setting in URL
+[1A[2K[9/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:55:9 › Algebra Tiles - URL State › should preserve showY setting in URL
+[1A[2K[10/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:81:9 › Algebra Tiles - URL State › roundtrip: URL produces identical tile count in new page
+[1A[2K[11/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:68:9 › Algebra Tiles - URL State › should preserve snap setting in URL
+[1A[2K[12/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:102:9 › Algebra Tiles - URL State › should recreate settings from URL
+[1A[2K[13/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:138:9 › Algebra Tiles - Drag from Sidebar › sidebar tiles should be draggable
+[1A[2K[14/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:144:9 › Algebra Tiles - Drag from Sidebar › clicking sidebar tile still adds tile (fallback)
+[1A[2K[15/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:157:9 › Algebra Tiles - Drag from Sidebar › horizontal tile variants should appear when Show Y is enabled
+[1A[2K[16/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:178:9 › Algebra Tiles - Snap to Grid › Snap button should be visible and toggleable
+[1A[2K[17/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:190:9 › Algebra Tiles - Snap to Grid › grid should be visible when snap is enabled
+[1A[2K[18/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:210:9 › Algebra Tiles - Toolbar Updates › Delete button should not be present
+[1A[2K[19/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:215:9 › Algebra Tiles - Toolbar Updates › Visualise button should have correct text
+[1A[2K[20/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:220:9 › Algebra Tiles - Toolbar Updates › Clear button should be present
+[1A[2K[21/147] [chromium] › e2e/algebra-tiles-url-state.spec.ts:225:9 › Algebra Tiles - Toolbar Updates › placeholder should show new example text
+[1A[2K[22/147] [chromium] › e2e/algebra-tiles.spec.ts:16:9 › Algebra Tiles › should display the page with canvas and sidebar
+[1A[2K[23/147] [chromium] › e2e/algebra-tiles.spec.ts:26:9 › Algebra Tiles › should display toolbar controls
+[1A[2K[24/147] [chromium] › e2e/algebra-tiles.spec.ts:33:9 › Algebra Tiles › should add tile when clicking sidebar option
+[1A[2K[25/147] [chromium] › e2e/algebra-tiles.spec.ts:48:9 › Algebra Tiles › should add negative tile
+[1A[2K[26/147] [chromium] › e2e/algebra-tiles.spec.ts:60:9 › Algebra Tiles › Labels toggle should change visual
+[1A[2K[27/147] [chromium] › e2e/algebra-tiles.spec.ts:75:9 › Algebra Tiles › Clear button should remove all tiles
+[1A[2K[28/147] [chromium] › e2e/algebra-tiles.spec.ts:89:9 › Algebra Tiles › trash zone should be functional
+[1A[2K[29/147] [chromium] › e2e/algebra-tiles.spec.ts:127:9 › Algebra Tiles - Interactions › should allow adding multiple tiles and selecting them
+[1A[2K[30/147] [chromium] › e2e/algebra-tiles.spec.ts:137:9 › Algebra Tiles - Interactions › keyboard shortcuts should rotate tile
+[1A[2K[31/147] [chromium] › e2e/bar-model.spec.ts:14:9 › Bar Model Tool › page loads with correct elements
+[1A[2K[32/147] [chromium] › e2e/bar-model.spec.ts:25:9 › Bar Model Tool › can add a bar via drag and drop
+[1A[2K[33/147] [chromium] › e2e/bar-model.spec.ts:44:9 › Bar Model Tool › toolbar buttons exist and dropdowns work
+[1A[2K[34/147] [chromium] › e2e/bar-model.spec.ts:80:9 › Bar Model Tool › FDP format dropdown works correctly
+[1A[2K[35/147] [chromium] › e2e/bar-model.spec.ts:157:9 › Bar Model Tool › colour dropdown changes bar colour
+[1A[2K[36/147] [chromium] › e2e/bar-model.spec.ts:183:9 › Bar Model Tool › help button opens modal
+[1A[2K[37/147] [chromium] › e2e/bar-model.spec.ts:196:9 › Bar Model Tool › navigates from tools page
+[1A[2K[38/147] [chromium] › e2e/bar-model.spec.ts:210:9 › Bar Model URL State › restores state from URL
+[1A[2K[39/147] [chromium] › e2e/circuit-designer-url-state.spec.ts:10:9 › Circuit Designer - URL State › should generate shareable URL with circuit state
+[1A[2K[40/147] [chromium] › e2e/circuit-designer-url-state.spec.ts:55:9 › Circuit Designer - URL State › should restore connections and switch state
+[1A[2K[41/147] [chromium] › e2e/circuit-designer.spec.ts:11:9 › Circuit Designer › should load page elements
+[1A[2K[42/147] [chromium] › e2e/circuit-designer.spec.ts:18:9 › Circuit Designer › should add component from sidebar
+[1A[2K[43/147] [chromium] › e2e/circuit-designer.spec.ts:40:9 › Circuit Designer › should load Demo circuit
+[1A[2K[44/147] [chromium] › e2e/circuit-designer.spec.ts:53:9 › Circuit Designer › Truth Table generation
+[1A[2K[45/147] [chromium] › e2e/circuit-designer.spec.ts:75:9 › Circuit Designer › Undo functionality
+[1A[2K[46/147] [chromium] › e2e/counters-overlap.spec.ts:3:5 › Counters Toolbar: verify input and add button visibility at tablet width
+[1A[2K[47/147] [chromium] › e2e/counters-two-row-layout.spec.ts:23:9 › Double Sided Counters - Two-Row Layout › positive counters appear on top row
+[1A[2K[48/147] [chromium] › e2e/counters-two-row-layout.spec.ts:48:9 › Double Sided Counters - Two-Row Layout › negative counters appear on bottom row
+[1A[2K[49/147] [chromium] › e2e/counters-two-row-layout.spec.ts:74:9 › Double Sided Counters - Two-Row Layout › zero pair places counters in respective rows
+[1A[2K[50/147] [chromium] › e2e/counters-two-row-layout.spec.ts:95:9 › Double Sided Counters - Two-Row Layout › Sort button arranges counters into two rows
+[1A[2K[51/147] [chromium] › e2e/counters-two-row-layout.spec.ts:133:9 › Double Sided Counters - Two-Row Layout › Ordered button is no longer present
+[1A[2K[52/147] [chromium] › e2e/counters-two-row-layout.spec.ts:143:9 › Double Sided Counters - UI Improvements › Animation Speed slider appears below stats panel
+[1A[2K[53/147] [chromium] › e2e/counters-two-row-layout.spec.ts:168:9 › Double Sided Counters - UI Improvements › Number line is visible and reasonably sized
+[1A[2K[54/147] [chromium] › e2e/counters-two-row-layout.spec.ts:192:9 › Double Sided Counters - Drag from Sidebar › can drag positive counter from sidebar to canvas
+[1A[2K[55/147] [chromium] › e2e/counters-two-row-layout.spec.ts:218:9 › Double Sided Counters - Drag from Sidebar › can drag negative counter from sidebar to canvas
+[1A[2K[56/147] [chromium] › e2e/counters-url-state.spec.ts:21:9 › Double Sided Counters - URL State › should recreate exact counter configuration from generated URL
+[1A[2K[57/147] [chromium] › e2e/counters-url-state.spec.ts:58:9 › Double Sided Counters - URL State › should preserve number line visibility in URL
+[1A[2K[58/147] [chromium] › e2e/counters-url-state.spec.ts:84:9 › Double Sided Counters - URL State › should preserve slow mode in URL
+[1A[2K[59/147] [chromium] › e2e/counters-url-state.spec.ts:109:9 › Double Sided Counters - URL State › should preserve stats visibility in URL
+[1A[2K[60/147] [chromium] › e2e/counters-url-state.spec.ts:140:9 › Double Sided Counters - URL State › should preserve sort state in URL
+[1A[2K[61/147] [chromium] › e2e/counters-url-state.spec.ts:168:9 › Double Sided Counters - URL State › should handle empty state URL
+[1A[2K[62/147] [chromium] › e2e/counters-url-state.spec.ts:182:9 › Double Sided Counters - URL State › should recreate many counters correctly
+[1A[2K[63/147] [chromium] › e2e/counters-url-state.spec.ts:212:9 › Double Sided Counters - URL State › should handle URL with multiple settings enabled
+[1A[2K[64/147] [chromium] › e2e/counters-url-state.spec.ts:251:9 › Double Sided Counters - URL State › roundtrip: URL produces identical counter count in new page
+[1A[2K[65/147] [chromium] › e2e/double-sided-counters.spec.ts:15:9 › Double Sided Counters - Core Functionality › should display empty board message initially
+[1A[2K[66/147] [chromium] › e2e/double-sided-counters.spec.ts:20:9 › Double Sided Counters - Core Functionality › should display toolbar controls
+[1A[2K[67/147] [chromium] › e2e/double-sided-counters.spec.ts:27:9 › Double Sided Counters - Core Functionality › should add positive counter when clicking Add +1
+[1A[2K[68/147] [chromium] › e2e/double-sided-counters.spec.ts:35:9 › Double Sided Counters - Core Functionality › should add negative counter when clicking Add -1
+[1A[2K[69/147] [chromium] › e2e/double-sided-counters.spec.ts:43:9 › Double Sided Counters - Core Functionality › should add zero pair (one positive and one negative)
+[1A[2K[70/147] [chromium] › e2e/double-sided-counters.spec.ts:51:9 › Double Sided Counters - Core Functionality › should show stats panel by default
+[1A[2K[71/147] [chromium] › e2e/double-sided-counters.spec.ts:61:9 › Double Sided Counters - Core Functionality › should toggle stats visibility with Stats button
+[1A[2K[72/147] [chromium] › e2e/double-sided-counters.spec.ts:74:9 › Double Sided Counters - Core Functionality › Number Line toggle should work
+[1A[2K[73/147] [chromium] › e2e/double-sided-counters.spec.ts:85:9 › Double Sided Counters - Core Functionality › Slow mode toggle should work
+[1A[2K[74/147] [chromium] › e2e/double-sided-counters.spec.ts:94:9 › Double Sided Counters - Core Functionality › Sort button should organize counters into rows
+[1A[2K[75/147] [chromium] › e2e/double-sided-counters.spec.ts:108:9 › Double Sided Counters - Core Functionality › Clear button should remove all counters
+[1A[2K[76/147] [chromium] › e2e/double-sided-counters.spec.ts:122:9 › Double Sided Counters - Core Functionality › should handle expression input
+[1A[2K[77/147] [chromium] › e2e/double-sided-counters.spec.ts:139:9 › Double Sided Counters - Core Functionality › Link button should generate shareable URL
+[1A[2K[78/147] [chromium] › e2e/double-sided-counters.spec.ts:160:9 › Double Sided Counters - Counter Interactions › should flip counter on double-click
+[1A[2K[79/147] [chromium] › e2e/double-sided-counters.spec.ts:178:9 › Double Sided Counters - Counter Interactions › should allow dragging counters
+[1A[2K[80/147] [chromium] › e2e/double-sided-counters.spec.ts:207:9 › Double Sided Counters - Counter Interactions › Cancel Pairs should animate pairs disappearing
+[1A[2K[81/147] [chromium] › e2e/double-sided-counters.spec.ts:230:9 › Double Sided Counters - Counter Interactions › Undo button should revert the last action
+[1A[2K[82/147] [chromium] › e2e/double-sided-counters.spec.ts:247:9 › Double Sided Counters - Counter Interactions › Ctrl+Z should trigger undo
+[1A[2K[83/147] [chromium] › e2e/double-sided-counters.spec.ts:264:9 › Double Sided Counters - Counter Interactions › Undo button should be disabled when there is nothing to undo
+[1A[2K[84/147] [chromium] › e2e/double-sided-counters.spec.ts:273:9 › Double Sided Counters - Counter Interactions › should change color when flipped
+[1A[2K[85/147] [chromium] › e2e/double-sided-counters.spec.ts:293:9 › Double Sided Counters - Counter Interactions › should delete selected counter via keyboard
+[1A[2K[86/147] [chromium] › e2e/export.spec.ts:5:9 › Export Functionality › Bar Model export should work in Firefox
+[1A[2K[87/147] [chromium] › e2e/export.spec.ts:42:9 › Export Functionality › Bar Model SVG export should work
+[1A[2K[88/147] [chromium] › e2e/export.spec.ts:61:9 › Export Functionality › Double Sided Counters export should work
+[1A[2K[89/147] [chromium] › e2e/home.spec.ts:12:9 › Homepage › should display the page title
+[1A[2K[90/147] [chromium] › e2e/home.spec.ts:16:9 › Homepage › should display the hero heading
+[1A[2K[91/147] [chromium] › e2e/home.spec.ts:24:9 › Homepage › should display the hero description
+[1A[2K[92/147] [chromium] › e2e/home.spec.ts:29:9 › Homepage › should display Explore Tools CTA button
+[1A[2K[93/147] [chromium] › e2e/home.spec.ts:35:9 › Homepage › should display Learn More CTA button
+[1A[2K[94/147] [chromium] › e2e/home.spec.ts:41:9 › Homepage › should navigate to Tools page when clicking Explore Tools
+[1A[2K[95/147] [chromium] › e2e/home.spec.ts:47:9 › Homepage › should navigate to About page when clicking Learn More
+[1A[2K[96/147] [chromium] › e2e/home.spec.ts:53:9 › Homepage › should display hero visual/image section
+[1A[2K[97/147] [chromium] › e2e/linear-equations.spec.ts:14:13 › Linear Equations Tool › Layout & Sidebar › should have centered graph (centerpiece)
+[1A[2K[98/147] [chromium] › e2e/linear-equations.spec.ts:20:13 › Linear Equations Tool › Layout & Sidebar › should have functional sidebar toggle
+[1A[2K[99/147] [chromium] › e2e/linear-equations.spec.ts:32:13 › Linear Equations Tool › Layout & Sidebar › should scroll sidebar independently
+[1A[2K[100/147] [chromium] › e2e/linear-equations.spec.ts:40:13 › Linear Equations Tool › Interactive Graphing › should allow dragging to move (change c)
+[1A[2K[101/147] [chromium] › e2e/linear-equations.spec.ts:62:13 › Linear Equations Tool › Interactive Graphing › should allow rotating (change m)
+[1A[2K[102/147] [chromium] › e2e/linear-equations.spec.ts:80:13 › Linear Equations Tool › Interactive Graphing › should display slope triangle and labels
+[1A[2K[103/147] [chromium] › e2e/linear-equations.spec.ts:87:13 › Linear Equations Tool › Controls › should update graph when sliders change
+[1A[2K[104/147] [chromium] › e2e/linear-equations.spec.ts:96:13 › Linear Equations Tool › Controls › should toggle display options
+[1A[2K[105/147] [chromium] › e2e/linear-equations.spec.ts:111:13 › Linear Equations Tool › Controls › should apply presets
+[1A[2K[106/147] [chromium] › e2e/linear-equations.spec.ts:121:13 › Linear Equations Tool › Multi-line Support › should add and remove lines
+[1A[2K[107/147] [chromium] › e2e/navigation.spec.ts:8:9 › Navigation › navbar should be visible on home page
+[1A[2K[108/147] [chromium] › e2e/navigation.spec.ts:14:9 › Navigation › navbar should be visible on about page
+[1A[2K[109/147] [chromium] › e2e/navigation.spec.ts:20:9 › Navigation › navbar should be visible on tools page
+[1A[2K[110/147] [chromium] › e2e/navigation.spec.ts:26:9 › Navigation › navbar should be visible on algebra tiles page
+[1A[2K[111/147] [chromium] › e2e/navigation.spec.ts:32:9 › Navigation › navbar should be visible on double sided counters page
+[1A[2K[112/147] [chromium] › e2e/navigation.spec.ts:38:9 › Navigation › navbar should be visible on circuit designer page
+[1A[2K[113/147] [chromium] › e2e/navigation.spec.ts:44:9 › Navigation › should navigate from home to all main pages
+[1A[2K[114/147] [chromium] › e2e/navigation.spec.ts:70:9 › Navigation › logo/brand link in navbar should navigate to home
+[1A[2K[115/147] [chromium] › e2e/navigation.spec.ts:78:9 › Navigation › theme toggle should switch between light and dark mode
+[1A[2K[116/147] [chromium] › e2e/navigation.spec.ts:104:9 › Footer › should display social links on home page
+[1A[2K[117/147] [chromium] › e2e/percentage-grid.spec.ts:8:9 › Percentage Grid › should render grid and controls
+[1A[2K[118/147] [chromium] › e2e/percentage-grid.spec.ts:13:9 › Percentage Grid › should toggle squares on click
+[1A[2K[119/147] [chromium] › e2e/percentage-grid.spec.ts:23:9 › Percentage Grid › should select multiple squares on drag
+[1A[2K[120/147] [chromium] › e2e/percentage-grid.spec.ts:46:9 › Percentage Grid › should resize grid when viewport changes
+[1A[2K[121/147] [chromium] › e2e/percentage-grid.spec.ts:77:9 › Percentage Grid › should maintain consistent grid size across different modes
+[1A[2K[122/147] [chromium] › e2e/percentage-grid.spec.ts:116:9 › Percentage Grid › should toggle row and column labels without resizing grid
+[1A[2K[123/147] [chromium] › e2e/responsive-layout.spec.ts:13:17 › Responsive Breakpoint Policy › /mathematics/double-sided-counters › Desktop (>= 1024px): Full experience with labels
+[1A[2K[124/147] [chromium] › e2e/responsive-layout.spec.ts:33:17 › Responsive Breakpoint Policy › /mathematics/double-sided-counters › Tablet (768px - 1023px): Compact mode (Icon only)
+[1A[2K[125/147] [chromium] › e2e/responsive-layout.spec.ts:55:17 › Responsive Breakpoint Policy › /mathematics/double-sided-counters › Mobile (< 768px): Banner active and Override flow
+[1A[2K[126/147] [chromium] › e2e/responsive-layout.spec.ts:13:17 › Responsive Breakpoint Policy › /mathematics/bar-model › Desktop (>= 1024px): Full experience with labels
+[1A[2K[127/147] [chromium] › e2e/responsive-layout.spec.ts:33:17 › Responsive Breakpoint Policy › /mathematics/bar-model › Tablet (768px - 1023px): Compact mode (Icon only)
+[1A[2K[128/147] [chromium] › e2e/responsive-layout.spec.ts:55:17 › Responsive Breakpoint Policy › /mathematics/bar-model › Mobile (< 768px): Banner active and Override flow
+[1A[2K[129/147] [chromium] › e2e/responsive-layout.spec.ts:13:17 › Responsive Breakpoint Policy › /mathematics/algebra-tiles › Desktop (>= 1024px): Full experience with labels
+[1A[2K[130/147] [chromium] › e2e/responsive-layout.spec.ts:33:17 › Responsive Breakpoint Policy › /mathematics/algebra-tiles › Tablet (768px - 1023px): Compact mode (Icon only)
+[1A[2K[131/147] [chromium] › e2e/responsive-layout.spec.ts:55:17 › Responsive Breakpoint Policy › /mathematics/algebra-tiles › Mobile (< 768px): Banner active and Override flow
+[1A[2K[132/147] [chromium] › e2e/sequences-responsive.spec.ts:10:9 › Sequences Tool Responsive & Touch › Mobile View (375x667): Verify Banner and Override
+[1A[2K[133/147] [chromium] › e2e/sequences-responsive.spec.ts:34:9 › Sequences Tool Responsive & Touch › Tablet View (768x1024): Verify Header and Toolbar
+[1A[2K[134/147] [chromium] › e2e/sequences-responsive.spec.ts:70:9 › Sequences Tool Responsive & Touch › Touch Targets: Random dropdown items size
+[1A[2K[135/147] [chromium] › e2e/sequences-responsive.spec.ts:85:9 › Sequences Tool Responsive & Touch › State Persistence: Resize to Mobile and Back
+[1A[2K[136/147] [chromium] › e2e/tools.spec.ts:12:9 › Tools Page › should display the page heading
+[1A[2K[137/147] [chromium] › e2e/tools.spec.ts:18:9 › Tools Page › should display the page description
+[1A[2K[138/147] [chromium] › e2e/tools.spec.ts:25:9 › Tools Page › should display Mathematics section heading
+[1A[2K[139/147] [chromium] › e2e/tools.spec.ts:30:9 › Tools Page › should display Computing section heading
+[1A[2K[140/147] [chromium] › e2e/tools.spec.ts:35:9 › Tools Page › should display Algebra Tiles tool card
+[1A[2K[141/147] [chromium] › e2e/tools.spec.ts:44:9 › Tools Page › should display Double Sided Counters tool card
+[1A[2K[142/147] [chromium] › e2e/tools.spec.ts:53:9 › Tools Page › should display Circuit Designer tool card
+[1A[2K[143/147] [chromium] › e2e/tools.spec.ts:62:9 › Tools Page › should navigate to Algebra Tiles when clicking its card
+[1A[2K[144/147] [chromium] › e2e/tools.spec.ts:67:9 › Tools Page › should navigate to Double Sided Counters when clicking its card
+[1A[2K[145/147] [chromium] › e2e/tools.spec.ts:72:9 › Tools Page › should navigate to Circuit Designer when clicking its card
+[1A[2K[146/147] [chromium] › e2e/tools.spec.ts:77:9 › Tools Page › Mathematics section should contain correct number of tools
+[1A[2K[147/147] [chromium] › e2e/tools.spec.ts:83:9 › Tools Page › Computing section should contain correct number of tools
+[1A[2K  147 passed (33.0s)
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report[39m
+[36m[39m
