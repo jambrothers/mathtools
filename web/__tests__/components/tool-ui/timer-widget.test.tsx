@@ -13,11 +13,12 @@ describe('TimerWidget', () => {
     it('renders with initial time of 00:00', () => {
         render(<TimerWidget />)
         expect(screen.getByText('00:00')).toBeInTheDocument()
+        expect(screen.getByRole('timer')).toBeInTheDocument()
     })
 
     it('sets correct time when preset button is clicked', () => {
         render(<TimerWidget />)
-        const btn1m = screen.getByRole('button', { name: /1m/i })
+        const btn1m = screen.getByRole('button', { name: /1 minute/i })
         fireEvent.click(btn1m)
         expect(screen.getByText('01:00')).toBeInTheDocument()
     })
@@ -25,11 +26,10 @@ describe('TimerWidget', () => {
     it('counts down when started', () => {
         render(<TimerWidget />)
         // Set to 1m
-        fireEvent.click(screen.getByRole('button', { name: /1m/i }))
-        fireEvent.click(screen.getByRole('button', { name: /1m/i }))
+        fireEvent.click(screen.getByRole('button', { name: /1 minute/i }))
 
         // Start
-        const startBtn = screen.getByRole('button', { name: /start/i })
+        const startBtn = screen.getByRole('button', { name: /start timer/i })
         fireEvent.click(startBtn)
 
         act(() => {
@@ -45,9 +45,9 @@ describe('TimerWidget', () => {
 
     it('stops counting when stopped', () => {
         render(<TimerWidget />)
-        fireEvent.click(screen.getByRole('button', { name: /1m/i }))
+        fireEvent.click(screen.getByRole('button', { name: /1 minute/i }))
 
-        const startBtn = screen.getByRole('button', { name: /start/i })
+        const startBtn = screen.getByRole('button', { name: /start timer/i })
         fireEvent.click(startBtn)
 
         act(() => {
@@ -56,7 +56,7 @@ describe('TimerWidget', () => {
         expect(screen.getByText('00:59')).toBeInTheDocument()
 
         // Stop (should toggle to pause/stop)
-        const stopBtn = screen.getByRole('button', { name: /pause/i })
+        const stopBtn = screen.getByRole('button', { name: /pause timer/i })
         fireEvent.click(stopBtn)
 
         act(() => {
@@ -67,10 +67,10 @@ describe('TimerWidget', () => {
 
     it('resets time to 00:00 when reset is clicked', () => {
         render(<TimerWidget />)
-        fireEvent.click(screen.getByRole('button', { name: /1m/i }))
+        fireEvent.click(screen.getByRole('button', { name: /1 minute/i }))
         expect(screen.getByText('01:00')).toBeInTheDocument()
 
-        const resetBtn = screen.getByRole('button', { name: /reset/i })
+        const resetBtn = screen.getByRole('button', { name: /reset timer/i })
         fireEvent.click(resetBtn)
         expect(screen.getByText('00:00')).toBeInTheDocument()
 
@@ -83,12 +83,29 @@ describe('TimerWidget', () => {
 
     it('does not go below 00:00', () => {
         render(<TimerWidget />)
-        fireEvent.click(screen.getByRole('button', { name: /30s/i }))
-        fireEvent.click(screen.getByRole('button', { name: /start/i }))
+        fireEvent.click(screen.getByRole('button', { name: /30 seconds/i }))
+        fireEvent.click(screen.getByRole('button', { name: /start timer/i }))
 
         act(() => {
             jest.advanceTimersByTime(40000)
         })
         expect(screen.getByText('00:00')).toBeInTheDocument()
+    })
+
+    it('shows visual feedback and alert when timer completes', () => {
+        render(<TimerWidget />)
+        fireEvent.click(screen.getByRole('button', { name: /30 seconds/i }))
+        fireEvent.click(screen.getByRole('button', { name: /start timer/i }))
+
+        act(() => {
+            jest.advanceTimersByTime(31000)
+        })
+
+        // Check for alert
+        expect(screen.getByRole('alert')).toHaveTextContent(/timer finished/i)
+
+        // Check for visual class on timer display
+        const timerDisplay = screen.getByRole('timer')
+        expect(timerDisplay).toHaveClass('text-red-600')
     })
 })
