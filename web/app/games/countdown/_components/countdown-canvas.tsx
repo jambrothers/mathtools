@@ -28,7 +28,7 @@ export function CountdownCanvas({
     const secondHandRotation = (30 - timeLeft) * 12; // 360 / 30 = 12 degrees per second
 
     return (
-        <div className="w-full h-full flex items-center justify-center p-8 bg-slate-50 dark:bg-slate-900 overflow-hidden">
+        <div className="w-full h-full flex flex-col items-center p-8 pt-12 bg-slate-50 dark:bg-slate-900 overflow-y-auto custom-scrollbar pb-32">
             <div className="max-w-4xl w-full space-y-12 flex flex-col items-center">
 
                 {/* Clock and Target Section */}
