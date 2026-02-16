@@ -1,5 +1,5 @@
 import { ToolCard } from "@/components/tool-card"
-import { Gamepad2 } from "lucide-react"
+import { Gamepad2, Calculator } from "lucide-react"
 
 export default function GamesPage() {
     return (
@@ -23,6 +23,13 @@ export default function GamesPage() {
                                 href="/games/pointless"
                                 gradient="from-indigo-600 to-violet-600"
                                 icon={<Gamepad2 className="w-8 h-8 text-indigo-600" />}
+                            />
+                            <ToolCard
+                                title="Countdown"
+                                description="Combine six numbers using arithmetic to reach the target. A classic challenge for mental math and strategy."
+                                href="/games/countdown"
+                                gradient="from-blue-600 to-indigo-600"
+                                icon={<Calculator className="w-8 h-8 text-blue-600" />}
                             />
                         </div>
                     </div>
