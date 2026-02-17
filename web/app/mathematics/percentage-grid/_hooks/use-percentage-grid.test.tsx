@@ -366,4 +366,20 @@ describe('Dual Grid Support', () => {
         expect(result.current.selectedIndices.size).toBe(10);
         expect(result.current.selectedIndices2.size).toBe(10);
     });
+
+    it('simplifies fraction to whole number when denominator is 1 (e.g. 200/100 -> 2)', () => {
+        const { result } = renderHook(() => usePercentageGrid());
+
+        act(() => {
+            result.current.toggleSecondGrid();
+            result.current.toggleSimplifyFraction(); // Enable simplification
+            result.current.fillPercent(100); // Grid 1 full
+
+            // Grid 2 full
+            const allIndices = Array.from({ length: 100 }, (_, i) => i);
+            result.current.setFromIndices2(allIndices);
+        });
+
+        expect(result.current.fractionDisplay).toBe('2');
+    });
 });

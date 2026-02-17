@@ -324,6 +324,11 @@ export function usePercentageGrid() {
         // Note: For things like 110/100, this will simplify to 11/10 which is correct
         const numerator = totalSelectedCount / divisor;
         const denominator = totalCells / divisor;
+
+        if (denominator === 1) {
+            return numerator.toString();
+        }
+
         return `${numerator}/${denominator}`;
     })();
 
