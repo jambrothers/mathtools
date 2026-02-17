@@ -207,6 +207,7 @@ export function ControlPresetButton({
     return (
         <button
             type="button"
+            aria-pressed={isActive}
             className={cn(
                 "w-full text-left px-4 py-3 rounded-lg border transition-all group relative overflow-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900",
                 isActive
