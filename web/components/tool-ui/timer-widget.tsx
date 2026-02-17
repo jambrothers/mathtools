@@ -16,7 +16,6 @@ import { cn } from "@/lib/utils"
 export function TimerWidget({ className }: { className?: string }) {
     const [seconds, setSeconds] = React.useState(0)
     const [isRunning, setIsRunning] = React.useState(false)
-    const timerRef = React.useRef<NodeJS.Timeout | null>(null)
 
     const startTimer = () => {
         if (seconds > 0) {
@@ -38,9 +37,13 @@ export function TimerWidget({ className }: { className?: string }) {
         setIsRunning(false)
     }
 
+    // Optimization: Remove 'seconds' from dependency array to prevent interval thrashing.
+    // The interval is now stable and only re-created when 'isRunning' changes.
     React.useEffect(() => {
-        if (isRunning && seconds > 0) {
-            timerRef.current = setInterval(() => {
+        let intervalId: NodeJS.Timeout | undefined
+
+        if (isRunning) {
+            intervalId = setInterval(() => {
                 setSeconds((prev) => {
                     if (prev <= 1) {
                         setIsRunning(false)
@@ -49,14 +52,12 @@ export function TimerWidget({ className }: { className?: string }) {
                     return prev - 1
                 })
             }, 1000)
-        } else {
-            if (timerRef.current) clearInterval(timerRef.current)
         }
 
         return () => {
-            if (timerRef.current) clearInterval(timerRef.current)
+            if (intervalId) clearInterval(intervalId)
         }
-    }, [isRunning, seconds])
+    }, [isRunning])
 
     const formatTime = (s: number) => {
         const mins = Math.floor(s / 60)
