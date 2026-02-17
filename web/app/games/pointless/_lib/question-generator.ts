@@ -40,7 +40,11 @@ export function generateQuestion(
 
 function generateFactorsQuestion(params?: Record<string, number | string>): Question {
     const options = [48, 60, 72, 84, 90, 96, 120, 144, 180, 240];
-    const n = (params?.n as number) ?? options[Math.floor(Math.random() * options.length)];
+    let n = (params?.n as number) ?? options[Math.floor(Math.random() * options.length)];
+
+    // Security: Clamp inputs
+    n = clamp(n, 1, 10000);
+
     const answers: number[] = [];
     for (let i = 1; i <= n; i++) {
         if (n % i === 0) answers.push(i);
@@ -54,11 +58,19 @@ function generateFactorsQuestion(params?: Record<string, number | string>): Ques
 }
 
 function generateMultiplesQuestion(params?: Record<string, number | string>): Question {
-    const multiplier = (params?.multiplier as number) ?? (Math.floor(Math.random() * 9) + 2); // 2-10
-    const min = (params?.min as number) ?? Math.floor(Math.random() * 50);
-    const max = (params?.max as number) ?? (min + 100 + Math.floor(Math.random() * 100));
+    let multiplier = (params?.multiplier as number) ?? (Math.floor(Math.random() * 9) + 2); // 2-10
+    let min = (params?.min as number) ?? Math.floor(Math.random() * 50);
+    let max = (params?.max as number) ?? (min + 100 + Math.floor(Math.random() * 100));
+
+    // Security: Clamp inputs to prevent DoS
+    multiplier = clamp(multiplier, 1, 100);
+    min = clamp(min, 0, 10000);
+    max = clamp(max, min, 10000); // Allow min == max, but enforce limits
 
     const answers: number[] = [];
+    // Ensure multiplier is not 0 (though clamp(1) handles it)
+    if (multiplier === 0) multiplier = 1;
+
     for (let i = Math.ceil(min / multiplier) * multiplier; i <= max; i += multiplier) {
         if (i >= min) answers.push(i);
     }
@@ -72,7 +84,11 @@ function generateMultiplesQuestion(params?: Record<string, number | string>): Qu
 }
 
 function generatePrimesQuestion(params?: Record<string, number | string>): Question {
-    const max = (params?.max as number) ?? (50 + Math.floor(Math.random() * 150)); // 50-200
+    let max = (params?.max as number) ?? (50 + Math.floor(Math.random() * 150)); // 50-200
+
+    // Security: Clamp inputs (primes calculation is expensive)
+    max = clamp(max, 2, 10000);
+
     const answers: number[] = [];
     for (let i = 2; i <= max; i++) {
         if (isPrime(i)) answers.push(i);
@@ -86,7 +102,11 @@ function generatePrimesQuestion(params?: Record<string, number | string>): Quest
 }
 
 function generateSquaresQuestion(params?: Record<string, number | string>): Question {
-    const max = (params?.max as number) ?? (100 + Math.floor(Math.random() * 900)); // 100-1000
+    let max = (params?.max as number) ?? (100 + Math.floor(Math.random() * 900)); // 100-1000
+
+    // Security: Clamp inputs
+    max = clamp(max, 1, 100000);
+
     const answers: number[] = [];
     for (let i = 1; i * i <= max; i++) {
         answers.push(i * i);
@@ -100,7 +120,11 @@ function generateSquaresQuestion(params?: Record<string, number | string>): Ques
 }
 
 function generateCubesQuestion(params?: Record<string, number | string>): Question {
-    const max = (params?.max as number) ?? (200 + Math.floor(Math.random() * 800)); // 200-1000
+    let max = (params?.max as number) ?? (200 + Math.floor(Math.random() * 800)); // 200-1000
+
+    // Security: Clamp inputs
+    max = clamp(max, 1, 100000);
+
     const answers: number[] = [];
     for (let i = 1; i * i * i <= max; i++) {
         answers.push(i * i * i);
@@ -115,7 +139,11 @@ function generateCubesQuestion(params?: Record<string, number | string>): Questi
 
 function generatePowersOf2Question(params?: Record<string, number | string>): Question {
     const options = [128, 256, 512, 1024, 2048];
-    const max = (params?.max as number) ?? options[Math.floor(Math.random() * options.length)];
+    let max = (params?.max as number) ?? options[Math.floor(Math.random() * options.length)];
+
+    // Security: Clamp inputs (powers of 2 grows fast, so max can be larger safely, but let's limit it)
+    max = clamp(max, 1, 1000000);
+
     const answers: number[] = [];
     for (let i = 1; i <= max; i *= 2) {
         answers.push(i);
@@ -129,7 +157,11 @@ function generatePowersOf2Question(params?: Record<string, number | string>): Qu
 }
 
 function generateTriangularNumbersQuestion(params?: Record<string, number | string>): Question {
-    const max = (params?.max as number) ?? (50 + Math.floor(Math.random() * 150)); // 50-200
+    let max = (params?.max as number) ?? (50 + Math.floor(Math.random() * 150)); // 50-200
+
+    // Security: Clamp inputs
+    max = clamp(max, 1, 100000);
+
     const answers: number[] = [];
     let n = 1;
     while (true) {
@@ -153,4 +185,10 @@ function isPrime(n: number): boolean {
         if (n % i === 0) return false;
     }
     return true;
+}
+
+function clamp(val: number, min: number, max: number): number {
+    // Handle NaN
+    if (isNaN(val)) return min;
+    return Math.min(Math.max(val, min), max);
 }
