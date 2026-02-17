@@ -9,6 +9,7 @@ export function usePercentageGrid() {
     const activeMode = GRID_MODES.find(m => m.id === gridMode) ?? GRID_MODES[0];
     const { cols, rows, totalCells, cellValue } = activeMode;
 
+    // Grid 1 State
     const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set());
     const [isDragging, setIsDragging] = useState(false);
     const isDraggingRef = useRef(false);
@@ -22,6 +23,23 @@ export function usePercentageGrid() {
         colMin: number;
         colMax: number;
     } | null>(null);
+
+    // Grid 2 State
+    const [showSecondGrid, setShowSecondGrid] = useState(false);
+    const [selectedIndices2, setSelectedIndices2] = useState<Set<number>>(new Set());
+    const [isDragging2, setIsDragging2] = useState(false);
+    const isDraggingRef2 = useRef(false);
+    const dragModeRef2 = useRef<DragMode>('paint');
+    const dragStartIndexRef2 = useRef<number | null>(null);
+    const dragCurrentIndexRef2 = useRef<number | null>(null);
+    const dragBaseSelectionRef2 = useRef<Set<number>>(new Set());
+    const [dragPreviewBounds2, setDragPreviewBounds2] = useState<{
+        rowMin: number;
+        rowMax: number;
+        colMin: number;
+        colMax: number;
+    } | null>(null);
+
     const [showPanel, setShowPanel] = useState(true);
     const [showPercentage, setShowPercentage] = useState(false);
     const [showDecimal, setShowDecimal] = useState(false);
@@ -35,24 +53,39 @@ export function usePercentageGrid() {
         const prevConfig = activeMode;
         const nextConfig = GRID_MODES.find(m => m.id === modeId) ?? GRID_MODES[0];
 
-        // Calculate current percentage
-        const currentSelectedCount = selectedIndices.size;
-        const currentPercentage = currentSelectedCount / prevConfig.totalCells;
+        // Helper to migrate selection for a grid
+        const migrateSelection = (indices: Set<number>) => {
+            const currentSelectedCount = indices.size;
+            const currentPercentage = currentSelectedCount / prevConfig.totalCells;
+            const nextSelectedCount = Math.floor(currentPercentage * nextConfig.totalCells);
+            const columnOrder = getColumnMajorOrder(nextConfig.cols, nextConfig.rows);
+            return new Set<number>(columnOrder.slice(0, nextSelectedCount));
+        };
 
-        // Calculate new cell count to maintain percentage (floored)
-        const nextSelectedCount = Math.floor(currentPercentage * nextConfig.totalCells);
-
-        // Create new selection set based on column major order
-        const columnOrder = getColumnMajorOrder(nextConfig.cols, nextConfig.rows);
-        const nextSelectedIndices = new Set<number>(columnOrder.slice(0, nextSelectedCount));
-
-        setSelectedIndices(nextSelectedIndices);
+        setSelectedIndices(migrateSelection(selectedIndices));
+        setSelectedIndices2(migrateSelection(selectedIndices2));
         setGridModeState(modeId);
-    }, [gridMode, activeMode, selectedIndices.size]);
+    }, [gridMode, activeMode, selectedIndices.size, selectedIndices2.size]);
+
+    const toggleSecondGrid = useCallback(() => {
+        setShowSecondGrid(prev => {
+            const next = !prev;
+            if (!next) {
+                // When hiding, clear the second grid
+                setSelectedIndices2(new Set());
+            }
+            return next;
+        });
+    }, []);
 
     const updateDragging = useCallback((value: boolean) => {
         isDraggingRef.current = value;
         setIsDragging(value);
+    }, []);
+
+    const updateDragging2 = useCallback((value: boolean) => {
+        isDraggingRef2.current = value;
+        setIsDragging2(value);
     }, []);
 
     const getRectangleBounds = useCallback((startIndex: number, currentIndex: number) => {
@@ -79,6 +112,7 @@ export function usePercentageGrid() {
         return indices;
     }, [cols]);
 
+    // Grid 1 Interactions
     const toggleSquare = useCallback((index: number) => {
         setSelectedIndices(prev => {
             const next = new Set(prev);
@@ -139,15 +173,78 @@ export function usePercentageGrid() {
         setDragPreviewBounds(null);
     }, [updateDragging]);
 
+    // Grid 2 Interactions
+    const toggleSquare2 = useCallback((index: number) => {
+        setSelectedIndices2(prev => {
+            const next = new Set(prev);
+            if (next.has(index)) {
+                next.delete(index);
+            } else {
+                next.add(index);
+            }
+            return next;
+        });
+    }, []);
+
+    const startDrag2 = useCallback((index: number) => {
+        updateDragging2(true);
+        setSelectedIndices2(prev => {
+            const next = new Set(prev);
+            dragBaseSelectionRef2.current = new Set(prev);
+            dragStartIndexRef2.current = index;
+            dragCurrentIndexRef2.current = index;
+            const shouldErase = next.has(index);
+            dragModeRef2.current = shouldErase ? 'erase' : 'paint';
+            if (shouldErase) {
+                next.delete(index);
+            } else {
+                next.add(index);
+            }
+            return next;
+        });
+        setDragPreviewBounds2(null);
+    }, [updateDragging2]);
+
+    const dragEnter2 = useCallback((index: number) => {
+        if (!isDraggingRef2.current) return;
+        const startIndex = dragStartIndexRef2.current;
+        if (startIndex === null) return;
+        const mode = dragModeRef2.current;
+        dragCurrentIndexRef2.current = index;
+        const bounds = getRectangleBounds(startIndex, index);
+        const rectIndices = getRectangleIndices(bounds);
+
+        setDragPreviewBounds2(startIndex === index ? null : bounds);
+        setSelectedIndices2(() => {
+            const base = dragBaseSelectionRef2.current;
+            const next = new Set(base);
+            if (mode === 'paint') {
+                rectIndices.forEach(rectIndex => next.add(rectIndex));
+            } else {
+                rectIndices.forEach(rectIndex => next.delete(rectIndex));
+            }
+            return next;
+        });
+    }, [getRectangleIndices, getRectangleBounds]);
+
+    const endDrag2 = useCallback(() => {
+        updateDragging2(false);
+        dragStartIndexRef2.current = null;
+        dragCurrentIndexRef2.current = null;
+        setDragPreviewBounds2(null);
+    }, [updateDragging2]);
+
     const fillPercent = useCallback((percent: number) => {
         const count = Math.max(0, Math.min(totalCells, Math.round((percent / 100) * totalCells)));
         const columnOrder = getColumnMajorOrder(cols, rows);
         const next = new Set<number>(columnOrder.slice(0, count));
         setSelectedIndices(next);
+        // Fill only applies to grid 1 as per design to allow "fill 100% then manually fill more on grid 2"
     }, [cols, rows, totalCells]);
 
     const clear = useCallback(() => {
         setSelectedIndices(new Set());
+        setSelectedIndices2(new Set());
     }, []);
 
     const setFromIndices = useCallback((indices: number[]) => {
@@ -160,6 +257,16 @@ export function usePercentageGrid() {
         setSelectedIndices(next);
     }, [totalCells]);
 
+    const setFromIndices2 = useCallback((indices: number[]) => {
+        const next = new Set<number>();
+        indices.forEach(index => {
+            if (index >= 0 && index < totalCells) {
+                next.add(index);
+            }
+        });
+        setSelectedIndices2(next);
+    }, [totalCells]);
+
     const setDisplayOptions = useCallback((options: {
         showPanel?: boolean;
         showPercentage?: boolean;
@@ -167,6 +274,7 @@ export function usePercentageGrid() {
         showFraction?: boolean;
         simplifyFraction?: boolean;
         showLabels?: boolean;
+        showSecondGrid?: boolean;
     }) => {
         if (typeof options.showPanel === 'boolean') setShowPanel(options.showPanel);
         if (typeof options.showPercentage === 'boolean') setShowPercentage(options.showPercentage);
@@ -174,21 +282,22 @@ export function usePercentageGrid() {
         if (typeof options.showFraction === 'boolean') setShowFraction(options.showFraction);
         if (typeof options.simplifyFraction === 'boolean') setSimplifyFraction(options.simplifyFraction);
         if (typeof options.showLabels === 'boolean') setShowLabels(options.showLabels);
+        if (typeof options.showSecondGrid === 'boolean') setShowSecondGrid(options.showSecondGrid);
     }, []);
 
-    const selectedCount = selectedIndices.size;
+    // FDP Calculations
+    // If showing second grid, we sum the selected counts
+    // The "Total" is ONE grid (100%), so we can go > 100%
+    const totalSelectedCount = selectedIndices.size + (showSecondGrid ? selectedIndices2.size : 0);
 
     const percentageDisplay = (() => {
-        const value = selectedCount * cellValue;
-        // If integer, show as integer. If float, show with necessary decimals (max 1 for 0.5 steps)
+        const value = totalSelectedCount * cellValue;
         const formatted = Number.isInteger(value) ? value.toString() : value.toFixed(1);
         return `${formatted}%`;
     })();
 
     const decimalDisplay = (() => {
-        const val = (selectedCount * cellValue) / 100;
-        // Standard 2 decimals, but if cellValue < 1 (20x10 mode) we might have 3 decimals (e.g. 0.005)
-        // If the value has more than 2 decimal places, show 3.
+        const val = (totalSelectedCount * cellValue) / 100;
         const needsMorePrecision = val.toString().split('.')[1]?.length > 2;
         return val.toFixed(needsMorePrecision ? 3 : 2);
     })();
@@ -206,12 +315,14 @@ export function usePercentageGrid() {
 
     const fractionDisplay = (() => {
         if (!simplifyFraction) {
-            return `${selectedCount}/${totalCells}`;
+            return `${totalSelectedCount}/${totalCells}`;
         }
-        if (selectedCount === 0) return '0';
-        if (selectedCount === totalCells) return '1';
-        const divisor = gcd(selectedCount, totalCells);
-        const numerator = selectedCount / divisor;
+        if (totalSelectedCount === 0) return '0';
+        if (totalSelectedCount === totalCells) return '1';
+
+        const divisor = gcd(totalSelectedCount, totalCells);
+        // Note: For things like 110/100, this will simplify to 11/10 which is correct
+        const numerator = totalSelectedCount / divisor;
         const denominator = totalCells / divisor;
         return `${numerator}/${denominator}`;
     })();
@@ -229,6 +340,8 @@ export function usePercentageGrid() {
         cols,
         rows,
         totalCells,
+
+        // Grid 1
         selectedIndices,
         dragPreviewBounds,
         isDragging,
@@ -236,14 +349,29 @@ export function usePercentageGrid() {
         startDrag,
         dragEnter,
         endDrag,
+
+        // Grid 2
+        showSecondGrid,
+        toggleSecondGrid,
+        selectedIndices2,
+        dragPreviewBounds2,
+        isDragging2,
+        toggleSquare2,
+        startDrag2,
+        dragEnter2,
+        endDrag2,
+
         fillPercent,
         clear,
         setFromIndices,
+        setFromIndices2,
         setDisplayOptions,
-        selectedCount,
+
+        selectedCount: totalSelectedCount,
         percentageDisplay,
         decimalDisplay,
         fractionDisplay,
+
         showPanel,
         showPercentage,
         showDecimal,
