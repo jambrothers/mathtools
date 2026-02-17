@@ -16,11 +16,13 @@ import { cn } from "@/lib/utils"
 export function TimerWidget({ className }: { className?: string }) {
     const [seconds, setSeconds] = React.useState(0)
     const [isRunning, setIsRunning] = React.useState(false)
+    const [hasFinished, setHasFinished] = React.useState(false)
     const timerRef = React.useRef<NodeJS.Timeout | null>(null)
 
     const startTimer = () => {
         if (seconds > 0) {
             setIsRunning(true)
+            setHasFinished(false)
         }
     }
 
@@ -31,11 +33,13 @@ export function TimerWidget({ className }: { className?: string }) {
     const resetTimer = () => {
         setIsRunning(false)
         setSeconds(0)
+        setHasFinished(false)
     }
 
     const setPreset = (s: number) => {
         setSeconds(s)
         setIsRunning(false)
+        setHasFinished(false)
     }
 
     React.useEffect(() => {
@@ -44,6 +48,7 @@ export function TimerWidget({ className }: { className?: string }) {
                 setSeconds((prev) => {
                     if (prev <= 1) {
                         setIsRunning(false)
+                        setHasFinished(true)
                         return 0
                     }
                     return prev - 1
@@ -74,9 +79,20 @@ export function TimerWidget({ className }: { className?: string }) {
                 <span className="text-[10px] font-bold uppercase tracking-widest">Timer</span>
             </div>
 
-            <div className="text-3xl font-mono font-bold text-slate-900 dark:text-white text-center tabular-nums leading-none tracking-tight">
+            <div
+                role="timer"
+                className={cn(
+                    "text-3xl font-mono font-bold text-slate-900 dark:text-white text-center tabular-nums leading-none tracking-tight transition-colors",
+                    hasFinished && "text-red-600 dark:text-red-400 animate-pulse"
+                )}
+            >
                 {formatTime(seconds)}
             </div>
+            {hasFinished && (
+                <div role="status" className="sr-only">
+                    Timer finished
+                </div>
+            )}
 
             <div className="flex items-center justify-center gap-3 mt-2">
                 {!isRunning ? (
@@ -117,7 +133,7 @@ export function TimerWidget({ className }: { className?: string }) {
                                 ? "bg-indigo-50 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300"
                                 : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-600"
                         )}
-                        aria-label={`${s === 60 ? '1m' : s === 120 ? '2m' : s + 's'}`}
+                        aria-label={`Set timer to ${s === 60 ? '1 minute' : s === 120 ? '2 minutes' : s + ' seconds'}`}
                     >
                         {s === 60 ? '1m' : s === 120 ? '2m' : s + 's'}
                     </button>
