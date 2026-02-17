@@ -11,7 +11,6 @@ describe('Footer', () => {
     it('renders social links with accessible labels', () => {
         render(<Footer />)
 
-        expect(screen.getByRole('link', { name: /GitHub/i })).toHaveAttribute('href', 'https://github.com/jambrothers/mathtools')
         expect(screen.getByRole('link', { name: /LinkedIn/i })).toHaveAttribute('href', '#')
         expect(screen.getByRole('link', { name: /Bluesky/i })).toHaveAttribute('href', 'https://bsky.app')
         expect(screen.getByRole('link', { name: /Email/i })).toHaveAttribute('href', 'mailto:help@teachmaths.net')

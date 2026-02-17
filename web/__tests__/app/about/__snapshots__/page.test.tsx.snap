@@ -15,7 +15,7 @@ exports[`About Page matches snapshot 1`] = `
         <span
           class="text-[var(--color-primary)]"
         >
-          MathTools
+          TeachMaths.net
         </span>
       </h1>
       <div
@@ -24,7 +24,7 @@ exports[`About Page matches snapshot 1`] = `
         <p
           class="text-xl text-[var(--theme-muted)] leading-relaxed mb-6"
         >
-          MathTools is a collection of interactive digital tools designed to bridge the gap between abstract mathematical concepts and concrete understanding.
+          TeachMaths.net is a collection of interactive digital tools designed to bridge the gap between abstract mathematical concepts and concrete understanding.
         </p>
         <div
           class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl p-8 mb-8"

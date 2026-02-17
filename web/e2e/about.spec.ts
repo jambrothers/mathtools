@@ -13,7 +13,7 @@ test.describe('About Page', () => {
         const heading = page.locator('h1');
         await expect(heading).toBeVisible();
         await expect(heading).toContainText('About');
-        await expect(heading).toContainText('MathTools');
+        await expect(heading).toContainText('TeachMaths.net');
     });
 
     test('should display the introduction paragraph', async ({ page }) => {

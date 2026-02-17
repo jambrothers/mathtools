@@ -3,44 +3,35 @@
 import * as React from "react"
 
 /**
- * Context type definition for managing page titles and navbar visibility.
+ * Context type definition for managing page titles.
  */
 interface PageTitleContextType {
     /** The current page title to display in the navbar. */
     title: string | null
     /** Function to update the page title. */
     setTitle: (title: string | null) => void
-    /** Whether the navbar is currently visible (expanded). */
-    isNavbarVisible: boolean
-    /** Function to toggle navbar visibility. */
-    toggleNavbar: () => void
 }
 
 const PageTitleContext = React.createContext<PageTitleContextType | undefined>(undefined)
 
 /**
  * Provider component that wraps the application to supply page title context.
- * Manages the state for the current page title and navbar visibility.
+ * Manages the state for the current page title.
  * 
  * @param children - The child components that will have access to this context.
  */
 export function PageTitleProvider({ children }: { children: React.ReactNode }) {
     const [title, setTitle] = React.useState<string | null>(null)
-    const [isNavbarVisible, setIsNavbarVisible] = React.useState(true)
-
-    const toggleNavbar = React.useCallback(() => {
-        setIsNavbarVisible(prev => !prev)
-    }, [])
 
     return (
-        <PageTitleContext.Provider value={{ title, setTitle, isNavbarVisible, toggleNavbar }}>
+        <PageTitleContext.Provider value={{ title, setTitle }}>
             {children}
         </PageTitleContext.Provider>
     )
 }
 
 /**
- * Hook to access and manipulate the page title and navbar visibility.
+ * Hook to access and manipulate the page title.
  * Must be used within a PageTitleProvider.
  * 
  * @returns The PageTitleContextType object.

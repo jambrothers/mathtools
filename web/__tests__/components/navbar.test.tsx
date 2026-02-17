@@ -18,13 +18,11 @@ jest.mock('@/components/page-title-context', () => ({
 }))
 
 describe('Navbar', () => {
-    const mockToggleNavbar = jest.fn()
 
     beforeEach(() => {
         (PageTitleContext.usePageTitle as jest.Mock).mockReturnValue({
             title: 'Test Title',
-            isNavbarVisible: true,
-            toggleNavbar: mockToggleNavbar,
+            setTitle: jest.fn(),
         })
     })
 
@@ -53,20 +51,5 @@ describe('Navbar', () => {
 
         const menuButton = screen.getByRole('button', { name: /Toggle mobile menu/i })
         expect(menuButton).toBeInTheDocument()
-    })
-
-    it('calls toggleNavbar when toggle button is clicked', () => {
-        render(<Navbar />)
-        const hideButtons = screen.getAllByRole('button', { name: /Hide Navbar/i })
-        // There might be multiple due to responsive layout or logic?
-        // In code: one "Show Navbar" (fixed) and one "Hide Navbar" (inside nav)
-
-        const hideButton = screen.getByTitle('Hide Navbar')
-        fireEvent.click(hideButton)
-        expect(mockToggleNavbar).toHaveBeenCalled()
-
-        const showButton = screen.getByTitle('Show Navbar')
-        fireEvent.click(showButton)
-        expect(mockToggleNavbar).toHaveBeenCalled()
     })
 })

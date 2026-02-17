@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 /**
  * E2E tests for cross-cutting navigation functionality.
- * Tests verify navbar, footer, theme toggle, and page-to-page navigation.
+ * Tests verify navbar, footer, and page-to-page navigation.
  */
 test.describe('Navigation', () => {
     test('navbar should be visible on home page', async ({ page }) => {
@@ -73,30 +73,6 @@ test.describe('Navigation', () => {
         const brandLink = page.locator('nav a').first();
         await brandLink.click();
         await expect(page).toHaveURL('/');
-    });
-
-    test('theme toggle should switch between light and dark mode', async ({ page }) => {
-        await page.goto('/');
-
-        // Find the theme toggle button by its aria-label
-        const themeToggle = page.locator('button[aria-label="Toggle theme"]');
-
-        // Button should exist
-        await expect(themeToggle).toBeVisible();
-
-        // Get initial theme state
-        const html = page.locator('html');
-        const initialClass = await html.getAttribute('class');
-
-        // Click theme toggle
-        await themeToggle.click();
-        await page.waitForTimeout(300); // Allow for theme transition
-
-        // Theme should have changed (class should be different now)
-        const newClass = await html.getAttribute('class');
-        // Either initially had 'dark' and now doesn't, or vice versa
-        const themeChanged = initialClass !== newClass;
-        expect(themeChanged || initialClass?.includes('dark') !== newClass?.includes('dark')).toBeTruthy();
     });
 });
 

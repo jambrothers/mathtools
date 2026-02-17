@@ -123,8 +123,9 @@ export function FractionWallSVG({
                                 y1={0}
                                 x2={x * width}
                                 y2={height}
-                                stroke="var(--color-primary)"
+                                stroke="#2563EB"
                                 strokeWidth="2"
+
                                 strokeDasharray="4,2"
                             />
                         ))}
