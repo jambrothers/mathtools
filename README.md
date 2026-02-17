@@ -76,7 +76,19 @@ An interactive environment for exploring arithmetic, geometric, and quadratic se
 *Status: Stable. Core functionality and URL sharing implemented.*
 [Documentation](./web/app/mathematics/sequences/HELP.md)
 
-### 7. Circuit Designer
+### 7. Fraction Wall
+An interactive tool for exploring equivalent fractions and comparing values.
+- **Display Modes**: Fraction, Decimal, Percent.
+- **Features**:
+    - Toggle visible rows (denominators 1-12).
+    - Equivalence lines for visual alignment.
+    - Shading for comparison.
+    - Shareable URLs.
+
+*Status: Stable. Core functionality, URL sharing, and export implemented.*
+[Documentation](./web/app/mathematics/fraction-wall/HELP.md)
+
+### 8. Circuit Designer
 A logic gate simulator for Computer Science students.
 - **Components**: Switches, Bulbs, AND, OR, NOT, XOR gates.
 - **Features**:
@@ -87,6 +99,30 @@ A logic gate simulator for Computer Science students.
 
 *Status: Stable. Recently updated with multi-select and enhanced UI.*
 [Documentation](./web/app/computing/circuit-designer/HELP.md)
+
+## Classroom Games
+
+### Pointless
+A classroom game inspired by the TV show *Pointless*.
+- **Goal**: Find obscure correct answers to mathematical questions.
+- **Features**:
+    - Customizable categories and number ranges.
+    - Reveal answers animation.
+    - Built-in timer.
+    - Shareable game setups.
+
+[Documentation](./web/app/games/pointless/HELP.md)
+
+### Countdown
+A classroom game inspired by the TV show *Countdown*.
+- **Goal**: Reach a target number using 6 random numbers and arithmetic operations.
+- **Features**:
+    - Customizable number selection (Large/Small).
+    - Analog clock timer.
+    - Solver algorithm to reveal solutions.
+    - Shareable game setups.
+
+[Documentation](./web/app/games/countdown/HELP.md)
 
 ## Key Features
 
@@ -127,9 +163,10 @@ mathtools/
 ```
 
 - **`web/app/`**: Contains the route segments and page definitions.
-  - **`mathematics/`**: Dedicated section for interactive mathematics tools (e.g., Algebra Tiles).
-  - **`computing/`**: Dedicated section for computing tools (e.g., Circuit Designer).
-    - **`[tool-name]/`**: Each tool (e.g., `algebra-tiles`) has its own subdirectory containing its page, `HELP.md`, and tool-specific local components.
+  - **`mathematics/`**: Dedicated section for interactive mathematics tools (e.g., `algebra-tiles`, `fraction-wall`).
+  - **`computing/`**: Dedicated section for computing tools (e.g., `circuit-designer`).
+  - **`games/`**: Dedicated section for classroom games (e.g., `pointless`, `countdown`).
+    - **`[tool-name]/`**: Each tool has its own subdirectory containing its page, `HELP.md`, and tool-specific local components.
 - **`web/components/`**: Shared reusable components. [Documentation](./web/components/README.md)
   - **`tool-ui/`**: Components shared across multiple tools (e.g., `Canvas`, `TileBase`, `Toolbar`, `HelpModal`).
 - **`lib/`**: Utility functions and custom hooks.

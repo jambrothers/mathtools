@@ -16,6 +16,18 @@ interface HelpModalProps {
  * Renders markdown content with proper styling.
  */
 export function HelpModal({ content, onClose }: HelpModalProps) {
+    // Handle escape key
+    React.useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
+
     return (
         <div
             data-testid="help-modal-backdrop"
@@ -23,13 +35,16 @@ export function HelpModal({ content, onClose }: HelpModalProps) {
             onClick={onClose}
         >
             <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="help-modal-title"
                 data-testid="help-modal-content"
                 className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-600 max-w-2xl w-full max-h-[80vh] flex flex-col"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 rounded-t-xl">
-                    <h2 className="text-xl font-bold flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                    <h2 id="help-modal-title" className="text-xl font-bold flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
                         <HelpCircle size={20} /> Help Guide
                     </h2>
                     <button
