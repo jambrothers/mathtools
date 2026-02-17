@@ -18,6 +18,23 @@ describe('percentageGridURLSerializer', () => {
         expect(params.get('gm')).toBe('10x10');
     });
 
+    it('serializes 2x2 mode correctly', () => {
+        const params = percentageGridURLSerializer.serialize({
+            gridMode: '2x2',
+            selectedIndices: [0, 1, 2, 3],
+            showPanel: true,
+            showPercentage: true,
+            showDecimal: false,
+            showFraction: false,
+            simplifyFraction: false,
+            showLabels: false,
+            showSecondGrid: false,
+            selectedIndices2: [],
+        });
+        expect(params.get('gm')).toBe('2x2');
+        expect(params.get('s')).toBe('0;1;2;3');
+    });
+
     it('deserializes URL params to selected indices', () => {
         const params = new URLSearchParams('gm=10x2&s=0;5;19&p=1&pc=1&dc=0&fr=1&sf=0');
         const state = percentageGridURLSerializer.deserialize(params);
