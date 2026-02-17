@@ -33,6 +33,17 @@ function CountdownGame() {
         setLargeNumbersCount
     } = useCountdown(urlState || undefined)
 
+    if (!puzzle) {
+        return (
+            <div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
+                    <p className="text-sm font-bold text-slate-500 animate-pulse">Generating Puzzle...</p>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <InteractiveToolLayout
             sidebar={

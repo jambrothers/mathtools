@@ -17,7 +17,7 @@ export function useCountdown(initialState?: { config: GameConfig, sources: numbe
     }
 
     const [config, setConfig] = React.useState<GameConfig>(initialState?.config || defaultConfig)
-    const [puzzle, setPuzzle] = React.useState<Puzzle>(() => {
+    const [puzzle, setPuzzle] = React.useState<Puzzle | null>(() => {
         if (initialState) {
             const solution = solve(initialState.sources, initialState.target, initialState.config.allowedOperations)
             return {
@@ -26,8 +26,14 @@ export function useCountdown(initialState?: { config: GameConfig, sources: numbe
                 solution
             }
         }
-        return generatePuzzle(defaultConfig)
+        return null
     })
+
+    React.useEffect(() => {
+        if (!puzzle && !initialState) {
+            setPuzzle(generatePuzzle(config))
+        }
+    }, [config, initialState, puzzle])
 
     const [isRevealed, setIsRevealed] = React.useState(false)
 
