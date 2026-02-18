@@ -15,3 +15,7 @@
 ## 2026-02-14 - Silent Tool Addition
 **Learning:** New tools (like `Sequences`) can be fully implemented and deployed but missing from the main `README.md`, making them invisible to contributors.
 **Action:** Audit `web/app/tools/page.tsx` against `README.md` periodically. The "Definition of Done" for new tools must include a README entry.
+
+## 2026-02-15 - Classroom Games Category
+**Learning:** Classroom games (like Pointless and Countdown) are distinct from Mathematics tools and are located in `web/app/games/`. They should be listed in a separate 'Classroom Games' section in the documentation.
+**Action:** When adding new games, ensure they are placed in `web/app/games/` and listed under the 'Classroom Games' section in `README.md`.

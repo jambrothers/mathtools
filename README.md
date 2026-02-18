@@ -12,7 +12,9 @@ The goal of this project is to create high-quality, web-based educational tools 
 
 ## Available Tools
 
-### 1. Algebra Tiles
+### Mathematics
+
+#### Algebra Tiles
 A comprehensive environment for modeling algebraic concepts such as:
 - Solving linear equations
 - Factorizing quadratics
@@ -21,7 +23,7 @@ A comprehensive environment for modeling algebraic concepts such as:
 *Status: Architecture finalized (Hooks + Components).*
 [Documentation](./web/app/mathematics/algebra-tiles/HELP.md)
 
-### 2. Double Sided Counters
+#### Double Sided Counters
 A tool for teaching integer operations using positive (yellow) and negative (red) counters. Features include:
 - **Algebraic Variables**: Support for symbolic variables (x, y, z...) alongside integer counters.
 - Zero pair cancellation animations
@@ -32,7 +34,7 @@ A tool for teaching integer operations using positive (yellow) and negative (red
 *Status: Architecture aligned with project standards. URL state sharing implemented.*
 [Documentation](./web/app/mathematics/double-sided-counters/HELP.md)
 
-### 3. Bar Model
+#### Bar Model
 A visualization tool for problem-solving using proportional bars.
 - **Operations**: Split (halves, thirds, fifths), Join, Clone.
 - **Features**:
@@ -43,7 +45,7 @@ A visualization tool for problem-solving using proportional bars.
 *Status: Stable. Core functionality implemented.*
 [Documentation](./web/app/mathematics/bar-model/HELP.md)
 
-### 4. Linear Equations
+#### Linear Equations
 An interactive graph for exploring linear relationships ($y = mx + c$).
 - **Interaction Modes**: Move ($c$), Rotate ($m$), and Select.
 - **Visual Aids**: Slope triangles, intercepts, and equation display.
@@ -52,7 +54,7 @@ An interactive graph for exploring linear relationships ($y = mx + c$).
 *Status: Stable. Export and interaction modes available.*
 [Documentation](./web/app/mathematics/linear-equations/HELP.md)
 
-### 5. Percentage Grid
+#### Percentage Grid
 An interactive grid for exploring the relationship between percentages, fractions, and decimals.
 - **Modes**: 10x10, 10x5, 10x2, 10x1 grids.
 - **Features**:
@@ -64,7 +66,7 @@ An interactive grid for exploring the relationship between percentages, fraction
 *Status: Stable. Core functionality and URL sharing implemented.*
 [Documentation](./web/app/mathematics/percentage-grid/HELP.md)
 
-### 6. Sequences
+#### Sequences
 An interactive environment for exploring arithmetic, geometric, and quadratic sequences.
 - **Sequence Types**: Arithmetic, Geometric, Quadratic.
 - **Features**:
@@ -76,7 +78,21 @@ An interactive environment for exploring arithmetic, geometric, and quadratic se
 *Status: Stable. Core functionality and URL sharing implemented.*
 [Documentation](./web/app/mathematics/sequences/HELP.md)
 
-### 7. Circuit Designer
+#### Fraction Wall
+An interactive tool for exploring equivalent fractions, comparing values, and understanding the relationship between fractions, decimals, and percentages.
+- **Features**:
+    - Toggle visibility of rows (1/1 to 1/12).
+    - Shade segments and switch labels (Fraction, Decimal, Percentage).
+    - Vertical equivalence lines.
+    - Export as PNG.
+    - Shareable URLs.
+
+*Status: Stable. Core functionality and URL sharing implemented.*
+[Documentation](./web/app/mathematics/fraction-wall/HELP.md)
+
+### Computing
+
+#### Circuit Designer
 A logic gate simulator for Computer Science students.
 - **Components**: Switches, Bulbs, AND, OR, NOT, XOR gates.
 - **Features**:
@@ -87,6 +103,31 @@ A logic gate simulator for Computer Science students.
 
 *Status: Stable. Recently updated with multi-select and enhanced UI.*
 [Documentation](./web/app/computing/circuit-designer/HELP.md)
+
+### Classroom Games
+
+#### Countdown
+A classroom game inspired by the TV show *Countdown*. Students combine six numbers using basic arithmetic to reach a randomly generated target number.
+- **Features**:
+    - Customise allowed operations and number of "large" numbers.
+    - Analog clock with start/reset controls.
+    - Reveal Solution feature showing step-by-step calculations.
+    - Shareable URLs for specific puzzles.
+
+*Status: Stable. Core game logic and solver implemented.*
+[Documentation](./web/app/games/countdown/HELP.md)
+
+#### Pointless
+A classroom game inspired by the TV show *Pointless*. Students strive for the most obscure correct answers to mathematical questions.
+- **Features**:
+    - Select categories (Factors, Multiples, Primes, etc.).
+    - Adjust number ranges and constraints.
+    - Built-in timer (1m, 2m, 5m).
+    - Reveal Answers toggle.
+    - Shareable URLs.
+
+*Status: Stable. Core game logic and URL sharing implemented.*
+[Documentation](./web/app/games/pointless/HELP.md)
 
 ## Key Features
 
@@ -129,6 +170,7 @@ mathtools/
 - **`web/app/`**: Contains the route segments and page definitions.
   - **`mathematics/`**: Dedicated section for interactive mathematics tools (e.g., Algebra Tiles).
   - **`computing/`**: Dedicated section for computing tools (e.g., Circuit Designer).
+  - **`games/`**: Dedicated section for classroom games (e.g., Countdown).
     - **`[tool-name]/`**: Each tool (e.g., `algebra-tiles`) has its own subdirectory containing its page, `HELP.md`, and tool-specific local components.
 - **`web/components/`**: Shared reusable components. [Documentation](./web/components/README.md)
   - **`tool-ui/`**: Components shared across multiple tools (e.g., `Canvas`, `TileBase`, `Toolbar`, `HelpModal`).
