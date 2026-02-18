@@ -1,15 +1,18 @@
 "use client"
 
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { InteractiveToolLayout } from '@/components/tool-ui/interactive-tool-layout';
 import { ResolutionGuard } from '@/components/tool-ui/resolution-guard';
 import { SetPageTitle } from '@/components/set-page-title';
+import { HelpModal } from '@/components/tool-ui/help-modal';
+import { HelpButton } from '@/components/tool-ui/help-button';
 import { useFractionWall } from './_hooks/use-fraction-wall';
 import { fractionWallURLSerializer } from './_lib/url-state';
 import { useUrlState } from '@/lib/hooks/use-url-state';
 import { FractionWallSVG } from './_components/fraction-wall-svg';
 import { FractionWallSidebar } from './_components/fraction-wall-sidebar';
 import { exportSVGElement } from '@/lib/export/canvas-export';
+import helpContent from './HELP.md';
 
 function FractionWallContent() {
     const {
@@ -25,6 +28,8 @@ function FractionWallContent() {
         setShowEquivalenceLines,
         initFromState
     } = useFractionWall();
+
+    const [isHelpOpen, setIsHelpOpen] = useState(false);
 
     const { hasRestored, getShareableUrl, copyShareableUrl } = useUrlState(fractionWallURLSerializer, {
         onRestore: (state) => {
@@ -73,7 +78,7 @@ function FractionWallContent() {
                 />
             }
         >
-            <div className="flex-1 bg-slate-50 dark:bg-slate-950 p-8 overflow-auto flex items-center justify-center min-h-0">
+            <div className="flex-1 bg-slate-50 dark:bg-slate-950 p-8 overflow-auto flex items-center justify-center min-h-0 relative">
                 <div className="w-full max-w-5xl bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-8">
                     <FractionWallSVG
                         visibleDenominators={visibleDenominators}
@@ -84,7 +89,20 @@ function FractionWallContent() {
                         onSegmentClick={toggleSegment}
                     />
                 </div>
+
+                {/* Help Button positioned in bottom-left of the canvas area */}
+                <div className="absolute bottom-6 left-6">
+                    <HelpButton onClick={() => setIsHelpOpen(true)} />
+                </div>
             </div>
+
+            {/* Help Modal */}
+            {isHelpOpen && (
+                <HelpModal
+                    onClose={() => setIsHelpOpen(false)}
+                    content={helpContent}
+                />
+            )}
         </InteractiveToolLayout>
     );
 }
