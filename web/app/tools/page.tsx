@@ -67,6 +67,13 @@ export default function ToolsPage() {
                                 gradient="from-rose-500 to-orange-500"
                                 icon={<Rows2 className="w-8 h-8 text-rose-500" />}
                             />
+                            <ToolCard
+                                title="Number Line"
+                                description="Explore directed number, scale, and decimals. Zoom in/out, place draggable points, and draw directional jump arcs."
+                                href="/mathematics/number-line"
+                                gradient="from-emerald-500 to-teal-500"
+                                icon={<Rows2 className="w-8 h-8 text-emerald-500" />}
+                            />
                         </div>
                     </div>
 
