@@ -92,7 +92,10 @@ export function NumberLineSidebar({
                         <input
                             type="number"
                             value={viewport.min}
-                            onChange={(e) => onSetRange(parseFloat(e.target.value), viewport.max)}
+                            onChange={(e) => {
+                                const val = parseFloat(e.target.value);
+                                if (!isNaN(val)) onSetRange(val, viewport.max);
+                            }}
                             className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                         />
                     </div>
@@ -101,7 +104,10 @@ export function NumberLineSidebar({
                         <input
                             type="number"
                             value={viewport.max}
-                            onChange={(e) => onSetRange(viewport.min, parseFloat(e.target.value))}
+                            onChange={(e) => {
+                                const val = parseFloat(e.target.value);
+                                if (!isNaN(val)) onSetRange(viewport.min, val);
+                            }}
                             className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                         />
                     </div>

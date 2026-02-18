@@ -24,6 +24,7 @@ function NumberLineContent() {
         hideValues,
         snapToTicks,
         setRange,
+        zoom,
         zoomIn,
         zoomOut,
         addPoint,
@@ -109,8 +110,8 @@ function NumberLineContent() {
                         showLabels={showLabels}
                         hideValues={hideValues}
                         onPointMove={movePoint}
-                        onZoom={() => {
-                            // Wheel handled in SVG, buttons in sidebar
+                        onZoom={(focal, factor) => {
+                            zoom(factor, focal);
                         }}
                     />
                 </div>

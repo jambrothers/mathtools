@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import {
     Viewport,
     zoomViewport,
@@ -26,7 +26,8 @@ export function useNumberLine() {
     const [hideValues, setHideValues] = useState(false);
     const [snapToTicks, setSnapToTicks] = useState(true);
 
-    const viewport: Viewport = { min, max };
+    // Memoize viewport to prevent unnecessary re-renders and stabilize hook dependencies
+    const viewport = useMemo<Viewport>(() => ({ min, max }), [min, max]);
 
     // Viewport Actions
     const setRange = useCallback((newMin: number, newMax: number) => {
@@ -35,17 +36,19 @@ export function useNumberLine() {
         setMax(clamped.max);
     }, []);
 
-    const zoomIn = useCallback((focalPoint?: number) => {
-        const next = zoomViewport(viewport, 1 / ZOOM_FACTOR, focalPoint);
+    const zoom = useCallback((factor: number, focalPoint?: number) => {
+        const next = zoomViewport(viewport, factor, focalPoint);
         setMin(next.min);
         setMax(next.max);
     }, [viewport]);
 
-    const zoomOut = useCallback((focalPoint?: number) => {
-        const next = zoomViewport(viewport, ZOOM_FACTOR, focalPoint);
-        setMin(next.min);
-        setMax(next.max);
-    }, [viewport]);
+    const zoomIn = useCallback(() => {
+        zoom(1 / ZOOM_FACTOR);
+    }, [zoom]);
+
+    const zoomOut = useCallback(() => {
+        zoom(ZOOM_FACTOR);
+    }, [zoom]);
 
     const applyPreset = useCallback((newMin: number, newMax: number) => {
         setRange(newMin, newMax);
@@ -125,6 +128,7 @@ export function useNumberLine() {
         setMin,
         setMax,
         setRange,
+        zoom,
         zoomIn,
         zoomOut,
         applyPreset,
