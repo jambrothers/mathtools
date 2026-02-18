@@ -18,8 +18,8 @@ export function useDraggable(
     initialPos: Position,
     options: UseDraggableOptions = {}
 ) {
-    // keeping track of local visual position during drag to avoid jank
-    const [position, setPosition] = useState(initialPos);
+    // Local state for the drag position. Only used when isDragging is true.
+    const [dragPosition, setDragPosition] = useState(initialPos);
     // Track if we are actively dragging (passed threshold)
     const [isDragging, setIsDragging] = useState(false);
 
@@ -28,6 +28,10 @@ export function useDraggable(
     const [dragStartPointer, setDragStartPointer] = useState<Position | null>(null);
     const [startPos, setStartPos] = useState<Position | null>(null);
     const prevPointerRef = React.useRef<Position | null>(null);
+
+    // Derived position: use local drag state if dragging, otherwise directly use props.
+    // This avoids syncing state and causing double-renders when parent updates (e.g. multi-select drag).
+    const position = isDragging ? dragPosition : initialPos;
 
     // Refs to avoid re-attaching listeners on every render/move
     const optionsRef = React.useRef(options);
@@ -40,16 +44,6 @@ export function useDraggable(
     React.useEffect(() => {
         positionRef.current = position;
     }, [position]);
-
-    // Track previous initialPos to detect changes during render
-    const [prevInitialPos, setPrevInitialPos] = useState(initialPos);
-
-    // Derived State Pattern: Sync position when initialPos changes (and not dragging)
-    // This avoids a double render cycle (render -> effect -> setState -> render)
-    if (!isDragging && (initialPos.x !== prevInitialPos.x || initialPos.y !== prevInitialPos.y)) {
-        setPrevInitialPos(initialPos);
-        setPosition(initialPos);
-    }
 
     const handlePointerDown = useCallback((e: React.PointerEvent) => {
         if (optionsRef.current.disabled) return;
@@ -110,7 +104,7 @@ export function useDraggable(
             const deltaX = newPos.x - positionRef.current.x;
             const deltaY = newPos.y - positionRef.current.y;
 
-            setPosition(newPos);
+            setDragPosition(newPos);
             positionRef.current = newPos; // Update ref immediately so handlers see it
 
             currentOptions.onDragMove?.(id, newPos, { x: deltaX, y: deltaY });
