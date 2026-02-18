@@ -167,9 +167,9 @@ describe('Double Sided Counters Interaction', () => {
 
         const canvas = screen.getByTestId('counter-canvas');
 
-        fireEvent.pointerDown(canvas, { clientX: 0, clientY: 0 });
-        fireEvent.pointerMove(canvas, { clientX: 150, clientY: 150 });
-        fireEvent.pointerUp(canvas);
+        fireEvent.pointerDown(canvas, { clientX: 0, clientY: 0, offsetX: 0, offsetY: 0 });
+        fireEvent.pointerMove(canvas, { clientX: 150, clientY: 150, offsetX: 150, offsetY: 150 });
+        fireEvent.pointerUp(canvas, { clientX: 150, clientY: 150, offsetX: 150, offsetY: 150 });
 
         expect(handleMarqueeSelect).toHaveBeenCalled();
         expect(handleMarqueeSelect).toHaveBeenCalledTimes(1);

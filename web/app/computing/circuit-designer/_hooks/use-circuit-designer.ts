@@ -316,7 +316,6 @@ export function useCircuitDesigner() {
         // Validate type to prevent crash/DoS
         // Use hasOwnProperty to prevent Prototype Pollution attacks (e.g. "constructor")
         if (!Object.prototype.hasOwnProperty.call(COMPONENT_TYPES, type)) {
-        if (!COMPONENT_TYPES[type]) {
             console.warn(`[Security] Attempted to add invalid component type: ${type}`);
             return;
         }
