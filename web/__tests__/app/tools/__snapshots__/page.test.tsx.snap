@@ -97,7 +97,7 @@ exports[`Tools Page matches snapshot 1`] = `
                 <div
                   class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
                 >
-                  Launch Tool
+                  Open
                   <svg
                     aria-hidden="true"
                     class="lucide lucide-arrow-right ml-2 w-4 h-4"
@@ -203,7 +203,7 @@ exports[`Tools Page matches snapshot 1`] = `
                 <div
                   class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
                 >
-                  Launch Tool
+                  Open
                   <svg
                     aria-hidden="true"
                     class="lucide lucide-arrow-right ml-2 w-4 h-4"
@@ -282,7 +282,7 @@ exports[`Tools Page matches snapshot 1`] = `
                 <div
                   class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
                 >
-                  Launch Tool
+                  Open
                   <svg
                     aria-hidden="true"
                     class="lucide lucide-arrow-right ml-2 w-4 h-4"
@@ -388,7 +388,7 @@ exports[`Tools Page matches snapshot 1`] = `
                 <div
                   class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
                 >
-                  Launch Tool
+                  Open
                   <svg
                     aria-hidden="true"
                     class="lucide lucide-arrow-right ml-2 w-4 h-4"
@@ -470,7 +470,7 @@ exports[`Tools Page matches snapshot 1`] = `
                 <div
                   class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
                 >
-                  Launch Tool
+                  Open
                   <svg
                     aria-hidden="true"
                     class="lucide lucide-arrow-right ml-2 w-4 h-4"
@@ -555,6 +555,158 @@ exports[`Tools Page matches snapshot 1`] = `
                     class="text-[var(--theme-muted)] leading-relaxed"
                   >
                     Explore arithmetic, geometric, and quadratic sequences. Reveal terms one by one and find the nth term rule.
+                  </p>
+                </div>
+                <div
+                  class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
+                >
+                  Open
+                  <svg
+                    aria-hidden="true"
+                    class="lucide lucide-arrow-right ml-2 w-4 h-4"
+                    fill="none"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12h14"
+                    />
+                    <path
+                      d="m12 5 7 7-7 7"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </a>
+            <a
+              class="group relative block w-full h-full"
+              href="/mathematics/fraction-wall"
+            >
+              <div
+                class="relative h-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card)] shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col justify-between"
+              >
+                <div
+                  class="relative z-10"
+                >
+                  <div
+                    class="mb-4 inline-flex items-center justify-center rounded-lg bg-[var(--theme-page)] p-3 border border-[var(--theme-border)]"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="lucide lucide-rows2 lucide-rows-2 w-8 h-8 text-rose-500"
+                      fill="none"
+                      height="24"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                      width="24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <rect
+                        height="18"
+                        rx="2"
+                        width="18"
+                        x="3"
+                        y="3"
+                      />
+                      <path
+                        d="M3 12h18"
+                      />
+                    </svg>
+                  </div>
+                  <h3
+                    class="mb-2 text-xl font-bold tracking-tight text-[var(--theme-main)] group-hover:text-[var(--color-primary)] transition-colors font-[family-name:var(--font-heading)]"
+                  >
+                    Fraction Wall
+                  </h3>
+                  <p
+                    class="text-[var(--theme-muted)] leading-relaxed"
+                  >
+                    Visualise unit fractions and equivalence. Shade segments, toggle labels, and use vertical guides to find equal fractions.
+                  </p>
+                </div>
+                <div
+                  class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
+                >
+                  Open
+                  <svg
+                    aria-hidden="true"
+                    class="lucide lucide-arrow-right ml-2 w-4 h-4"
+                    fill="none"
+                    height="24"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12h14"
+                    />
+                    <path
+                      d="m12 5 7 7-7 7"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </a>
+            <a
+              class="group relative block w-full h-full"
+              href="/mathematics/fraction-wall"
+            >
+              <div
+                class="relative h-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-card)] shadow-sm hover:shadow-md transition-shadow p-6 flex flex-col justify-between"
+              >
+                <div
+                  class="relative z-10"
+                >
+                  <div
+                    class="mb-4 inline-flex items-center justify-center rounded-lg bg-[var(--theme-page)] p-3 border border-[var(--theme-border)]"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="lucide lucide-rows2 lucide-rows-2 w-8 h-8 text-rose-500"
+                      fill="none"
+                      height="24"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                      width="24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <rect
+                        height="18"
+                        rx="2"
+                        width="18"
+                        x="3"
+                        y="3"
+                      />
+                      <path
+                        d="M3 12h18"
+                      />
+                    </svg>
+                  </div>
+                  <h3
+                    class="mb-2 text-xl font-bold tracking-tight text-[var(--theme-main)] group-hover:text-[var(--color-primary)] transition-colors font-[family-name:var(--font-heading)]"
+                  >
+                    Fraction Wall
+                  </h3>
+                  <p
+                    class="text-[var(--theme-muted)] leading-relaxed"
+                  >
+                    Visualise unit fractions and equivalence. Shade segments, toggle labels, and use vertical guides to find equal fractions.
                   </p>
                 </div>
                 <div
@@ -690,7 +842,7 @@ exports[`Tools Page matches snapshot 1`] = `
                 <div
                   class="relative z-10 mt-6 flex items-center font-medium text-[var(--color-primary)] group-hover:translate-x-1 transition-transform"
                 >
-                  Launch Tool
+                  Open
                   <svg
                     aria-hidden="true"
                     class="lucide lucide-arrow-right ml-2 w-4 h-4"

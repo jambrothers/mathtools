@@ -15,6 +15,9 @@ export default function Home() {
                 the classroom
                 {/*</span> */}
               </h1>
+              <p className="text-sm md:text-base font-medium text-[var(--color-primary)] mb-6">
+                Built by a mathematics teacher, here in the UK • Free • No accounts needed
+              </p>
               <p className="text-lg md:text-xl text-[var(--theme-muted)] max-w-2xl mx-auto lg:mx-0 leading-relaxed mb-8">
                 Free, no login tools designed for your classroom. Visualise algebraic concepts, number, circuits and statistics to deepen understanding and aid exposition.
               </p>

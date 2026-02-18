@@ -314,6 +314,8 @@ export function useCircuitDesigner() {
 
     const addNode = (type: ComponentTypeName) => {
         // Validate type to prevent crash/DoS
+        // Use hasOwnProperty to prevent Prototype Pollution attacks (e.g. "constructor")
+        if (!Object.prototype.hasOwnProperty.call(COMPONENT_TYPES, type)) {
         if (!COMPONENT_TYPES[type]) {
             console.warn(`[Security] Attempted to add invalid component type: ${type}`);
             return;
@@ -346,7 +348,8 @@ export function useCircuitDesigner() {
 
     const addNodeAtPosition = (type: ComponentTypeName, x: number, y: number) => {
         // Validate type to prevent crash/DoS
-        if (!COMPONENT_TYPES[type]) {
+        // Use hasOwnProperty to prevent Prototype Pollution attacks (e.g. "constructor")
+        if (!Object.prototype.hasOwnProperty.call(COMPONENT_TYPES, type)) {
             console.warn(`[Security] Attempted to add invalid component type: ${type}`);
             return;
         }

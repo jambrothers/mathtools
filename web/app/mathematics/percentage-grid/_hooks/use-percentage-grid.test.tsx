@@ -271,3 +271,115 @@ it('uses dynamic columns for drag rectangle', () => {
     expect(result.current.selectedIndices.size).toBe(4);
 });
 
+
+describe('Dual Grid Support', () => {
+    it('toggles second grid visibility', () => {
+        const { result } = renderHook(() => usePercentageGrid());
+        expect(result.current.showSecondGrid).toBe(false);
+
+        act(() => {
+            result.current.toggleSecondGrid();
+        });
+        expect(result.current.showSecondGrid).toBe(true);
+    });
+
+    it('interacts with second grid independently', () => {
+        const { result } = renderHook(() => usePercentageGrid());
+
+        act(() => {
+            result.current.toggleSecondGrid();
+        });
+
+        // Grid 1 interaction
+        act(() => {
+            result.current.toggleSquare(0);
+        });
+        expect(result.current.selectedIndices.has(0)).toBe(true);
+        expect(result.current.selectedIndices2.has(0)).toBe(false);
+
+        // Grid 2 interaction
+        act(() => {
+            result.current.toggleSquare2(5);
+        });
+        expect(result.current.selectedIndices.has(5)).toBe(false);
+        expect(result.current.selectedIndices2.has(5)).toBe(true);
+    });
+
+    it('sums selections for FDP display when second grid is active', () => {
+        const { result } = renderHook(() => usePercentageGrid());
+
+        act(() => {
+            result.current.toggleSecondGrid();
+            result.current.fillPercent(100); // 100 on grid 1
+        });
+
+        act(() => {
+            result.current.toggleSquare2(0); // 1 on grid 2
+        });
+
+        // Total = 101 squares
+        expect(result.current.percentageDisplay).toBe('101%');
+        expect(result.current.fractionDisplay).toBe('101/100');
+        expect(result.current.decimalDisplay).toBe('1.01');
+    });
+
+    it('ignores second grid selection for FDP if hidden', () => {
+        const { result } = renderHook(() => usePercentageGrid());
+
+        act(() => {
+            result.current.toggleSecondGrid();
+            result.current.toggleSquare2(0);
+        });
+
+        // Should see 1%
+        expect(result.current.percentageDisplay).toBe('1%');
+
+        act(() => {
+            result.current.toggleSecondGrid(); // Hide it
+        });
+
+        // Should see 0% (grid 1 is empty)
+        expect(result.current.percentageDisplay).toBe('0%');
+        // Logic clears grid 2 on hide? Let's verify that expectation
+        expect(result.current.selectedIndices2.size).toBe(0);
+    });
+
+    it('migrates selection on grid mode change for both grids', () => {
+        const { result } = renderHook(() => usePercentageGrid());
+
+        act(() => {
+            result.current.toggleSecondGrid();
+            result.current.fillPercent(50); // 50 on grid 1
+            // Manually fill 50% on grid 2 (0-49)
+            for (let i = 0; i < 50; i++) result.current.toggleSquare2(i);
+        });
+
+        expect(result.current.selectedIndices.size).toBe(50);
+        expect(result.current.selectedIndices2.size).toBe(50);
+
+        // Switch to 10x2 (20 cells total)
+        // 50% of 20 = 10 cells
+        act(() => {
+            result.current.setGridMode('10x2');
+        });
+
+        expect(result.current.selectedIndices.size).toBe(10);
+        expect(result.current.selectedIndices2.size).toBe(10);
+    });
+
+    it('simplifies fraction to whole number when denominator is 1 (e.g. 200/100 -> 2)', () => {
+        const { result } = renderHook(() => usePercentageGrid());
+
+        act(() => {
+            result.current.toggleSecondGrid();
+            result.current.toggleSimplifyFraction(); // Enable simplification
+            result.current.fillPercent(100); // Grid 1 full
+
+            // Grid 2 full
+            const allIndices = Array.from({ length: 100 }, (_, i) => i);
+            result.current.setFromIndices2(allIndices);
+        });
+
+        expect(result.current.fractionDisplay).toBe('2');
+    });
+});

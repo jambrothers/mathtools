@@ -36,8 +36,8 @@ describe('parseList', () => {
 
     it('handles large input without crashing (allocation check)', () => {
         // Create a large string that would cause memory issues if split entirely
-        // 1 million items
-        const largeString = 'a;'.repeat(1000000);
+        // 40,000 items (80,000 chars) < MAX_INPUT_LENGTH (100,000)
+        const largeString = 'a;'.repeat(40000);
 
         const start = performance.now();
         const result = parseList(largeString, (part) => part, { maxItems: 10 });
@@ -64,10 +64,7 @@ describe('parseList', () => {
     });
 
     it('respects custom maxItemLength', () => {
-        const input = 'a;b;c';
-        // maxItemLength 0 means anything > 0 is skipped (essentially empty strings only?)
-        // Wait, length > 0.
-        // Let's use maxItemLength 1. 'abc' is length 3, should be skipped.
+        // Let's use maxItemLength 2. 'abc' is length 3, should be skipped.
         const result = parseList('a;abc;b', (part) => part, { maxItemLength: 2 });
         expect(result).toEqual(['a', 'b']);
     });

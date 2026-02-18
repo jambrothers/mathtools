@@ -12,6 +12,8 @@ import { GRID_MODES, GridMode } from '../constants';
 export interface PercentageGridURLState {
     gridMode: GridMode;
     selectedIndices: number[];
+    showSecondGrid: boolean;
+    selectedIndices2: number[];
     showPanel: boolean;
     showPercentage: boolean;
     showDecimal: boolean;
@@ -22,6 +24,8 @@ export interface PercentageGridURLState {
 
 const PARAM_MODE = 'gm';
 const PARAM_SELECTED = 's';
+const PARAM_SHOW_SECOND = 'sg';
+const PARAM_SELECTED_2 = 's2';
 const PARAM_PANEL = 'p';
 const PARAM_PERCENTAGE = 'pc';
 const PARAM_DECIMAL = 'dc';
@@ -43,11 +47,24 @@ function parseSelectedIndices(value: string | null, maxItems: number): number[] 
 export const percentageGridURLSerializer: URLStateSerializer<PercentageGridURLState> = {
     serialize(state: PercentageGridURLState): URLSearchParams {
         const params = new URLSearchParams();
+
+        // Grid 1
         const sorted = [...state.selectedIndices].sort((a, b) => a - b);
         const serialized = serializeList(sorted, (index) => String(index));
         if (serialized) {
             params.set(PARAM_SELECTED, serialized);
         }
+
+        // Grid 2
+        if (state.showSecondGrid) {
+            params.set(PARAM_SHOW_SECOND, '1');
+            const sorted2 = [...state.selectedIndices2].sort((a, b) => a - b);
+            const serialized2 = serializeList(sorted2, (index) => String(index));
+            if (serialized2) {
+                params.set(PARAM_SELECTED_2, serialized2);
+            }
+        }
+
         params.set(PARAM_MODE, state.gridMode);
         params.set(PARAM_PANEL, serializeBool(state.showPanel));
         params.set(PARAM_PERCENTAGE, serializeBool(state.showPercentage));
@@ -61,6 +78,8 @@ export const percentageGridURLSerializer: URLStateSerializer<PercentageGridURLSt
         const hasAny = hasAnyParam(params, [
             PARAM_MODE,
             PARAM_SELECTED,
+            PARAM_SHOW_SECOND,
+            PARAM_SELECTED_2,
             PARAM_PANEL,
             PARAM_PERCENTAGE,
             PARAM_DECIMAL,
@@ -75,9 +94,18 @@ export const percentageGridURLSerializer: URLStateSerializer<PercentageGridURLSt
         const config = GRID_MODES.find(m => m.id === gridMode)!;
 
         const selectedIndices = parseSelectedIndices(params.get(PARAM_SELECTED), config.totalCells);
+
+        const showSecondGrid = deserializeBool(params.get(PARAM_SHOW_SECOND), false);
+        // Only parse selected indices for grid 2 if it's shown? 
+        // Or always parse to be safe, but default to empty if not present.
+        // It's safer to always parse if present.
+        const selectedIndices2 = parseSelectedIndices(params.get(PARAM_SELECTED_2), config.totalCells);
+
         return {
             gridMode,
             selectedIndices,
+            showSecondGrid,
+            selectedIndices2,
             showPanel: deserializeBool(params.get(PARAM_PANEL), true),
             showPercentage: deserializeBool(params.get(PARAM_PERCENTAGE), false),
             showDecimal: deserializeBool(params.get(PARAM_DECIMAL), false),

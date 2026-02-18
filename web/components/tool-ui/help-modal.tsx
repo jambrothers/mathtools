@@ -27,6 +27,15 @@ export function HelpModal({ content, onClose }: HelpModalProps) {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [onClose]);
+    const titleId = React.useId()
+    const closeButtonRef = React.useRef<HTMLButtonElement>(null)
+
+    React.useEffect(() => {
+        // Focus the close button when the modal mounts
+        if (closeButtonRef.current) {
+            closeButtonRef.current.focus()
+        }
+    }, [])
 
     return (
         <div
@@ -38,6 +47,7 @@ export function HelpModal({ content, onClose }: HelpModalProps) {
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="help-modal-title"
+                aria-labelledby={titleId}
                 data-testid="help-modal-content"
                 className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-600 max-w-2xl w-full max-h-[80vh] flex flex-col"
                 onClick={(e) => e.stopPropagation()}
@@ -45,9 +55,14 @@ export function HelpModal({ content, onClose }: HelpModalProps) {
                 {/* Header */}
                 <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 rounded-t-xl">
                     <h2 id="help-modal-title" className="text-xl font-bold flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                    <h2
+                        id={titleId}
+                        className="text-xl font-bold flex items-center gap-2 text-indigo-600 dark:text-indigo-400"
+                    >
                         <HelpCircle size={20} /> Help Guide
                     </h2>
                     <button
+                        ref={closeButtonRef}
                         onClick={onClose}
                         aria-label="Close"
                         className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white"

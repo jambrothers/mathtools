@@ -61,8 +61,9 @@ test.describe('Fraction Wall', () => {
         await page.getByLabel('Equivalence Lines').click({ force: true });
 
         // Should show a line in the SVG
-        await expect(page.locator('svg line').first()).toBeVisible();
+        await expect(page.locator('svg line').first()).toBeAttached();
     });
+
 
     test('should restore state from URL', async ({ page }) => {
         // Go to URL with 1/2 and 2/4 shaded

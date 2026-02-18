@@ -11,25 +11,42 @@ interface UseGridLayoutProps {
     cols: number;
     padding?: number;
     maxWidth?: number;
+    gridCount?: number;
 }
 
 export function calculateGridDimensions(
     availableWidth: number,
     availableHeight: number,
-
     padding: number = 48,
-    maxWidth: number = 1000
+    maxWidth: number = 1000,
+    gridCount: number = 1
 ): GridDimensions {
     // Calculate max available dimensions for the GRID itself (subtracting card padding)
-    const maxAvailableGridWidth = Math.min(availableWidth - padding, maxWidth);
+    // padding represents the chrome around the grid squares (e.g. p-6 = 24px * 2 = 48px)
+    // If we have multiple grids, we have multiple sets of chrome.
+
+    const gap = padding / 2;
+    const totalGapWidth = (gridCount > 1 ? (gridCount - 1) * gap : 0);
+    const totalChromeWidth = padding * gridCount;
+
+    // Width available for ALL grid SQUARES combined
+    // We cap the *single grid* width at maxWidth, so for total we use maxWidth * gridCount
+    // But we must check against available width minus all gaps and chrome
+    const maxSquareWidthAllowed = maxWidth * gridCount;
+    const availableForSquares = Math.max(0, availableWidth - totalGapWidth - totalChromeWidth);
+
+    const maxAvailableTotalSquaresWidth = Math.min(availableForSquares, maxSquareWidthAllowed);
+
+    // Width per grid squares
+    const widthPerGridSquares = maxAvailableTotalSquaresWidth / gridCount;
+
     const maxAvailableGridHeight = availableHeight - padding;
 
     // Always use a square footprint so the card size is consistent
-    // across all grid modes (10x10, 10x5, 10x2, 10x1)
-    const gridSize = Math.min(maxAvailableGridWidth, maxAvailableGridHeight);
+    const gridSize = Math.min(widthPerGridSquares, maxAvailableGridHeight);
 
     return {
-        width: gridSize + padding,
+        width: gridSize + padding, // This includes padding back into the returned "card" size
         height: gridSize + padding
     };
 }
@@ -39,7 +56,8 @@ export function useGridLayout({
     rows,
     cols,
     padding = 48,
-    maxWidth = 1000
+    maxWidth = 1000,
+    gridCount = 1
 }: UseGridLayoutProps) {
     const [dimensions, setDimensions] = useState<GridDimensions | null>(null);
 
@@ -51,13 +69,13 @@ export function useGridLayout({
             if (!entry) return;
 
             const { width, height } = entry.contentRect;
-            const newDimensions = calculateGridDimensions(width, height, padding, maxWidth);
+            const newDimensions = calculateGridDimensions(width, height, padding, maxWidth, gridCount);
             setDimensions(newDimensions);
         });
 
         observer.observe(containerRef.current);
         return () => observer.disconnect();
-    }, [containerRef, rows, cols, padding, maxWidth]);
+    }, [containerRef, rows, cols, padding, maxWidth, gridCount]);
 
     return dimensions;
 }

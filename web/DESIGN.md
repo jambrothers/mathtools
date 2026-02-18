@@ -279,6 +279,10 @@ The interactive tools have their own considerations:
 | 2rem+ border radius | Feels like a toy | 8-12px is professional |
 | Animated gradients | Performance issues, distracting | Static, purposeful color |
 
+> [!NOTE]
+> **Exception for Schematic Tools:** Tools that represent physical or electronic schematics (like Circuit Designer) may use subtle technical backgrounds (e.g., dot grids, graph paper) to enhance the metaphor, provided they remain low-contrast and non-distracting.
+
+
 ---
 
 ## Implementation Checklist

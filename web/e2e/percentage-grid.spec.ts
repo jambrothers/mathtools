@@ -156,4 +156,66 @@ test.describe('Percentage Grid', () => {
         await expect(page.getByTestId('column-labels')).not.toBeVisible();
         await expect(page.getByTestId('row-labels')).not.toBeVisible();
     });
+    test('should support dual grid mode', async ({ page }) => {
+        // 1. Enable Dual Grid
+        await page.getByRole('button', { name: '+ Grid' }).click();
+
+        // Should now have 2 grids
+        // Note: The role='grid' might be on the SVG or inner div?
+        // In percentage-grid.tsx: <div role="grid" ...>
+        // So we should find 2 elements with role grid
+        await expect(page.getByRole('grid')).toHaveCount(2);
+
+        // 2. Enable Percentage Display
+        await page.getByRole('button', { name: 'Percentage' }).click();
+
+        // 3. Interact with Grid 2
+        const grid2 = page.getByRole('grid').nth(1);
+        const squares2 = grid2.getByRole('button');
+        await squares2.nth(0).click();
+
+        // 4. Verify FDP (should be 1%)
+        // If grid 1 is empty and grid 2 has 1 square, total is 1%.
+        await expect(page.getByText('1%')).toBeVisible();
+
+        // 4. Fill Grid 1 (Partial) to verify total > 1%
+        // We'll just click a square on Grid 1 to increase count
+        const grid1 = page.getByRole('grid').nth(0);
+        await grid1.getByRole('button').nth(0).click();
+
+    });
+
+
+
+    test('dual grid should fit on tablet', async ({ page }) => {
+        // Enable Dual Grid
+        await page.getByRole('button', { name: '+ Grid' }).click();
+        await expect(page.getByRole('grid')).toHaveCount(2);
+
+        // Resize to Tablet
+        await page.setViewportSize({ width: 768, height: 1024 });
+        await page.waitForTimeout(200);
+
+        // Both grids should be visible
+        const grid1 = page.getByRole('grid').nth(0);
+        const grid2 = page.getByRole('grid').nth(1);
+
+        await expect(grid1).toBeVisible();
+        await expect(grid2).toBeVisible();
+
+        // Check they are side-by-side (y positions roughly equal)
+        const box1 = await grid1.boundingBox();
+        const box2 = await grid2.boundingBox();
+
+        if (!box1 || !box2) throw new Error('Grids not visible');
+
+        // Allow some small pixel diff due to layout/borders
+        expect(Math.abs(box1.y - box2.y)).toBeLessThan(20);
+
+        // Ensure they fit within viewport width
+        // Box1 Right < Box2 Left
+        expect(box1.x + box1.width).toBeLessThan(box2.x);
+        // Box2 Right < 768
+        expect(box2.x + box2.width).toBeLessThan(768);
+    });
 });

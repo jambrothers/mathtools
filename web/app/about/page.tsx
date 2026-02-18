@@ -3,12 +3,12 @@ export default function AboutPage() {
         <div className="min-h-screen pt-24 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
                 <h1 className="text-4xl md:text-5xl font-bold text-[var(--theme-main)] mb-8 font-[family-name:var(--font-heading)]">
-                    About <span className="text-[var(--color-primary)]">MathTools</span>
+                    About <span className="text-[var(--color-primary)]">TeachMaths.net</span>
                 </h1>
 
                 <div className="prose prose-lg dark:prose-invert">
                     <p className="text-xl text-[var(--theme-muted)] leading-relaxed mb-6">
-                        MathTools is a collection of interactive digital tools designed to bridge the gap between abstract mathematical concepts and concrete understanding.
+                        TeachMaths.net is a collection of interactive digital tools designed to bridge the gap between abstract mathematical concepts and concrete understanding.
                     </p>
 
                     <div className="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl p-8 mb-8">

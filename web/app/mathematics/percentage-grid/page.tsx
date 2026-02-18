@@ -42,6 +42,8 @@ function PercentageGridPageContent() {
         cols,
         rows,
         totalCells,
+
+        // Grid 1
         selectedIndices,
         dragPreviewBounds,
         isDragging,
@@ -49,13 +51,28 @@ function PercentageGridPageContent() {
         startDrag,
         dragEnter,
         endDrag,
+
+        // Grid 2
+        showSecondGrid,
+        toggleSecondGrid,
+        selectedIndices2,
+        dragPreviewBounds2,
+        isDragging2,
+        toggleSquare2,
+        startDrag2,
+        dragEnter2,
+        endDrag2,
+
         fillPercent,
         clear,
         setFromIndices,
+        setFromIndices2,
         setDisplayOptions,
+
         percentageDisplay,
         decimalDisplay,
         fractionDisplay,
+
         showPanel,
         showPercentage,
         showDecimal,
@@ -75,7 +92,8 @@ function PercentageGridPageContent() {
     const gridDimensions = useGridLayout({
         containerRef,
         rows,
-        cols
+        cols,
+        gridCount: showSecondGrid ? 2 : 1
     });
 
     const [activeDropdown, setActiveDropdown] = React.useState<'gridMode' | null>(null);
@@ -103,7 +121,11 @@ function PercentageGridPageContent() {
                 showFraction: state.showFraction,
                 simplifyFraction: state.simplifyFraction,
                 showLabels: state.showLabels,
+                showSecondGrid: state.showSecondGrid,
             });
+            if (state.showSecondGrid) {
+                setFromIndices2(state.selectedIndices2);
+            }
         }
     });
 
@@ -111,6 +133,8 @@ function PercentageGridPageContent() {
         const state: PercentageGridURLState = {
             gridMode,
             selectedIndices: Array.from(selectedIndices).sort((a, b) => a - b),
+            showSecondGrid,
+            selectedIndices2: Array.from(selectedIndices2).sort((a, b) => a - b),
             showPanel,
             showPercentage,
             showDecimal,
@@ -119,7 +143,7 @@ function PercentageGridPageContent() {
             showLabels,
         };
         await copyShareableUrl(state);
-    }, [copyShareableUrl, gridMode, selectedIndices, showPanel, showPercentage, showDecimal, showFraction, simplifyFraction, showLabels]);
+    }, [copyShareableUrl, gridMode, selectedIndices, showSecondGrid, selectedIndices2, showPanel, showPercentage, showDecimal, showFraction, simplifyFraction, showLabels]);
 
     return (
         <div className="flex flex-col h-[calc(100vh-81px)] w-full bg-slate-50 dark:bg-slate-950 overflow-hidden">
@@ -181,6 +205,14 @@ function PercentageGridPageContent() {
 
                     <ToolbarSeparator />
                     <ToolbarButton
+                        label={showSecondGrid ? "+ Grid" : "+ Grid"}
+                        onClick={toggleSecondGrid}
+                        active={showSecondGrid}
+                        aria-pressed={showSecondGrid}
+                    />
+
+                    <ToolbarSeparator />
+                    <ToolbarButton
                         label={showPanel ? "Panel" : "Panel"}
                         onClick={togglePanel}
                         active={showPanel}
@@ -223,26 +255,54 @@ function PercentageGridPageContent() {
             <Canvas className="flex-1">
                 <div ref={containerRef} className="relative flex h-full w-full items-center justify-center p-6 py-12 overflow-hidden">
                     {gridDimensions && (
-                        <div
-                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-4 sm:p-6 flex flex-col items-center justify-center"
-                            style={{
-                                width: gridDimensions.width,
-                                height: gridDimensions.height,
-                            }}
-                        >
-                            <PercentageGrid
-                                selectedIndices={selectedIndices}
-                                dragPreviewBounds={dragPreviewBounds}
-                                isDragging={isDragging}
-                                rows={rows}
-                                cols={cols}
-                                totalCells={totalCells}
-                                showLabels={showLabels}
-                                onToggle={toggleSquare}
-                                onDragStart={startDrag}
-                                onDragEnter={dragEnter}
-                                onDragEnd={endDrag}
-                            />
+                        <div className="flex gap-6 items-center justify-center">
+                            {/* Grid 1 */}
+                            <div
+                                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-4 sm:p-6 flex flex-col items-center justify-center"
+                                style={{
+                                    width: gridDimensions.width,
+                                    height: gridDimensions.height,
+                                }}
+                            >
+                                <PercentageGrid
+                                    selectedIndices={selectedIndices}
+                                    dragPreviewBounds={dragPreviewBounds}
+                                    isDragging={isDragging}
+                                    rows={rows}
+                                    cols={cols}
+                                    totalCells={totalCells}
+                                    showLabels={showLabels}
+                                    onToggle={toggleSquare}
+                                    onDragStart={startDrag}
+                                    onDragEnter={dragEnter}
+                                    onDragEnd={endDrag}
+                                />
+                            </div>
+
+                            {/* Grid 2 */}
+                            {showSecondGrid && (
+                                <div
+                                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-4 sm:p-6 flex flex-col items-center justify-center"
+                                    style={{
+                                        width: gridDimensions.width,
+                                        height: gridDimensions.height,
+                                    }}
+                                >
+                                    <PercentageGrid
+                                        selectedIndices={selectedIndices2}
+                                        dragPreviewBounds={dragPreviewBounds2}
+                                        isDragging={isDragging2}
+                                        rows={rows}
+                                        cols={cols}
+                                        totalCells={totalCells}
+                                        showLabels={showLabels}
+                                        onToggle={toggleSquare2}
+                                        onDragStart={startDrag2}
+                                        onDragEnter={dragEnter2}
+                                        onDragEnd={endDrag2}
+                                    />
+                                </div>
+                            )}
                         </div>
                     )}
                     {showPanel && (

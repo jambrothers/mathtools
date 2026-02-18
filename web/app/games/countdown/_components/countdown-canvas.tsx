@@ -35,7 +35,6 @@ export function CountdownCanvas({
                 <div className="flex flex-col md:flex-row items-center gap-12 md:gap-24">
                     {/* Analog-style Clock Visual */}
                     <div className="relative group">
-                        <div className="absolute inset-0 bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all duration-700" />
                         <div className="relative w-48 h-48 rounded-full border-4 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-2xl flex items-center justify-center overflow-hidden">
                             {/* Tick marks */}
                             {[...Array(12)].map((_, i) => (
@@ -109,13 +108,12 @@ export function CountdownCanvas({
                     <div className="flex flex-col items-center">
                         <span className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Target</span>
                         <div className="relative">
-                            <div className="absolute inset-x-0 -bottom-2 h-4 bg-indigo-600/20 blur-xl rounded-full" />
                             <div className="relative bg-slate-900 dark:bg-indigo-950 border-y-4 border-indigo-500 px-12 py-8 rounded-2xl shadow-2xl overflow-hidden min-w-[240px] text-center">
                                 {/* Digital segmented look background */}
                                 <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] select-none pointer-events-none">
                                     <span className="text-[120px] font-mono leading-none font-black italic">888</span>
                                 </div>
-                                <span className="text-8xl font-black font-mono tracking-tighter text-white drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]">
+                                <span className="text-8xl font-black font-mono tracking-tighter text-white">
                                     {puzzle.target}
                                 </span>
                             </div>
@@ -160,7 +158,7 @@ export function CountdownCanvas({
                             </div>
                         </div>
                     ) : (
-                        <div className="bg-white dark:bg-slate-800/80 backdrop-blur-sm border-2 border-slate-100 dark:border-slate-700/50 rounded-3xl p-8 shadow-inner animate-in fade-in zoom-in-95 duration-500">
+                        <div className="bg-white dark:bg-slate-800/80 border-2 border-slate-100 dark:border-slate-700/50 rounded-3xl p-8 shadow-inner animate-in fade-in zoom-in-95 duration-500">
                             <div className="flex items-center gap-2 mb-6">
                                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                                 <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Step by Step</h3>

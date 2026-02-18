@@ -11,9 +11,28 @@ describe('percentageGridURLSerializer', () => {
             showFraction: false,
             simplifyFraction: false,
             showLabels: false,
+            showSecondGrid: false,
+            selectedIndices2: [],
         });
         expect(params.get('s')).toBe('0;5;42');
         expect(params.get('gm')).toBe('10x10');
+    });
+
+    it('serializes 2x2 mode correctly', () => {
+        const params = percentageGridURLSerializer.serialize({
+            gridMode: '2x2',
+            selectedIndices: [0, 1, 2, 3],
+            showPanel: true,
+            showPercentage: true,
+            showDecimal: false,
+            showFraction: false,
+            simplifyFraction: false,
+            showLabels: false,
+            showSecondGrid: false,
+            selectedIndices2: [],
+        });
+        expect(params.get('gm')).toBe('2x2');
+        expect(params.get('s')).toBe('0;1;2;3');
     });
 
     it('deserializes URL params to selected indices', () => {
@@ -40,6 +59,8 @@ describe('percentageGridURLSerializer', () => {
             showFraction: false,
             simplifyFraction: false,
             showLabels: true,
+            showSecondGrid: false,
+            selectedIndices2: [],
         };
         const params = percentageGridURLSerializer.serialize(state);
         const restored = percentageGridURLSerializer.deserialize(params);
@@ -75,5 +96,47 @@ describe('percentageGridURLSerializer', () => {
         expect(state?.showFraction).toBe(false);
         expect(state?.simplifyFraction).toBe(false);
         expect(state?.showLabels).toBe(false);
+        expect(state?.showSecondGrid).toBe(false);
+        expect(state?.selectedIndices2).toEqual([]);
+    });
+
+    it('round-trips dual grid state', () => {
+        const state: any = {
+            gridMode: '10x10',
+            selectedIndices: [1, 2],
+            showSecondGrid: true,
+            selectedIndices2: [3, 4, 5],
+            showPanel: true,
+            showPercentage: true,
+            showDecimal: false,
+            showFraction: false,
+            simplifyFraction: false,
+            showLabels: false,
+        };
+        const params = percentageGridURLSerializer.serialize(state);
+
+        expect(params.get('sg')).toBe('1');
+        expect(params.get('s2')).toBe('3;4;5');
+
+        const restored = percentageGridURLSerializer.deserialize(params);
+        expect(restored?.showSecondGrid).toBe(true);
+        expect(restored?.selectedIndices2).toEqual([3, 4, 5]);
+        expect(restored?.selectedIndices).toEqual([1, 2]);
+    });
+
+    it('omits grid 2 params when hidden', () => {
+        const state: any = {
+            gridMode: '10x10',
+            selectedIndices: [1],
+            showSecondGrid: false,
+            selectedIndices2: [99], // Should be ignored in serialization
+            showPanel: true,
+            // ... other defaults
+            showPercentage: false, showDecimal: false, showFraction: false, simplifyFraction: false, showLabels: false
+        };
+        const params = percentageGridURLSerializer.serialize(state);
+
+        expect(params.has('sg')).toBe(false);
+        expect(params.has('s2')).toBe(false);
     });
 });

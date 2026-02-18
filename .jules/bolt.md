@@ -21,3 +21,7 @@
 ## 2026-02-19 - Memoizing Styles and Classes in Dragged Components
 **Learning:** In high-frequency render scenarios (like drag operations), even "cheap" operations like creating object literals (`style={{...}}`) or merging classes (`cn(...)` / `tailwind-merge`) add up. `tailwind-merge` in particular is computationally expensive to run 60 times per second.
 **Action:** Use `React.useMemo` to cache `style` objects and `className` strings in the draggable component. This ensures that when the component re-renders due to position updates, the expensive class merging logic is skipped if the visual state (like `isSelected`) hasn't changed.
+
+## 2026-02-20 - Canvas Drag Optimization via Pointer Capture
+**Learning:** Using `getBoundingClientRect()` in high-frequency `pointermove` handlers causes layout thrashing (forced reflow). Instead, utilizing `setPointerCapture()` allows using `event.offsetX/Y` which are relative to the captured target, avoiding the need for expensive DOM measurements.
+**Action:** Replaced `getBoundingClientRect` calls in `Canvas` component with `setPointerCapture` and `nativeEvent.offsetX/Y`. Polyfilled these in `jest.setup.ts` for JSDOM testing.
