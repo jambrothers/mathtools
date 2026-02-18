@@ -47,12 +47,15 @@ export const countdownURLSerializer: URLStateSerializer<CountdownURLState> = {
         const targetStr = params.get(PARAM_TARGET);
         if (!sourcesStr || !targetStr) return null;
 
-        const sources = parseList(sourcesStr, (n) => Number(n), { delimiter: ',' });
+        // SECURITY: Limit sources to 6 to prevent DoS via factorial complexity in solver
+        // We use maxItems in parseList, but also slice to be double-safe against implementation changes
+        const sources = parseList(sourcesStr, (n) => Number(n), { delimiter: ',', maxItems: 6 }).slice(0, 6);
         const target = deserializeNumber(targetStr);
 
         const opsStr = params.get(PARAM_OPS);
+        const validOps = ['+', '-', '*', '/', '^'];
         const allowedOperations = opsStr
-            ? parseList(opsStr, (op) => op as Operation, { delimiter: ',' })
+            ? parseList(opsStr, (op) => validOps.includes(op) ? op as Operation : null, { delimiter: ',' })
             : ['+', '-', '*', '/'] as Operation[];
 
         const rangeStr = params.get(PARAM_RANGE);
