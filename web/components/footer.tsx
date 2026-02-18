@@ -1,4 +1,4 @@
-import { Github, Linkedin, Mail } from "lucide-react"
+import { Linkedin, Mail } from "lucide-react"
 import { BlueskyIcon } from "./icons/bluesky-icon"
 
 /**
@@ -21,9 +21,6 @@ export function Footer() {
                     © {new Date().getFullYear()} TeachMaths.net. All rights reserved.
                 </p>
                 <div className="flex items-center gap-6">
-                    <a href="https://github.com/jambrothers/mathtools" aria-label="GitHub" className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
-                        <Github size={20} />
-                    </a>
                     <a href="#" aria-label="LinkedIn" className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
                         <Linkedin size={20} />
                     </a>
@@ -34,6 +31,7 @@ export function Footer() {
                         <Mail size={20} />
                     </a>
                 </div>
+
             </div>
         </footer>
     )

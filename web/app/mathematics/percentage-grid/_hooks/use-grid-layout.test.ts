@@ -42,4 +42,36 @@ describe('calculateGridDimensions', () => {
         const result2 = calculateGridDimensions(1000, 500, PADDING, MAX_WIDTH);
         expect(result2.width).toBe(result2.height);
     });
+
+    describe('Dual Grid Sizing', () => {
+        it('splits width for two grids', () => {
+            // Available: 1000 wide
+            // PADDING = 48
+            // GAP = 24
+            // Total Gap = 24
+            // Total Chrome = 48 * 2 = 96
+            // Available for squares = 1000 - 24 - 96 = 880
+            // Per grid squares = 880 / 2 = 440
+            // Returned width (per card) = 440 + 48 = 488
+
+            const result = calculateGridDimensions(1000, 1000, PADDING, MAX_WIDTH, 2);
+            expect(result.width).toBe(488);
+            expect(result.height).toBe(488);
+        });
+
+        it('fits side by side at tablet width (768px)', () => {
+            // Available: 768
+            // Total Gap: 24
+            // Total Chrome: 96
+            // Available for squares: 768 - 120 = 648
+            // Per Grid Squares: 324
+            // Per Grid Card: 324 + 48 = 372
+
+            const result = calculateGridDimensions(768, 1000, PADDING, MAX_WIDTH, 2);
+            expect(result.width).toBe(372);
+
+            // Check total width constraint
+            // 2 * 372 + 24 (gap) = 744 + 24 = 768. Fits exactly.
+        });
+    });
 });

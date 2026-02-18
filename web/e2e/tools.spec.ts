@@ -77,7 +77,7 @@ test.describe('Tools Page', () => {
     test('Mathematics section should contain correct number of tools', async ({ page }) => {
         const mathSection = page.locator('#mathematics');
         const toolCards = mathSection.locator('a[href^="/mathematics"]');
-        await expect(toolCards).toHaveCount(6); // Algebra Tiles, Counters, Bar Model, Linear Equations, Percentage Grid, Sequences
+        await expect(toolCards).toHaveCount(7); // Algebra Tiles, Counters, Bar Model, Linear Equations, Percentage Grid, Sequences, Fraction Wall
     });
 
     test('Computing section should contain correct number of tools', async ({ page }) => {

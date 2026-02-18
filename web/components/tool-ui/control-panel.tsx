@@ -106,9 +106,12 @@ export function ControlSlider({
                 <button
                     type="button"
                     onClick={() => {
-                        const newValue = Math.max(min, value - step);
+                        // Round to the nearest multiple of 'step' to avoid floating point drift
+                        const rawValue = Math.max(min, Math.round((value - step) / step) * step);
+                        // Final safety round to handle cases like 0.7 * 1 = 0.7000000000000001
+                        const finalValue = parseFloat(rawValue.toFixed(10));
                         if (onValueChange) {
-                            onValueChange(newValue)
+                            onValueChange(finalValue)
                         }
                     }}
                     className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
@@ -138,9 +141,10 @@ export function ControlSlider({
                 <button
                     type="button"
                     onClick={() => {
-                        const newValue = Math.min(max, value + step);
+                        const rawValue = Math.min(max, Math.round((value + step) / step) * step);
+                        const finalValue = parseFloat(rawValue.toFixed(10));
                         if (onValueChange) {
-                            onValueChange(newValue)
+                            onValueChange(finalValue)
                         }
                     }}
                     className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"

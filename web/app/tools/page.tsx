@@ -1,5 +1,5 @@
 import { ToolCard } from "@/components/tool-card"
-import { Grid2x2, Calculator, Cpu, Percent, Hash } from "lucide-react"
+import { Grid2x2, Calculator, Cpu, Percent, Hash, Rows } from "lucide-react"
 
 export default function ToolsPage() {
     return (
@@ -60,6 +60,13 @@ export default function ToolsPage() {
                                 gradient="from-indigo-500 to-purple-500"
                                 icon={<Hash className="w-8 h-8 text-indigo-500" />}
                             />
+                            <ToolCard
+                                title="Fraction Wall"
+                                description="Visualise unit fractions and equivalence. Shade segments, toggle labels, and use vertical guides to find equal fractions."
+                                href="/mathematics/fraction-wall"
+                                gradient="from-rose-500 to-orange-500"
+                                icon={<Rows className="w-8 h-8 text-rose-500" />}
+                            />
                         </div>
                     </div>
 
@@ -75,6 +82,7 @@ export default function ToolsPage() {
                             />
                         </div>
                     </div>
+
                 </div>
             </section>
         </div>

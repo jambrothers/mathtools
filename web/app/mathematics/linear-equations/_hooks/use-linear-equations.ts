@@ -1,12 +1,11 @@
 import { useState, useCallback, useEffect } from "react"
-import { useSearchParams, usePathname } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { LineConfig, MAX_LINES, LINE_COLORS, DEFAULT_M, DEFAULT_C } from "../constants"
 import { linearEquationsSerializer } from "../_lib/url-state"
 import { generateShareableURL } from "@/lib/url-state"
 
 export function useLinearEquations() {
     const searchParams = useSearchParams()
-    const pathname = usePathname()
 
     // Initialize state from URL or defaults
     const [lines, setLines] = useState<LineConfig[]>([])
@@ -192,6 +191,7 @@ export function useLinearEquations() {
         isInitialized,
         getShareableURL: () => generateShareableURL(linearEquationsSerializer, {
             lines, activeLineId, showEquation, showIntercepts, showSlopeTriangle, slopeTriangleSize, showGradientCalculation, showGrid
-        }, pathname)
+        })
     }
 }
+
