@@ -43,7 +43,7 @@ export function TimerWidget({ className }: { className?: string }) {
     }
 
     React.useEffect(() => {
-        if (isRunning && seconds > 0) {
+        if (isRunning) {
             timerRef.current = setInterval(() => {
                 setSeconds((prev) => {
                     if (prev <= 1) {
@@ -61,7 +61,7 @@ export function TimerWidget({ className }: { className?: string }) {
         return () => {
             if (timerRef.current) clearInterval(timerRef.current)
         }
-    }, [isRunning, seconds])
+    }, [isRunning])
 
     const formatTime = (s: number) => {
         const mins = Math.floor(s / 60)
