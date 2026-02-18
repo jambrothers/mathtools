@@ -21,3 +21,7 @@
 2. `role="dialog"` and `aria-modal="true"` on the container.
 3. `aria-labelledby` pointing to the title ID.
 4. Focus a key interactive element (like Close button) on mount.
+
+## 2026-02-15 - Toggle Button State Feedback
+**Learning:** Standard `<button>` elements used for toggling features (like visibility or mode selection) often rely only on visual cues (background color), making their state invisible to screen readers.
+**Action:** Always use `aria-pressed={isActive}` for toggle buttons and mode selectors to explicitly communicate state changes. Pair this with `aria-label` when the button text (e.g., "1") lacks context.
