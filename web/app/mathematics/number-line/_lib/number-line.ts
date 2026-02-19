@@ -145,6 +145,15 @@ export function zoomViewport(viewport: Viewport, factor: number, focalPoint?: nu
 }
 
 /**
+ * Pan the viewport by a specific delta in graph units
+ */
+export function panViewport(viewport: Viewport, delta: number): Viewport {
+    const newMin = viewport.min + delta;
+    const newMax = viewport.max + delta;
+    return clampViewport({ min: newMin, max: newMax });
+}
+
+/**
  * Enforce minimum/maximum range limits on the viewport
  */
 export function clampViewport(viewport: Viewport): Viewport {

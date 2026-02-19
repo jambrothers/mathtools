@@ -6,8 +6,8 @@ describe('Number Line URL State', () => {
             min: -10,
             max: 10,
             points: [
-                { id: 'p-1', value: 3, label: 'A', color: 'red' },
-                { id: 'p-2', value: -5, label: 'B', color: 'blue' }
+                { id: 'p-1', value: 3, label: 'A', color: 'red', hidden: false },
+                { id: 'p-2', value: -5, label: 'B', color: 'blue', hidden: false }
             ],
             arcs: [
                 { fromId: 'p-2', toId: 'p-1', label: '+8' }
@@ -27,11 +27,11 @@ describe('Number Line URL State', () => {
         const params = new URLSearchParams('min=abc&max=xyz&points=garbage');
         const deserialized = numberLineSerializer.deserialize(params);
 
-        expect(deserialized.min).toBe(-10);
-        expect(deserialized.max).toBe(10);
-        expect(deserialized.points).toEqual([]);
-        expect(deserialized.arcs).toEqual([]);
-        expect(deserialized.showLabels).toBe(true);
+        expect(deserialized!.min).toBe(-10);
+        expect(deserialized!.max).toBe(10);
+        expect(deserialized!.points).toEqual([]);
+        expect(deserialized!.arcs).toEqual([]);
+        expect(deserialized!.showLabels).toBe(true);
     });
 
     it('should serialize empty points and arcs correctly', () => {
@@ -48,6 +48,6 @@ describe('Number Line URL State', () => {
         const params = numberLineSerializer.serialize(state);
         const deserialized = numberLineSerializer.deserialize(params);
 
-        expect(deserialized).toEqual(state);
+        expect(deserialized!).toEqual(state);
     });
 });

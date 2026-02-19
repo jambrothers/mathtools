@@ -28,6 +28,8 @@ interface NumberLineSVGProps {
     onPointClick?: (id: string) => void;
     onLineClick?: (newValue: number) => void;
     onZoom?: (focalPoint: number, factor: number) => void;
+    onPan?: (delta: number) => void;
+    onAddArc?: (fromId: string, toId: string) => void;
 }
 
 export function NumberLineSVG({
@@ -42,10 +44,20 @@ export function NumberLineSVG({
     onPointMove,
     onPointClick,
     onLineClick,
-    onZoom
+    onZoom,
+    onPan,
+    onAddArc
 }: NumberLineSVGProps) {
     const svgRef = React.useRef<SVGSVGElement>(null);
-    const [dragState, setDragState] = React.useState<{ id: string } | null>(null);
+
+    type DragState =
+        | { type: 'point-intent', id: string, startX: number, startY: number, hasMoved: boolean }
+        | { type: 'point-move', id: string }
+        | { type: 'arc-create', fromId: string, currentX: number }
+        | { type: 'pan', lastX: number };
+
+    const [dragState, setDragState] = React.useState<DragState | null>(null);
+    const [hoveredPoint, setHoveredPoint] = React.useState<string | null>(null);
 
     const ticks = React.useMemo(() => calculateTicks(viewport), [viewport]);
 
@@ -94,17 +106,60 @@ export function NumberLineSVG({
 
     const handlePointerDown = (e: React.PointerEvent, id: string) => {
         e.stopPropagation();
-        setDragState({ id });
+        setDragState({ type: 'point-intent', id, startX: e.clientX, startY: e.clientY, hasMoved: false });
         (e.target as Element).setPointerCapture(e.pointerId);
     };
 
     const handlePointerMove = (e: React.PointerEvent) => {
-        if (!dragState || !onPointMove) return;
+        if (!dragState) return;
+
+        if (dragState.type === 'pan') {
+            if (!onPan || !svgRef.current) return;
+            // Calculate pixel difference
+            const dxPixels = dragState.lastX - e.clientX;
+            const rect = svgRef.current.getBoundingClientRect();
+            // Convert to graph units
+            const range = viewport.max - viewport.min;
+            const dxGraph = (dxPixels / rect.width) * range;
+
+            onPan(dxGraph);
+            setDragState({ type: 'pan', lastX: e.clientX });
+            return;
+        }
+
         const newValue = getGraphX(e.clientX);
-        onPointMove(dragState.id, newValue);
+
+        if (dragState.type === 'point-intent') {
+            const dx = Math.abs(e.clientX - dragState.startX);
+            const dy = Math.abs(e.clientY - dragState.startY);
+
+            if (dy > 20 && interactionMode === 'default') {
+                // Pulled up/down significantly -> create arc
+                setDragState({ type: 'arc-create', fromId: dragState.id, currentX: newValue });
+            } else if (dx > 10 || dy > 10) {
+                // Moved laterally or generally -> move point
+                setDragState({ type: 'point-move', id: dragState.id });
+                if (onPointMove) onPointMove(dragState.id, newValue);
+            }
+            return;
+        }
+
+        if (dragState.type === 'point-move') {
+            if (onPointMove) onPointMove(dragState.id, newValue);
+        } else if (dragState.type === 'arc-create') {
+            setDragState({ ...dragState, currentX: newValue });
+        }
     };
 
     const handlePointerUp = () => {
+        if (dragState?.type === 'arc-create' && hoveredPoint && hoveredPoint !== dragState.fromId) {
+            onAddArc?.(dragState.fromId, hoveredPoint);
+        } else if (dragState?.type === 'point-intent' && !dragState.hasMoved) {
+            // If we didn't move it at all, it was a click
+            if (interactionMode === 'delete-point' || interactionMode === 'add-arc') {
+                onPointClick?.(dragState.id);
+            }
+        }
         setDragState(null);
     };
 
@@ -136,7 +191,6 @@ export function NumberLineSVG({
             }}
             data-testid="number-line-svg"
         >
-            {/* Hit area for E2E tests and background clicks */}
             <rect
                 data-testid="number-line-hit-area"
                 x={0}
@@ -144,6 +198,15 @@ export function NumberLineSVG({
                 width={NUMBER_LINE_CANVAS_WIDTH}
                 height={NUMBER_LINE_CANVAS_HEIGHT}
                 fill="transparent"
+                onPointerDown={(e) => {
+                    // Start panning if in default mode
+                    if (interactionMode === 'default' || interactionMode === 'add-point') {
+                        (e.target as Element).setPointerCapture(e.pointerId);
+                        setDragState({ type: 'pan', lastX: e.clientX });
+                    }
+                }}
+                onPointerUp={() => setDragState(null)}
+                className={interactionMode === 'default' ? "cursor-grab active:cursor-grabbing" : ""}
             />
             <defs>
                 <marker
@@ -254,7 +317,7 @@ export function NumberLineSVG({
                     const path = `M ${x1} ${lineY} Q ${midX} ${lineY + yOffset} ${x2} ${lineY}`;
 
                     return (
-                        <g key={`arc-${i}`} className="text-indigo-500">
+                        <g key={`arc-${i}`} className="text-indigo-500 pointer-events-none">
                             <path
                                 d={path}
                                 fill="none"
@@ -277,26 +340,52 @@ export function NumberLineSVG({
                 })
             }
 
+            {/* Dynamic Arc being created */}
+            {dragState?.type === 'arc-create' && (() => {
+                const fromP = points.find(p => p.id === dragState.fromId);
+                if (!fromP) return null;
+                const x1 = toPixelX(fromP.value, viewport, NUMBER_LINE_CANVAS_WIDTH);
+                const x2 = toPixelX(dragState.currentX, viewport, NUMBER_LINE_CANVAS_WIDTH);
+
+                const midX = (x1 + x2) / 2;
+                const dist = Math.abs(x2 - x1);
+                const arcHeight = Math.min(dist / 2, 80);
+                const isNegative = dragState.currentX < fromP.value;
+                const yOffset = isNegative ? arcHeight : -arcHeight;
+                const path = `M ${x1} ${lineY} Q ${midX} ${lineY + yOffset} ${x2} ${lineY}`;
+
+                return (
+                    <g className="text-indigo-400 pointer-events-none opacity-50">
+                        <path
+                            d={path}
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                            strokeDasharray="4 4"
+                            markerEnd="url(#arrowhead)"
+                        />
+                    </g>
+                );
+            })()}
+
             {/* Point Markers */}
             {
                 points.map((p) => {
                     const x = toPixelX(p.value, viewport, NUMBER_LINE_CANVAS_WIDTH);
-                    const isDragging = dragState?.id === p.id;
-                    const isPending = pendingArcStart === p.id;
+                    const isDragging = dragState?.type === 'point-move' && dragState.id === p.id;
+                    const isPending = pendingArcStart === p.id || (dragState?.type === 'arc-create' && dragState.fromId === p.id);
                     const isInteraction = interactionMode === 'add-arc' || interactionMode === 'delete-point';
+                    const isArcTarget = dragState?.type === 'arc-create' && hoveredPoint === p.id;
 
                     return (
                         <g
                             key={p.id}
                             onPointerDown={(e) => {
-                                if (isInteraction) {
-                                    e.stopPropagation();
-                                    onPointClick?.(p.id);
-                                } else {
-                                    handlePointerDown(e, p.id);
-                                }
+                                handlePointerDown(e, p.id);
                             }}
                             onPointerUp={handlePointerUp}
+                            onPointerEnter={() => setHoveredPoint(p.id)}
+                            onPointerLeave={() => setHoveredPoint(null)}
                             className={cn(
                                 isInteraction ? "cursor-pointer" : "cursor-move",
                                 "group"
@@ -307,12 +396,13 @@ export function NumberLineSVG({
                             <circle
                                 cx={x}
                                 cy={lineY}
-                                r={isPending ? 24 : 18}
+                                r={isPending ? 24 : 32} // Increased grab area from 18 to 32
                                 className={cn(
-                                    "fill-transparent transition-all duration-200",
+                                    "fill-transparent transition-all duration-200 cursor-pointer",
                                     !isPending && "group-hover:fill-slate-200/50 dark:group-hover:fill-slate-700/50",
                                     isDragging && "fill-slate-200/80 dark:fill-slate-700/80",
-                                    isPending && "fill-amber-400/20 stroke-amber-400 stroke-2 animate-pulse"
+                                    isPending && "fill-amber-400/20 stroke-amber-400 stroke-2 animate-pulse",
+                                    isArcTarget && "fill-indigo-400/30 stroke-indigo-400 stroke-2"
                                 )}
                             />
                             {/* The Point */}

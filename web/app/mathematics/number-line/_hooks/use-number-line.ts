@@ -4,7 +4,8 @@ import {
     zoomViewport,
     clampViewport,
     snapToTick,
-    formatJumpLabel
+    formatJumpLabel,
+    panViewport
 } from '../_lib/number-line';
 import {
     PointMarker,
@@ -55,6 +56,12 @@ export function useNumberLine() {
     const zoomOut = useCallback(() => {
         zoom(ZOOM_FACTOR);
     }, [zoom]);
+
+    const pan = useCallback((delta: number) => {
+        const next = panViewport(viewport, delta);
+        setMin(next.min);
+        setMax(next.max);
+    }, [viewport]);
 
     const applyPreset = useCallback((newMin: number, newMax: number) => {
         setRange(newMin, newMax);
@@ -205,6 +212,7 @@ export function useNumberLine() {
         zoom,
         zoomIn,
         zoomOut,
+        pan,
         applyPreset,
         reset,
 

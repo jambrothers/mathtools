@@ -89,8 +89,8 @@ test.describe('Number Line Tool', () => {
     test('should add points by clicking on the number line in add-point mode', async ({ page }) => {
         await page.getByRole('button', { name: 'Add Point', exact: true }).click();
         const svg = page.getByTestId('number-line-svg');
-        // Click directly on the SVG using coordinates
-        await svg.click({ position: { x: 500, y: 250 } });
+        const box = await svg.boundingBox();
+        await svg.click({ position: { x: box!.width * 0.5, y: box!.height * 0.5 }, force: true });
         await page.waitForTimeout(500);
         await expect(svg.getByTestId(/^point-p-/).first()).toBeVisible();
         await expect(svg.getByText('A (0)')).toBeVisible();
@@ -99,9 +99,10 @@ test.describe('Number Line Tool', () => {
     test('should support ordering exercises', async ({ page }) => {
         await page.getByRole('button', { name: 'Add Point', exact: true }).click();
         const svg = page.getByTestId('number-line-svg');
-        await svg.click({ position: { x: 200, y: 250 } }); // Should be -6
+        const box = await svg.boundingBox();
+        await svg.click({ position: { x: box!.width * 0.2, y: box!.height * 0.5 }, force: true }); // Should be -6
         await page.waitForTimeout(200);
-        await svg.click({ position: { x: 800, y: 250 } }); // Should be 6
+        await svg.click({ position: { x: box!.width * 0.8, y: box!.height * 0.5 }, force: true }); // Should be 6
         await page.waitForTimeout(200);
 
         await expect(svg.getByText('A (-6)')).toBeVisible();

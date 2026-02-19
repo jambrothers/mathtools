@@ -32,6 +32,7 @@ function NumberLineContent() {
         zoom,
         zoomIn,
         zoomOut,
+        pan,
         addPoint,
         removePoint,
         movePoint,
@@ -154,6 +155,7 @@ function NumberLineContent() {
                         onZoom={(focal, factor) => {
                             zoom(factor, focal);
                         }}
+                        onPan={pan}
                     />
                 </div>
                 <NumberLineToolbar mode={interactionMode} setMode={setInteractionMode} />

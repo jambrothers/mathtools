@@ -211,7 +211,7 @@ describe('useNumberLine Hook', () => {
         });
 
         act(() => {
-            result.current.handleLineClick(5.2);
+            result.current.handleLineClick(5.08); // 5.08 should snap to 5.0 (major tick) since minor is 0.2
         });
 
         expect(result.current.points.length).toBe(1);

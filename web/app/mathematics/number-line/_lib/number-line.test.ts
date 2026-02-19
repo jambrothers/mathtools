@@ -6,7 +6,8 @@ import {
     snapToTick,
     zoomViewport,
     clampViewport,
-    formatJumpLabel
+    formatJumpLabel,
+    panViewport
 } from './number-line';
 
 describe('Number Line Core Library', () => {
@@ -86,6 +87,16 @@ describe('Number Line Core Library', () => {
             const tinyViewport = { min: 0, max: 0.0000001 };
             const clamped = clampViewport(tinyViewport);
             expect(clamped.max - clamped.min).toBeGreaterThanOrEqual(0.01);
+        });
+
+        it('should pan the viewport', () => {
+            const panned = panViewport(viewport, 2);
+            expect(panned.min).toBe(-8);
+            expect(panned.max).toBe(12);
+
+            const pannedNegative = panViewport(viewport, -5);
+            expect(pannedNegative.min).toBe(-15);
+            expect(pannedNegative.max).toBe(5);
         });
     });
 });
