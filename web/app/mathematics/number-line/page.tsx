@@ -12,6 +12,7 @@ import { useUrlState } from "@/lib/hooks/use-url-state"
 import { numberLineSerializer } from "./_lib/url-state"
 import { exportSVGElement } from "@/lib/export/canvas-export"
 import { ExportModal } from "@/components/tool-ui/export-modal"
+import { NumberLineToolbar } from "./_components/number-line-toolbar"
 
 function NumberLineContent() {
     const {
@@ -26,7 +27,6 @@ function NumberLineContent() {
         interactionMode,
         pendingArcStart,
         setInteractionMode,
-        setPendingArcStart,
         setRange,
         zoom,
         zoomIn,
@@ -75,6 +75,23 @@ function NumberLineContent() {
         window.history.replaceState({}, '', url);
     }, [min, max, points, arcs, showLabels, hideValues, snapToTicks, showNegativeRegion, hasRestored, getShareableUrl]);
 
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Only if not in an input
+            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
+
+            switch (e.key.toLowerCase()) {
+                case 'v': setInteractionMode('default'); break;
+                case 'p': setInteractionMode('add-point'); break;
+                case 'd': setInteractionMode('delete-point'); break;
+                case 'j': setInteractionMode('add-arc'); break;
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [setInteractionMode]);
+
     const handleExport = async (format: 'png' | 'svg') => {
         const svg = document.querySelector('[data-testid="number-line-svg"]') as SVGSVGElement;
         if (!svg) return;
@@ -113,8 +130,6 @@ function NumberLineContent() {
                     onHideAllPoints={hideAllPoints}
                     interactionMode={interactionMode}
                     pendingArcStart={pendingArcStart}
-                    onSetInteractionMode={setInteractionMode}
-                    onSetPendingArcStart={setPendingArcStart}
                     onReset={reset}
                     onCopyLink={() => copyShareableUrl({ min, max, points, arcs, showLabels, hideValues, snapToTicks, showNegativeRegion })}
                     onExport={() => setIsExportOpen(true)}
@@ -140,6 +155,7 @@ function NumberLineContent() {
                         }}
                     />
                 </div>
+                <NumberLineToolbar mode={interactionMode} setMode={setInteractionMode} />
             </div>
 
             <ExportModal

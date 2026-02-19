@@ -22,7 +22,7 @@ interface NumberLineSVGProps {
     showLabels: boolean;
     hideValues: boolean;
     showNegativeRegion?: boolean;
-    interactionMode: 'default' | 'add-arc' | 'add-point';
+    interactionMode: 'default' | 'add-arc' | 'add-point' | 'delete-point';
     pendingArcStart: string | null;
     onPointMove?: (id: string, newValue: number) => void;
     onPointClick?: (id: string) => void;
@@ -122,7 +122,8 @@ export function NumberLineSVG({
             viewBox={`0 0 ${NUMBER_LINE_CANVAS_WIDTH} ${NUMBER_LINE_CANVAS_HEIGHT}`}
             className={cn(
                 "w-full h-full touch-none select-none bg-white dark:bg-slate-900 outline-none",
-                interactionMode === 'add-point' && "cursor-crosshair"
+                interactionMode === 'add-point' && "cursor-crosshair",
+                interactionMode === 'delete-point' && "cursor-pointer"
             )}
             onPointerMove={handlePointerMove}
             onWheel={handleWheel}
@@ -135,6 +136,15 @@ export function NumberLineSVG({
             }}
             data-testid="number-line-svg"
         >
+            {/* Hit area for E2E tests and background clicks */}
+            <rect
+                data-testid="number-line-hit-area"
+                x={0}
+                y={0}
+                width={NUMBER_LINE_CANVAS_WIDTH}
+                height={NUMBER_LINE_CANVAS_HEIGHT}
+                fill="transparent"
+            />
             <defs>
                 <marker
                     id="arrowhead-right"
@@ -232,10 +242,16 @@ export function NumberLineSVG({
                     const x2 = toPixelX(toP.value, viewport, NUMBER_LINE_CANVAS_WIDTH);
                     const midX = (x1 + x2) / 2;
                     const dist = Math.abs(x2 - x1);
-                    const arcHeight = Math.min(dist / 2, 100);
+                    const arcHeight = Math.min(dist / 2, 80);
 
-                    // SVG arc path: M startX startY Q midX (startY - height) endX endY
-                    const path = `M ${x1} ${lineY} Q ${midX} ${lineY - arcHeight} ${x2} ${lineY}`;
+                    const isNegative = toP.value < fromP.value;
+
+                    // Arc height adjustment for negative (below line)
+                    const yOffset = isNegative ? arcHeight : -arcHeight;
+                    const labelOffset = isNegative ? 40 : -15;
+
+                    // SVG arc path: M startX startY Q midX (startY + yOffset) endX endY
+                    const path = `M ${x1} ${lineY} Q ${midX} ${lineY + yOffset} ${x2} ${lineY}`;
 
                     return (
                         <g key={`arc-${i}`} className="text-indigo-500">
@@ -249,7 +265,7 @@ export function NumberLineSVG({
                             {arc.label && (
                                 <text
                                     x={midX}
-                                    y={lineY - arcHeight - 15}
+                                    y={lineY + yOffset + labelOffset}
                                     textAnchor="middle"
                                     className="text-lg font-bold fill-current"
                                 >
@@ -267,13 +283,13 @@ export function NumberLineSVG({
                     const x = toPixelX(p.value, viewport, NUMBER_LINE_CANVAS_WIDTH);
                     const isDragging = dragState?.id === p.id;
                     const isPending = pendingArcStart === p.id;
-                    const isAddMode = interactionMode === 'add-arc';
+                    const isInteraction = interactionMode === 'add-arc' || interactionMode === 'delete-point';
 
                     return (
                         <g
                             key={p.id}
                             onPointerDown={(e) => {
-                                if (isAddMode) {
+                                if (isInteraction) {
                                     e.stopPropagation();
                                     onPointClick?.(p.id);
                                 } else {
@@ -282,7 +298,7 @@ export function NumberLineSVG({
                             }}
                             onPointerUp={handlePointerUp}
                             className={cn(
-                                isAddMode ? "cursor-pointer" : "cursor-move",
+                                isInteraction ? "cursor-pointer" : "cursor-move",
                                 "group"
                             )}
                             data-testid={`point-${p.id}`}

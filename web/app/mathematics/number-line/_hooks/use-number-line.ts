@@ -18,7 +18,7 @@ import {
     MAX_POINTS
 } from '../constants';
 
-export type InteractionMode = 'default' | 'add-arc' | 'add-point';
+export type InteractionMode = 'default' | 'add-arc' | 'add-point' | 'delete-point';
 
 export function useNumberLine() {
     const [min, setMin] = useState(DEFAULT_VIEWPORT.min);
@@ -155,6 +155,11 @@ export function useNumberLine() {
     }, [interactionMode, addPoint]);
 
     const handlePointClick = useCallback((id: string) => {
+        if (interactionMode === 'delete-point') {
+            removePoint(id);
+            return;
+        }
+
         if (interactionMode !== 'add-arc') return;
 
         if (pendingArcStart === null) {
@@ -167,7 +172,7 @@ export function useNumberLine() {
             addArc(pendingArcStart, id);
             setPendingArcStart(null);
         }
-    }, [interactionMode, pendingArcStart, addArc]);
+    }, [interactionMode, pendingArcStart, addArc, removePoint]);
 
     // Initialization
     const initFromState = useCallback((state: NumberLineState) => {

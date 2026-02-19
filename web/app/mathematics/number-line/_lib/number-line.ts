@@ -110,17 +110,16 @@ export function calculateTicks(viewport: Viewport): Tick[] {
  */
 export function snapToTick(value: number, viewport: Viewport): number {
     const ticks = calculateTicks(viewport);
-    const majorTicks = ticks.filter(t => t.type === 'major');
-    if (majorTicks.length === 0) return value;
+    if (ticks.length === 0) return value;
 
-    let closest = majorTicks[0].value;
+    let closest = ticks[0].value;
     let minDiff = Math.abs(value - closest);
 
-    for (let i = 1; i < majorTicks.length; i++) {
-        const diff = Math.abs(value - majorTicks[i].value);
+    for (let i = 1; i < ticks.length; i++) {
+        const diff = Math.abs(value - ticks[i].value);
         if (diff < minDiff) {
             minDiff = diff;
-            closest = majorTicks[i].value;
+            closest = ticks[i].value;
         }
     }
 

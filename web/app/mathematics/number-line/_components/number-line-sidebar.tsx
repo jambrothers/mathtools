@@ -48,10 +48,8 @@ interface NumberLineSidebarProps {
     onRevealAllPoints: () => void;
     onHideAllPoints: () => void;
 
-    interactionMode: 'default' | 'add-arc' | 'add-point';
+    interactionMode: 'default' | 'add-arc' | 'add-point' | 'delete-point';
     pendingArcStart: string | null;
-    onSetInteractionMode: (mode: 'default' | 'add-arc' | 'add-point') => void;
-    onSetPendingArcStart: (id: string | null) => void;
     onReset: () => void;
     onCopyLink: () => void;
     onExport: () => void;
@@ -81,8 +79,6 @@ export function NumberLineSidebar({
     onHideAllPoints,
     interactionMode,
     pendingArcStart,
-    onSetInteractionMode,
-    onSetPendingArcStart,
     onReset,
     onCopyLink,
     onExport
@@ -180,20 +176,15 @@ export function NumberLineSidebar({
                     </button>
                 </div>
 
-                <button
-                    onClick={() => onSetInteractionMode(interactionMode === 'add-point' ? 'default' : 'add-point')}
-                    className={`w-full flex items-center justify-center gap-2 py-2 px-4 mb-4 rounded-md text-sm font-medium transition-colors ${interactionMode === 'add-point'
-                        ? "bg-amber-100 text-amber-900 border border-amber-200 hover:bg-amber-200"
-                        : "bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100"
-                        }`}
-                >
-                    <Plus className="w-4 h-4" />
-                    {interactionMode === 'add-point' ? 'Finish Adding' : 'Click to Add Point'}
-                </button>
-
                 {interactionMode === 'add-point' && (
                     <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 p-2 mb-4 rounded text-xs text-amber-800 dark:text-amber-200 animate-pulse">
                         Click on the number line to place points...
+                    </div>
+                )}
+
+                {interactionMode === 'delete-point' && (
+                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 p-2 mb-4 rounded text-xs text-red-800 dark:text-red-200">
+                        Click on a point to delete it...
                     </div>
                 )}
 
@@ -246,24 +237,6 @@ export function NumberLineSidebar({
             {/* Arcs management */}
             <ControlSection title="Jump Arcs" defaultOpen={true} icon={<ArrowRightLeft className="w-4 h-4" />}>
                 <div className="space-y-3 mb-4">
-                    <button
-                        onClick={() => {
-                            if (interactionMode === 'add-arc') {
-                                onSetInteractionMode('default');
-                                onSetPendingArcStart(null);
-                            } else {
-                                onSetInteractionMode('add-arc');
-                            }
-                        }}
-                        className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-colors ${interactionMode === 'add-arc'
-                            ? "bg-amber-100 text-amber-900 border border-amber-200 hover:bg-amber-200"
-                            : "bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100"
-                            }`}
-                    >
-                        <ArrowRightLeft className="w-4 h-4" />
-                        {interactionMode === 'add-arc' ? 'Finish Drawing' : 'Draw Jump Arc'}
-                    </button>
-
                     {interactionMode === 'add-arc' && (
                         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 p-2 rounded text-xs text-amber-800 dark:text-amber-200 animate-pulse">
                             {pendingArcStart
