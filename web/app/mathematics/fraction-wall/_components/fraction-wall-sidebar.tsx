@@ -45,6 +45,7 @@ export function FractionWallSidebar({
                             <button
                                 key={mode.id}
                                 onClick={() => onLabelModeChange(mode.id as LabelMode)}
+                                aria-pressed={labelMode === mode.id}
                                 className={cn(
                                     "flex items-center gap-2 px-3 py-2 rounded-md text-sm border transition-colors",
                                     labelMode === mode.id
@@ -74,6 +75,8 @@ export function FractionWallSidebar({
                         <button
                             key={d}
                             onClick={() => onToggleDenominator(d)}
+                            aria-pressed={visibleDenominators.includes(d)}
+                            aria-label={`Toggle visibility of row ${d}`}
                             className={cn(
                                 "flex flex-col items-center justify-center p-2 rounded-md border transition-all",
                                 visibleDenominators.includes(d)
