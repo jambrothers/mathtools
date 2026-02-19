@@ -6,6 +6,10 @@ import {
     deserializeBool
 } from '@/lib/url-state';
 
+// Security: Limit maximum denominator to prevent SVG rendering DoS
+// The UI only shows up to 12, but we allow up to 20 for advanced usage.
+const MAX_DENOMINATOR = 20;
+
 export type LabelMode = 'fraction' | 'decimal' | 'percent' | 'none';
 
 export interface ShadedSegment {
@@ -52,14 +56,20 @@ export const fractionWallURLSerializer: URLStateSerializer<FractionWallState> = 
     deserialize: (params) => {
         const v = parseList(params.get('v'), p => {
             const d = parseInt(p);
-            return isNaN(d) ? null : d;
+            // Security: Enforce limits
+            if (isNaN(d) || d < 1 || d > MAX_DENOMINATOR) return null;
+            return d;
         });
 
         const s = parseList(params.get('s'), p => {
             const [dStr, iStr] = p.split(':');
             const d = parseInt(dStr);
             const i = parseInt(iStr);
-            return (isNaN(d) || isNaN(i)) ? null : { d, i };
+            // Security: Enforce limits
+            if (isNaN(d) || isNaN(i)) return null;
+            if (d < 1 || d > MAX_DENOMINATOR) return null;
+            if (i < 0 || i >= d) return null; // Segment index must be valid
+            return { d, i };
         });
 
         const lMode = params.get('l');
@@ -79,7 +89,11 @@ export const fractionWallURLSerializer: URLStateSerializer<FractionWallState> = 
                     const [dStr, iStr] = p.split(':');
                     const d = parseInt(dStr);
                     const i = parseInt(iStr);
-                    return (isNaN(d) || isNaN(i)) ? null : { d, i };
+                    // Security: Enforce limits
+                    if (isNaN(d) || isNaN(i)) return null;
+                    if (d < 1 || d > MAX_DENOMINATOR) return null;
+                    if (i < 0 || i >= d) return null;
+                    return { d, i };
                 };
                 const s1 = parseSeg(parts[0]);
                 const s2 = parseSeg(parts[1]);
