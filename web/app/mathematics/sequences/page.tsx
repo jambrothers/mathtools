@@ -17,6 +17,7 @@ import helpContent from './HELP.md';
 import { ChevronDown, RotateCcw, Eye, EyeOff, Calculator, Type, Settings, Dices, Check, Plus, Info, X } from "lucide-react";
 import { cn } from '@/lib/utils';
 import { SequenceType } from './_lib/sequences';
+import { useExperimentalBanner } from '@/components/tool-ui/experimental-banner-context';
 
 function SequencesPageLoading() {
     return (
@@ -97,6 +98,8 @@ function SequencesPageContent() {
     // Config Positioning logic (for the floating panel)
     const configBtnRef = React.useRef<HTMLDivElement>(null);
 
+    const { bannerHeight } = useExperimentalBanner();
+
     const toggleRandomType = (type: SequenceType) => {
         setSelectedRandomTypes(prev =>
             prev.includes(type)
@@ -106,7 +109,10 @@ function SequencesPageContent() {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-81px)] w-full bg-slate-50 dark:bg-slate-950 overflow-hidden text-slate-900 dark:text-slate-100 uppercase-buttons">
+        <div
+            className="flex flex-col w-full bg-slate-50 dark:bg-slate-950 overflow-hidden text-slate-900 dark:text-slate-100 uppercase-buttons"
+            style={{ height: `calc(100vh - 81px - ${bannerHeight}px)`, marginTop: bannerHeight }}
+        >
             <SetPageTitle title="Sequences Tool" />
 
             <Toolbar className="sticky top-0">

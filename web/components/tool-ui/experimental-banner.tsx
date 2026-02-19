@@ -3,6 +3,7 @@
 import * as React from "react"
 import { FlaskConical } from "lucide-react"
 import { Banner } from "./banner"
+import { ExperimentalBannerProvider, useExperimentalBanner } from "./experimental-banner-context"
 
 interface ExperimentalBannerProps {
     pageId: string
@@ -10,8 +11,38 @@ interface ExperimentalBannerProps {
 }
 
 export function ExperimentalBanner({ pageId, children }: ExperimentalBannerProps) {
+    return (
+        <ExperimentalBannerProvider>
+            <ExperimentalBannerInner pageId={pageId}>
+                {children}
+            </ExperimentalBannerInner>
+        </ExperimentalBannerProvider>
+    )
+}
+
+function ExperimentalBannerInner({ pageId, children }: ExperimentalBannerProps) {
     const [isDismissed, setIsDismissed] = React.useState(false)
     const [mounted, setMounted] = React.useState(false)
+    const { setBannerHeight } = useExperimentalBanner()
+    const bannerRef = React.useRef<HTMLDivElement>(null)
+
+    React.useEffect(() => {
+        if (bannerRef.current && !isDismissed) {
+            setBannerHeight(bannerRef.current.offsetHeight)
+        } else {
+            setBannerHeight(0)
+        }
+    }, [isDismissed, mounted, setBannerHeight])
+
+    React.useEffect(() => {
+        const handleResize = () => {
+            if (bannerRef.current && !isDismissed) {
+                setBannerHeight(bannerRef.current.offsetHeight)
+            }
+        }
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [isDismissed, setBannerHeight])
 
     React.useEffect(() => {
         setMounted(true)
@@ -24,26 +55,29 @@ export function ExperimentalBanner({ pageId, children }: ExperimentalBannerProps
     const handleDismiss = () => {
         setIsDismissed(true)
         sessionStorage.setItem(`mathtools-experimental-dismissed-${pageId}`, "true")
+        setBannerHeight(0)
     }
 
     // Don't render banner on server/hydration to avoid mismatch
     // But always render children
 
     return (
-        <div className="flex flex-col w-full h-full">
+        <>
             {mounted && !isDismissed && (
-                <Banner
-                    title="Experimental Feature"
-                    description="This page is experimental and features could change at any time."
-                    icon={<FlaskConical size={20} />}
-                    layout="row"
-                    onDismiss={handleDismiss}
-                    className="shrink-0 relative z-40"
-                />
+                <div
+                    ref={bannerRef}
+                    className="fixed top-[81px] left-0 right-0 z-40"
+                >
+                    <Banner
+                        title="Experimental Feature"
+                        description="This page is experimental and features could change at any time."
+                        icon={<FlaskConical size={20} />}
+                        layout="row"
+                        onDismiss={handleDismiss}
+                    />
+                </div>
             )}
-            <div className="flex-1 min-h-0 relative">
-                {children}
-            </div>
-        </div>
+            {children}
+        </>
     )
 }

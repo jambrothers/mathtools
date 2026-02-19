@@ -24,6 +24,27 @@ test.describe('Experimental Banner Integration', () => {
             await expect(bannerTitle).toBeVisible();
             await expect(bannerDesc).toBeVisible();
 
+            // Check for occlusion - Banner should be at the top (approx y=81), Content should be below it
+            const bannerBox = await page.locator('.fixed.z-40').boundingBox();
+            // We need to find the main content. For tools using InteractiveToolLayout, it's the element with z-[40] fixed.
+            // For sequences, it's the flex col wrapper.
+            // Let's grab the banner height and verify the content starts after it.
+
+            if (bannerBox) {
+                // Verify banner is positioned correctly (below header which is ~81px)
+                expect(bannerBox.y).toBeGreaterThanOrEqual(80);
+
+                // Now check that the tool content is pushed down.
+                // We pick a key element from the tool content. Be generic.
+                const toolContent = page.locator('main, div.flex-col > .flex-1').last();
+                const contentBox = await toolContent.boundingBox();
+
+                if (contentBox) {
+                    // The content should start at least where the banner ends
+                    expect(contentBox.y).toBeGreaterThanOrEqual(bannerBox.y + bannerBox.height);
+                }
+            }
+
             // Dismiss it
             await page.getByRole('button', { name: 'Continue Anyway' }).click();
 

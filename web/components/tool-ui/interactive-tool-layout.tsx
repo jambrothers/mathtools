@@ -3,6 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { ChevronRight } from "lucide-react"
+import { useExperimentalBanner } from "./experimental-banner-context"
 
 /**
  * Props for the InteractiveToolLayout.
@@ -53,6 +54,7 @@ export function InteractiveToolLayout({
     dataTestId = "interactive-tool-layout"
 }: InteractiveToolLayoutProps) {
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(true)
+    const { bannerHeight } = useExperimentalBanner()
 
     React.useEffect(() => {
         const checkWidth = () => {
@@ -74,7 +76,8 @@ export function InteractiveToolLayout({
 
     return (
         <div
-            className={cn("fixed inset-0 top-[81px] overflow-hidden flex bg-[var(--theme-page)] z-[40]", className)}
+            className={cn("fixed inset-0 overflow-hidden flex bg-[var(--theme-page)] z-[40]", className)}
+            style={{ top: 81 + bannerHeight }}
             data-testid={dataTestId}
         >
             {/* Main Content Area */}
