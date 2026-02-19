@@ -53,6 +53,26 @@ export function NumberLineSVG({
     const majorTicks = ticks.filter(t => t.type === 'major');
     const majorStep = majorTicks.length > 1 ? majorTicks[1].value - majorTicks[0].value : 1;
 
+    // Heuristic: Should we stagger labels to prevent overlap?
+    const shouldStagger = React.useMemo(() => {
+        if (!showLabels || majorTicks.length === 0) return false;
+
+        // Find the longest label text
+        const longestLabel = majorTicks.reduce((max, tick) => {
+            const label = formatTickLabel(tick.value);
+            return label.length > max.length ? label : max;
+        }, "");
+
+        // Estimated pixel width (approx 10px per char for text-base to be safe)
+        const estLabelWidth = longestLabel.length * 10;
+
+        // Pixels between major ticks
+        const pixelsPerTick = Math.abs(toPixelX(majorTicks[0].value + majorStep, viewport, NUMBER_LINE_CANVAS_WIDTH) - toPixelX(majorTicks[0].value, viewport, NUMBER_LINE_CANVAS_WIDTH));
+
+        // Stagger if labels would take up > 70% of available horizontal space
+        return estLabelWidth > (pixelsPerTick * 0.7);
+    }, [majorTicks, majorStep, showLabels, viewport]);
+
     const centerY = NUMBER_LINE_CANVAS_HEIGHT / 2;
     const lineY = centerY;
 
@@ -61,6 +81,15 @@ export function NumberLineSVG({
         const rect = svgRef.current.getBoundingClientRect();
         const x = ((clientX - rect.left) / rect.width) * NUMBER_LINE_CANVAS_WIDTH;
         return fromPixelX(x, viewport, NUMBER_LINE_CANVAS_WIDTH);
+    };
+
+    const handleLineClickEvent = (e: React.MouseEvent) => {
+        if (interactionMode !== 'add-point' || !onLineClick || !svgRef.current) return;
+
+        const rect = svgRef.current.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * NUMBER_LINE_CANVAS_WIDTH;
+        const value = fromPixelX(x, viewport, NUMBER_LINE_CANVAS_WIDTH);
+        onLineClick(value);
     };
 
     const handlePointerDown = (e: React.PointerEvent, id: string) => {
@@ -91,9 +120,19 @@ export function NumberLineSVG({
         <svg
             ref={svgRef}
             viewBox={`0 0 ${NUMBER_LINE_CANVAS_WIDTH} ${NUMBER_LINE_CANVAS_HEIGHT}`}
-            className="w-full h-full touch-none select-none bg-white dark:bg-slate-900"
+            className={cn(
+                "w-full h-full touch-none select-none bg-white dark:bg-slate-900 outline-none",
+                interactionMode === 'add-point' && "cursor-crosshair"
+            )}
             onPointerMove={handlePointerMove}
             onWheel={handleWheel}
+            onClick={(e) => {
+                // If in add-point mode, and NOT clicking on an existing point/arc
+                // (points/arcs stop propagation, so we only get here if clicking "line" or background)
+                if (interactionMode === 'add-point' && onLineClick) {
+                    handleLineClickEvent(e);
+                }
+            }}
             data-testid="number-line-svg"
         >
             <defs>
@@ -119,24 +158,6 @@ export function NumberLineSVG({
                 </marker>
             </defs>
 
-            {/* Click hit area - Explicitly handles clicks for adding points */}
-            <rect
-                x={0}
-                y={lineY - 40}
-                width={NUMBER_LINE_CANVAS_WIDTH}
-                height={80}
-                fill="transparent"
-                pointerEvents="all"
-                className={cn(interactionMode === 'add-point' && "cursor-crosshair")}
-                onClick={(e) => {
-                    // Only trigger if we are in adding mode
-                    if (interactionMode === 'add-point' && onLineClick) {
-                        e.stopPropagation(); // Prevent bubbling if needed
-                        const newValue = getGraphX(e.clientX);
-                        onLineClick(newValue);
-                    }
-                }}
-            />
             {/* Main Axis Line */}
             <line
                 x1={15}
@@ -169,10 +190,11 @@ export function NumberLineSVG({
                     const isZero = tick.value === 0;
 
                     // Stagger labels based on even/odd multiples of step size
-                    // Use Math.round to avoid floating point jitter near integer boundaries
+                    // User requested: "evens further down", "odds closer"
                     const stepIndex = Math.round(tick.value / majorStep);
-                    // Determine if we should stagger based on parity of the step index
-                    const isStaggered = Math.abs(stepIndex) % 2 === 1;
+                    // Standard height (closer) for ODDS (isStaggered = false)
+                    // Lower height (further) for EVENS (isStaggered = true)
+                    const isStaggered = shouldStagger && (Math.abs(stepIndex) % 2 === 0);
 
                     return (
                         <g key={`tick-${i}`} className="text-slate-600 dark:text-slate-400 pointer-events-none">

@@ -97,24 +97,28 @@ export function useNumberLine() {
         if (points.length >= MAX_POINTS) return;
 
         const id = `p-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        const snappedValue = snapToTicks ? snapToTick(value, viewport) : value;
 
-        // Auto-assign letter label if none provided
-        let finalLabel = label;
-        if (!finalLabel) {
-            const letter = String.fromCharCode(65 + (points.length % 26)); // A, B, C...
-            finalLabel = letter;
-        }
+        setPoints(prev => {
+            if (prev.length >= MAX_POINTS) return prev;
 
-        const newPoint: PointMarker = {
-            id,
-            value: snapToTicks ? snapToTick(value, viewport) : value,
-            label: finalLabel,
-            color: POINT_COLORS[points.length % POINT_COLORS.length]
-        };
+            // Auto-assign letter label if none provided
+            let finalLabel = label;
+            if (!finalLabel) {
+                const letter = String.fromCharCode(65 + (prev.length % 26)); // A, B, C...
+                finalLabel = letter;
+            }
 
-        setPoints(prev => [...prev, newPoint]);
+            const newPoint: PointMarker = {
+                id,
+                value: snappedValue,
+                label: finalLabel,
+                color: POINT_COLORS[prev.length % POINT_COLORS.length]
+            };
+            return [...prev, newPoint];
+        });
         return id;
-    }, [points, snapToTicks, viewport]);
+    }, [snapToTicks, viewport, points.length]);
 
     const removePoint = useCallback((id: string) => {
         setPoints(prev => prev.filter(p => p.id !== id));

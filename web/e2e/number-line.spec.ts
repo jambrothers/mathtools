@@ -124,11 +124,13 @@ test.describe('Number Line Tool', () => {
 
         const svg = page.getByTestId('number-line-svg');
 
-        // Click on the SVG at roughly 50% width (0 on -10 to 10 scale)
-        const box = await svg.boundingBox();
-        if (box) {
-            await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-        }
+        // Targeted via its data-testid for the active hit area
+        const hitArea = svg.getByTestId('number-line-hit-area');
+        await expect(hitArea).toBeVisible();
+
+        // Click on the hit area at 50% width (0 on -10 to 10 scale)
+        // Canvas height is 500, so center is 250.
+        await hitArea.click({ position: { x: 500, y: 250 } });
 
         // Wait a bit for the point to be added
         await page.waitForTimeout(500);
@@ -142,17 +144,26 @@ test.describe('Number Line Tool', () => {
     test('should support ordering exercises with progressive reveal', async ({ page }) => {
         // 1. Add some points
         await page.click('button:has-text("Click to Add Point")');
+        await expect(page.getByText('Finish Adding')).toBeVisible();
         const svg = page.getByTestId('number-line-svg');
         const box = await svg.boundingBox();
         if (!box) throw new Error('Could not find number line bounding box');
 
-        // Click at 25% and 75% of width (roughly -5 and 5 in default -10 to 10)
-        await page.mouse.click(box.x + box.width * 0.25, box.y + box.height / 2);
-        await page.mouse.click(box.x + box.width * 0.75, box.y + box.height / 2);
+        // Buffer wait for interaction mode state to settle
+        await page.waitForTimeout(200);
+
+        // Click on the SVG directly at tick-aligned positions
+        // Canvas width 1000. 200/1000 = 0.2. Value = -10 + 0.2*20 = -6.
+        // 700/1000 = 0.7. Value = -10 + 0.7*20 = 4.
+        // Height 500. Center = 250.
+        await svg.click({ position: { x: 200, y: 250 } });
+        await page.waitForTimeout(100);
+        await svg.click({ position: { x: 700, y: 250 } });
+        await page.waitForTimeout(100);
 
         // Verify auto-labels A and B in SVG
-        await expect(svg.getByText('A', { exact: true }).first()).toBeVisible();
-        await expect(svg.getByText('B', { exact: true }).first()).toBeVisible();
+        await expect(svg.getByText('A (-6)')).toBeVisible();
+        await expect(svg.getByText('B (4)')).toBeVisible();
 
         // 2. Hide all points
         await page.click('button:has-text("Hide All")');
