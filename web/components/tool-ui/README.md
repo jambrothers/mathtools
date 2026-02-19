@@ -163,6 +163,24 @@ A dialog for exporting the canvas content.
 - **Formats**: Supports PNG (raster) and SVG (vector) export.
 - **Accessibility**: Focus management and keyboard support.
 
+### TimerWidget
+`timer-widget.tsx`
+
+A standalone timer component with start/pause/reset functionality.
+- **Features**:
+    - Preset durations (30s, 1m, 2m).
+    - Visual countdown with progress indication.
+    - "Time's up" visual feedback.
+    - Accessible roles and announcements.
+
+### Toast
+`toast.tsx`
+
+A notification component that renders via React Portal to ensure visibility.
+- **Positioning**: Fixed to the bottom-center of the screen.
+- **Variants**: `default`, `success`, `error`.
+- **Accessibility**: Uses `role="status"` and `aria-live` regions.
+
 ## Creating a New Tool
 
 1.  **Create the Page**: `app/mathematics/my-tool/page.tsx`
