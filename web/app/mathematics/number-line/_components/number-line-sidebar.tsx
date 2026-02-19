@@ -37,6 +37,10 @@ interface NumberLineSidebarProps {
     onToggleLabels: (show: boolean) => void;
     onToggleHide: (hide: boolean) => void;
     onToggleSnap: (snap: boolean) => void;
+    interactionMode: 'default' | 'add-arc';
+    pendingArcStart: string | null;
+    onSetInteractionMode: (mode: 'default' | 'add-arc') => void;
+    onSetPendingArcStart: (id: string | null) => void;
     onReset: () => void;
     onCopyLink: () => void;
     onExport: () => void;
@@ -59,6 +63,10 @@ export function NumberLineSidebar({
     onToggleLabels,
     onToggleHide,
     onToggleSnap,
+    interactionMode,
+    pendingArcStart,
+    onSetInteractionMode,
+    onSetPendingArcStart,
     onReset,
     onCopyLink,
     onExport
@@ -167,8 +175,44 @@ export function NumberLineSidebar({
             </ControlSection>
 
             {/* Arcs management */}
-            <ControlSection title="Jump Arcs" defaultOpen={false} icon={<ArrowRightLeft className="w-4 h-4" />}>
-                <div className="space-y-2 mb-4">
+            <ControlSection title="Jump Arcs" defaultOpen={true} icon={<ArrowRightLeft className="w-4 h-4" />}>
+                <div className="space-y-3 mb-4">
+                    <button
+                        onClick={() => {
+                            if (interactionMode === 'add-arc') {
+                                onSetInteractionMode('default');
+                                onSetPendingArcStart(null);
+                            } else {
+                                onSetInteractionMode('add-arc');
+                            }
+                        }}
+                        className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-colors ${interactionMode === 'add-arc'
+                                ? "bg-amber-100 text-amber-900 border border-amber-200 hover:bg-amber-200"
+                                : "bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100"
+                            }`}
+                    >
+                        <ArrowRightLeft className="w-4 h-4" />
+                        {interactionMode === 'add-arc' ? 'Finish Drawing' : 'Draw Jump Arc'}
+                    </button>
+
+                    {interactionMode === 'add-arc' && (
+                        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 p-2 rounded text-xs text-amber-800 dark:text-amber-200 animate-pulse">
+                            {pendingArcStart
+                                ? "Click second point to finish arc..."
+                                : "Click first point to start arc..."
+                            }
+                        </div>
+                    )}
+
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                            <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
+                        </div>
+                        <div className="relative flex justify-center text-xs">
+                            <span className="px-2 bg-white dark:bg-slate-900 text-slate-400">or manual add</span>
+                        </div>
+                    </div>
+
                     <div className="flex gap-2">
                         <select
                             value={arcFrom}

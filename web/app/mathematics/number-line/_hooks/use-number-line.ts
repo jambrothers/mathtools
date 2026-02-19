@@ -17,6 +17,8 @@ import {
     MAX_POINTS
 } from '../constants';
 
+export type InteractionMode = 'default' | 'add-arc';
+
 export function useNumberLine() {
     const [min, setMin] = useState(DEFAULT_VIEWPORT.min);
     const [max, setMax] = useState(DEFAULT_VIEWPORT.max);
@@ -25,6 +27,9 @@ export function useNumberLine() {
     const [showLabels, setShowLabels] = useState(true);
     const [hideValues, setHideValues] = useState(false);
     const [snapToTicks, setSnapToTicks] = useState(true);
+
+    const [interactionMode, setInteractionMode] = useState<InteractionMode>('default');
+    const [pendingArcStart, setPendingArcStart] = useState<string | null>(null);
 
     // Memoize viewport to prevent unnecessary re-renders and stabilize hook dependencies
     const viewport = useMemo<Viewport>(() => ({ min, max }), [min, max]);
@@ -62,13 +67,25 @@ export function useNumberLine() {
         setShowLabels(true);
         setHideValues(false);
         setSnapToTicks(true);
+        setInteractionMode('default');
+        setPendingArcStart(null);
+    }, []);
+
+    // Arc Actions
+    const addArc = useCallback((fromId: string, toId: string, label?: string) => {
+        const newArc: JumpArc = { fromId, toId, label };
+        setArcs(prev => [...prev, newArc]);
+    }, []);
+
+    const removeArc = useCallback((index: number) => {
+        setArcs(prev => prev.filter((_, i) => i !== index));
     }, []);
 
     // Point Actions
     const addPoint = useCallback((value: number, label?: string) => {
         if (points.length >= MAX_POINTS) return;
 
-        const id = `p-${Date.now()}`;
+        const id = `p-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
         const newPoint: PointMarker = {
             id,
             value: snapToTicks ? snapToTick(value, viewport) : value,
@@ -84,7 +101,8 @@ export function useNumberLine() {
         setPoints(prev => prev.filter(p => p.id !== id));
         // Also remove arcs connected to this point
         setArcs(prev => prev.filter(a => a.fromId !== id && a.toId !== id));
-    }, []);
+        if (pendingArcStart === id) setPendingArcStart(null);
+    }, [pendingArcStart]);
 
     const movePoint = useCallback((id: string, newValue: number) => {
         setPoints(prev => prev.map(p =>
@@ -94,15 +112,20 @@ export function useNumberLine() {
         ));
     }, [snapToTicks, viewport]);
 
-    // Arc Actions
-    const addArc = useCallback((fromId: string, toId: string, label?: string) => {
-        const newArc: JumpArc = { fromId, toId, label };
-        setArcs(prev => [...prev, newArc]);
-    }, []);
+    const handlePointClick = useCallback((id: string) => {
+        if (interactionMode !== 'add-arc') return;
 
-    const removeArc = useCallback((index: number) => {
-        setArcs(prev => prev.filter((_, i) => i !== index));
-    }, []);
+        if (pendingArcStart === null) {
+            setPendingArcStart(id);
+        } else if (pendingArcStart === id) {
+            // Deselect if clicking same point
+            setPendingArcStart(null);
+        } else {
+            // Connect points
+            addArc(pendingArcStart, id);
+            setPendingArcStart(null);
+        }
+    }, [interactionMode, pendingArcStart, addArc]);
 
     // Initialization
     const initFromState = useCallback((state: NumberLineState) => {
@@ -113,6 +136,8 @@ export function useNumberLine() {
         setShowLabels(state.showLabels);
         setHideValues(state.hideValues);
         setSnapToTicks(state.snapToTicks);
+        setInteractionMode('default');
+        setPendingArcStart(null);
     }, []);
 
     return {
@@ -124,6 +149,8 @@ export function useNumberLine() {
         showLabels,
         hideValues,
         snapToTicks,
+        interactionMode,
+        pendingArcStart,
 
         setMin,
         setMax,
@@ -137,6 +164,7 @@ export function useNumberLine() {
         addPoint,
         removePoint,
         movePoint,
+        handlePointClick,
 
         addArc,
         removeArc,
@@ -144,6 +172,8 @@ export function useNumberLine() {
         setShowLabels,
         setHideValues,
         setSnapToTicks,
+        setInteractionMode,
+        setPendingArcStart,
 
         initFromState
     };

@@ -21,7 +21,10 @@ interface NumberLineSVGProps {
     arcs: JumpArc[];
     showLabels: boolean;
     hideValues: boolean;
+    interactionMode: 'default' | 'add-arc';
+    pendingArcStart: string | null;
     onPointMove?: (id: string, newValue: number) => void;
+    onPointClick?: (id: string) => void;
     onZoom?: (focalPoint: number, factor: number) => void;
 }
 
@@ -31,7 +34,10 @@ export function NumberLineSVG({
     arcs,
     showLabels,
     hideValues,
+    interactionMode,
+    pendingArcStart,
     onPointMove,
+    onPointClick,
     onZoom
 }: NumberLineSVGProps) {
     const svgRef = React.useRef<SVGSVGElement>(null);
@@ -166,23 +172,37 @@ export function NumberLineSVG({
             {points.map((p) => {
                 const x = toPixelX(p.value, viewport, NUMBER_LINE_CANVAS_WIDTH);
                 const isDragging = dragState?.id === p.id;
+                const isPending = pendingArcStart === p.id;
+                const isAddMode = interactionMode === 'add-arc';
 
                 return (
                     <g
                         key={p.id}
-                        onPointerDown={(e) => handlePointerDown(e, p.id)}
+                        onPointerDown={(e) => {
+                            if (isAddMode) {
+                                e.stopPropagation();
+                                onPointClick?.(p.id);
+                            } else {
+                                handlePointerDown(e, p.id);
+                            }
+                        }}
                         onPointerUp={handlePointerUp}
-                        className="cursor-move group"
+                        className={cn(
+                            isAddMode ? "cursor-pointer" : "cursor-move",
+                            "group"
+                        )}
                         data-testid={`point-${p.id}`}
                     >
-                        {/* Glow/Hover state */}
+                        {/* Highlights (Ring if pending, Glow on hover) */}
                         <circle
                             cx={x}
                             cy={lineY}
-                            r={12}
+                            r={isPending ? 15 : 12}
                             className={cn(
-                                "fill-transparent group-hover:fill-slate-200/50 dark:group-hover:fill-slate-700/50 transition-colors",
-                                isDragging && "fill-slate-200/80 dark:fill-slate-700/80"
+                                "fill-transparent transition-all duration-200",
+                                !isPending && "group-hover:fill-slate-200/50 dark:group-hover:fill-slate-700/50",
+                                isDragging && "fill-slate-200/80 dark:fill-slate-700/80",
+                                isPending && "fill-amber-400/20 stroke-amber-400 stroke-2 animate-pulse"
                             )}
                         />
                         {/* The Point */}
@@ -191,14 +211,20 @@ export function NumberLineSVG({
                             cy={lineY}
                             r={6}
                             fill={p.color}
-                            className="stroke-white dark:stroke-slate-900 stroke-2"
+                            className={cn(
+                                "stroke-white dark:stroke-slate-900 stroke-2 transition-transform duration-200",
+                                isPending && "scale-125"
+                            )}
                         />
                         {/* Label */}
                         <text
                             x={x}
                             y={lineY - 25}
                             textAnchor="middle"
-                            className="text-sm font-bold fill-slate-900 dark:fill-slate-100"
+                            className={cn(
+                                "text-sm font-bold fill-slate-900 dark:fill-slate-100 transition-all",
+                                isPending && "fill-amber-600 dark:fill-amber-400 -translate-y-1"
+                            )}
                         >
                             {hideValues ? (p.label ? p.label : "?") : (p.label ? `${p.label} (${formatTickLabel(p.value)})` : formatTickLabel(p.value))}
                         </text>

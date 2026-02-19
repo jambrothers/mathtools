@@ -23,6 +23,10 @@ function NumberLineContent() {
         showLabels,
         hideValues,
         snapToTicks,
+        interactionMode,
+        pendingArcStart,
+        setInteractionMode,
+        setPendingArcStart,
         setRange,
         zoom,
         zoomIn,
@@ -30,6 +34,7 @@ function NumberLineContent() {
         addPoint,
         removePoint,
         movePoint,
+        handlePointClick,
         addArc,
         removeArc,
         setShowLabels,
@@ -85,6 +90,8 @@ function NumberLineContent() {
                     showLabels={showLabels}
                     hideValues={hideValues}
                     snapToTicks={snapToTicks}
+                    interactionMode={interactionMode}
+                    pendingArcStart={pendingArcStart}
                     onSetRange={setRange}
                     onZoomIn={zoomIn}
                     onZoomOut={zoomOut}
@@ -95,6 +102,8 @@ function NumberLineContent() {
                     onToggleLabels={setShowLabels}
                     onToggleHide={setHideValues}
                     onToggleSnap={setSnapToTicks}
+                    onSetInteractionMode={setInteractionMode}
+                    onSetPendingArcStart={setPendingArcStart}
                     onReset={reset}
                     onCopyLink={() => copyShareableUrl({ min, max, points, arcs, showLabels, hideValues, snapToTicks })}
                     onExport={() => setIsExportOpen(true)}
@@ -109,7 +118,10 @@ function NumberLineContent() {
                         arcs={arcs}
                         showLabels={showLabels}
                         hideValues={hideValues}
+                        interactionMode={interactionMode}
+                        pendingArcStart={pendingArcStart}
                         onPointMove={movePoint}
+                        onPointClick={handlePointClick}
                         onZoom={(focal, factor) => {
                             zoom(factor, focal);
                         }}

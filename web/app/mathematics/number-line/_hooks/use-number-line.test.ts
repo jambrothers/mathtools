@@ -100,4 +100,60 @@ describe('useNumberLine Hook', () => {
 
         expect(result.current.max - result.current.min).toBeCloseTo(initialRange);
     });
+
+    it('should manage interaction mode and arc creation via clicks', () => {
+        const { result } = renderHook(() => useNumberLine());
+
+        // Initial state
+        expect(result.current.interactionMode).toBe('default');
+        expect(result.current.pendingArcStart).toBe(null);
+
+        act(() => {
+            result.current.addPoint(0);
+            result.current.addPoint(5);
+        });
+
+        const p1 = result.current.points[0].id;
+        const p2 = result.current.points[1].id;
+
+        // Switching mode
+        act(() => {
+            result.current.setInteractionMode('add-arc');
+        });
+        expect(result.current.interactionMode).toBe('add-arc');
+
+        // First click sets pending start
+        act(() => {
+            result.current.handlePointClick(p1);
+        });
+        expect(result.current.pendingArcStart).toBe(p1);
+
+        // Click same point deselects
+        act(() => {
+            result.current.handlePointClick(p1);
+        });
+        expect(result.current.pendingArcStart).toBe(null);
+
+        // Re-select p1, then click p2 to create arc
+        act(() => {
+            result.current.handlePointClick(p1);
+        });
+        act(() => {
+            result.current.handlePointClick(p2);
+        });
+
+        expect(result.current.arcs.length).toBe(1);
+        expect(result.current.arcs[0].fromId).toBe(p1);
+        expect(result.current.arcs[0].toId).toBe(p2);
+        expect(result.current.pendingArcStart).toBe(null);
+        // Mode stays active for rapid addition
+        expect(result.current.interactionMode).toBe('add-arc');
+
+        // Cancel/reset
+        act(() => {
+            result.current.reset();
+        });
+        expect(result.current.interactionMode).toBe('default');
+        expect(result.current.pendingArcStart).toBe(null);
+    });
 });

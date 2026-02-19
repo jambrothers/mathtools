@@ -63,4 +63,34 @@ test.describe('Number Line Tool', () => {
         await expect(svg.getByText('B (-1)', { exact: true })).toBeVisible();
         await expect(svg.getByText('+2', { exact: true })).toBeVisible();
     });
+
+    test('should create jump arcs interactively', async ({ page }) => {
+        // Add two points
+        await page.getByTestId('add-point-input').fill('0');
+        await page.getByTestId('add-point-button').click();
+        await page.getByTestId('add-point-input').fill('10');
+        await page.getByTestId('add-point-button').click();
+
+        // Start drawing mode
+        await page.getByRole('button', { name: 'Draw Jump Arc' }).click();
+        await expect(page.getByText('Click first point to start arc...')).toBeVisible();
+
+        const svg = page.getByTestId('number-line-svg');
+        const points = svg.getByTestId(/^point-p-/);
+
+        // Click first point - target the top-most circle
+        await points.nth(0).locator('circle').last().click({ force: true });
+        await expect(page.getByText('Click second point to finish arc...')).toBeVisible();
+
+        // Click second point
+        await points.nth(1).locator('circle').last().click({ force: true });
+
+        // Should create an arc
+        // Arcs don't have test-ids yet, but we can check if the instruction resets or just add an arc label
+        // Actually, let's just check if it resets to "first point" or stays in mode
+        await expect(page.getByText('Click first point to start arc...')).toBeVisible();
+
+        // Final check: manual addition should still show one arc
+        await expect(page.locator('text=Arc 1:')).toBeVisible();
+    });
 });
