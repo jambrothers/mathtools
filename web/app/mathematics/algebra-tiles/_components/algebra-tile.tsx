@@ -91,12 +91,12 @@ export const AlgebraTile = React.memo(function AlgebraTile({
         height: def.height
     }), [def.width, def.height]);
 
-    const handlePointerDown = (e: React.PointerEvent) => {
+    const handlePointerDown = React.useCallback((e: React.PointerEvent) => {
         // Stop bubbling so canvas doesn't clear selection when clicking a tile
         e.stopPropagation();
         onSelect?.(id, e.shiftKey || e.metaKey);
         handleDragStart(e);
-    };
+    }, [id, onSelect, handleDragStart]);
 
     // Event Priority Stack: Handles distinguishing between double and triple clicks.
     // Double click -> Flip
@@ -110,17 +110,17 @@ export const AlgebraTile = React.memo(function AlgebraTile({
         { delay: 200 } // Window to catch triple click after double click
     );
 
-    const handleDoubleClick = (e: React.MouseEvent) => {
+    const handleDoubleClick = React.useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
         pushEvent('DOUBLE');
-    };
+    }, [pushEvent]);
 
-    const handleClick = (e: React.MouseEvent) => {
+    const handleClick = React.useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
         if (e.detail === 3) {
             pushEvent('TRIPLE');
         }
-    };
+    }, [pushEvent]);
 
     return (
         <TileBase
