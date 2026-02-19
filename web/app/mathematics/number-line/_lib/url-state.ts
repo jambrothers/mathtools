@@ -11,6 +11,7 @@ export interface PointMarker {
     value: number;
     label?: string;
     color: string;
+    hidden?: boolean;
 }
 
 export interface JumpArc {
@@ -27,6 +28,7 @@ export interface NumberLineState {
     showLabels: boolean;
     hideValues: boolean;
     snapToTicks: boolean;
+    showNegativeRegion?: boolean;
 }
 
 const MAX_POINTS = 20;
@@ -39,7 +41,8 @@ const MAX_ARCS = 40;
 function serializePoints(points: PointMarker[]): string {
     return points.map(p => {
         const label = p.label || '';
-        return `${p.value},${label},${p.color}`;
+        const hidden = p.hidden ? '1' : '';
+        return `${p.value},${label},${p.color},${hidden}`;
     }).join('|');
 }
 
@@ -49,7 +52,7 @@ function serializePoints(points: PointMarker[]): string {
 function deserializePoints(value: string | null): PointMarker[] {
     let index = 0;
     return parseList(value, (part) => {
-        const [valStr, label, color] = part.split(',');
+        const [valStr, label, color, hiddenStr] = part.split(',');
         const val = parseFloat(valStr);
         if (isNaN(val)) return null;
 
@@ -58,7 +61,8 @@ function deserializePoints(value: string | null): PointMarker[] {
             id: `p-${index}`,
             value: val,
             label: label || undefined,
-            color: color || POINT_COLORS[(index - 1) % POINT_COLORS.length]
+            color: color || POINT_COLORS[(index - 1) % POINT_COLORS.length],
+            hidden: hiddenStr === '1'
         };
     }, { delimiter: '|', maxItems: MAX_POINTS });
 }

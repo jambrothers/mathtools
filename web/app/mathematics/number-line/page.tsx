@@ -34,6 +34,10 @@ function NumberLineContent() {
         addPoint,
         removePoint,
         movePoint,
+        togglePointHidden,
+        revealAllPoints,
+        hideAllPoints,
+        handleLineClick,
         handlePointClick,
         addArc,
         removeArc,
@@ -44,6 +48,7 @@ function NumberLineContent() {
         initFromState
     } = useNumberLine();
 
+    const [showNegativeRegion, setShowNegativeRegion] = useState(false);
     const [isExportOpen, setIsExportOpen] = useState(false);
 
     const { hasRestored, getShareableUrl, copyShareableUrl } = useUrlState(numberLineSerializer, {
@@ -63,11 +68,12 @@ function NumberLineContent() {
             arcs,
             showLabels,
             hideValues,
-            snapToTicks
+            snapToTicks,
+            showNegativeRegion
         };
         const url = getShareableUrl(state);
         window.history.replaceState({}, '', url);
-    }, [min, max, points, arcs, showLabels, hideValues, snapToTicks, hasRestored, getShareableUrl]);
+    }, [min, max, points, arcs, showLabels, hideValues, snapToTicks, showNegativeRegion, hasRestored, getShareableUrl]);
 
     const handleExport = async (format: 'png' | 'svg') => {
         const svg = document.querySelector('[data-testid="number-line-svg"]') as SVGSVGElement;
@@ -89,9 +95,8 @@ function NumberLineContent() {
                     arcs={arcs}
                     showLabels={showLabels}
                     hideValues={hideValues}
+                    showNegativeRegion={showNegativeRegion}
                     snapToTicks={snapToTicks}
-                    interactionMode={interactionMode}
-                    pendingArcStart={pendingArcStart}
                     onSetRange={setRange}
                     onZoomIn={zoomIn}
                     onZoomOut={zoomOut}
@@ -101,11 +106,17 @@ function NumberLineContent() {
                     onRemoveArc={removeArc}
                     onToggleLabels={setShowLabels}
                     onToggleHide={setHideValues}
+                    onToggleNegative={setShowNegativeRegion}
                     onToggleSnap={setSnapToTicks}
+                    onTogglePointHidden={togglePointHidden}
+                    onRevealAllPoints={revealAllPoints}
+                    onHideAllPoints={hideAllPoints}
+                    interactionMode={interactionMode}
+                    pendingArcStart={pendingArcStart}
                     onSetInteractionMode={setInteractionMode}
                     onSetPendingArcStart={setPendingArcStart}
                     onReset={reset}
-                    onCopyLink={() => copyShareableUrl({ min, max, points, arcs, showLabels, hideValues, snapToTicks })}
+                    onCopyLink={() => copyShareableUrl({ min, max, points, arcs, showLabels, hideValues, snapToTicks, showNegativeRegion })}
                     onExport={() => setIsExportOpen(true)}
                 />
             }
@@ -118,10 +129,12 @@ function NumberLineContent() {
                         arcs={arcs}
                         showLabels={showLabels}
                         hideValues={hideValues}
+                        showNegativeRegion={showNegativeRegion}
                         interactionMode={interactionMode}
                         pendingArcStart={pendingArcStart}
                         onPointMove={movePoint}
                         onPointClick={handlePointClick}
+                        onLineClick={handleLineClick}
                         onZoom={(focal, factor) => {
                             zoom(factor, focal);
                         }}

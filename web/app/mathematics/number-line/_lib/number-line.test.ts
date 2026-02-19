@@ -5,7 +5,8 @@ import {
     formatTickLabel,
     snapToTick,
     zoomViewport,
-    clampViewport
+    clampViewport,
+    formatJumpLabel
 } from './number-line';
 
 describe('Number Line Core Library', () => {
@@ -45,10 +46,20 @@ describe('Number Line Core Library', () => {
     });
 
     describe('Formatting', () => {
-        it('should format labels correctly without trailing zeros', () => {
+        it('should format tick labels correctly without trailing zeros', () => {
             expect(formatTickLabel(10)).toBe("10");
             expect(formatTickLabel(0.5)).toBe("0.5");
             expect(formatTickLabel(-1.2)).toBe("-1.2");
+        });
+
+        it('should format jump labels with proper plus/minus signs', () => {
+            expect(formatJumpLabel(0, 5)).toBe("+5");
+            expect(formatJumpLabel(5, 0)).toBe("−5");
+            expect(formatJumpLabel(-3, 2)).toBe("+5");
+            expect(formatJumpLabel(2, -3)).toBe("−5");
+            expect(formatJumpLabel(0, 0.5)).toBe("+0.5");
+            expect(formatJumpLabel(0.5, 0)).toBe("−0.5");
+            expect(formatJumpLabel(10, 10)).toBe("0");
         });
     });
 

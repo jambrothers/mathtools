@@ -7,8 +7,9 @@ import {
     ControlPresetButton
 } from "@/components/tool-ui/control-panel"
 import { Sidebar, SidebarButton } from "@/components/tool-ui/sidebar"
+import { cn } from "@/lib/utils"
 import { PointMarker, JumpArc } from "../_lib/url-state"
-import { Viewport } from "../_lib/number-line"
+import { Viewport, formatJumpLabel } from "../_lib/number-line"
 import {
     Plus,
     Minus,
@@ -17,7 +18,9 @@ import {
     Download,
     Target,
     ArrowRightLeft,
-    Trash2
+    Trash2,
+    Eye,
+    EyeOff
 } from "lucide-react"
 
 interface NumberLineSidebarProps {
@@ -26,6 +29,7 @@ interface NumberLineSidebarProps {
     arcs: JumpArc[];
     showLabels: boolean;
     hideValues: boolean;
+    showNegativeRegion: boolean;
     snapToTicks: boolean;
     onSetRange: (min: number, max: number) => void;
     onZoomIn: () => void;
@@ -36,10 +40,17 @@ interface NumberLineSidebarProps {
     onRemoveArc: (index: number) => void;
     onToggleLabels: (show: boolean) => void;
     onToggleHide: (hide: boolean) => void;
+    onToggleNegative: (show: boolean) => void;
     onToggleSnap: (snap: boolean) => void;
-    interactionMode: 'default' | 'add-arc';
+
+    // Hidden state actions
+    onTogglePointHidden: (id: string) => void;
+    onRevealAllPoints: () => void;
+    onHideAllPoints: () => void;
+
+    interactionMode: 'default' | 'add-arc' | 'add-point';
     pendingArcStart: string | null;
-    onSetInteractionMode: (mode: 'default' | 'add-arc') => void;
+    onSetInteractionMode: (mode: 'default' | 'add-arc' | 'add-point') => void;
     onSetPendingArcStart: (id: string | null) => void;
     onReset: () => void;
     onCopyLink: () => void;
@@ -52,6 +63,7 @@ export function NumberLineSidebar({
     arcs,
     showLabels,
     hideValues,
+    showNegativeRegion,
     snapToTicks,
     onSetRange,
     onZoomIn,
@@ -62,7 +74,11 @@ export function NumberLineSidebar({
     onRemoveArc,
     onToggleLabels,
     onToggleHide,
+    onToggleNegative,
     onToggleSnap,
+    onTogglePointHidden,
+    onRevealAllPoints,
+    onHideAllPoints,
     interactionMode,
     pendingArcStart,
     onSetInteractionMode,
@@ -135,15 +151,52 @@ export function NumberLineSidebar({
                     />
                 </div>
                 <div className="grid grid-cols-2 gap-2 mt-4">
+                    <ControlPresetButton label="-5 to 5" onClick={() => onSetRange(-5, 5)} isActive={viewport.min === -5 && viewport.max === 5} />
                     <ControlPresetButton label="-10 to 10" onClick={() => onSetRange(-10, 10)} isActive={viewport.min === -10 && viewport.max === 10} />
+                    <ControlPresetButton label="-20 to 20" onClick={() => onSetRange(-20, 20)} isActive={viewport.min === -20 && viewport.max === 20} />
+                    <ControlPresetButton label="-100 to 100" onClick={() => onSetRange(-100, 100)} isActive={viewport.min === -100 && viewport.max === 100} />
+                    <ControlPresetButton label="0 to 10" onClick={() => onSetRange(0, 10)} isActive={viewport.min === 0 && viewport.max === 10} />
                     <ControlPresetButton label="0 to 100" onClick={() => onSetRange(0, 100)} isActive={viewport.min === 0 && viewport.max === 100} />
                     <ControlPresetButton label="0 to 1" onClick={() => onSetRange(0, 1)} isActive={viewport.min === 0 && viewport.max === 1} />
+                    <ControlPresetButton label="0 to 2" onClick={() => onSetRange(0, 2)} isActive={viewport.min === 0 && viewport.max === 2} />
                     <ControlPresetButton label="-1 to 1" onClick={() => onSetRange(-1, 1)} isActive={viewport.min === -1 && viewport.max === 1} />
                 </div>
             </ControlSection>
 
             {/* Points management */}
             <ControlSection title="Points" defaultOpen={true} icon={<Plus className="w-4 h-4" />}>
+                <div className="flex gap-2 mb-4">
+                    <button
+                        onClick={onRevealAllPoints}
+                        className="flex-1 py-1 px-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-xs font-medium transition-colors"
+                    >
+                        Reveal All
+                    </button>
+                    <button
+                        onClick={onHideAllPoints}
+                        className="flex-1 py-1 px-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-xs font-medium transition-colors"
+                    >
+                        Hide All
+                    </button>
+                </div>
+
+                <button
+                    onClick={() => onSetInteractionMode(interactionMode === 'add-point' ? 'default' : 'add-point')}
+                    className={`w-full flex items-center justify-center gap-2 py-2 px-4 mb-4 rounded-md text-sm font-medium transition-colors ${interactionMode === 'add-point'
+                        ? "bg-amber-100 text-amber-900 border border-amber-200 hover:bg-amber-200"
+                        : "bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100"
+                        }`}
+                >
+                    <Plus className="w-4 h-4" />
+                    {interactionMode === 'add-point' ? 'Finish Adding' : 'Click to Add Point'}
+                </button>
+
+                {interactionMode === 'add-point' && (
+                    <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 p-2 mb-4 rounded text-xs text-amber-800 dark:text-amber-200 animate-pulse">
+                        Click on the number line to place points...
+                    </div>
+                )}
+
                 <div className="flex gap-2 mb-4">
                     <input
                         type="number"
@@ -165,9 +218,25 @@ export function NumberLineSidebar({
                         <div key={p.id} className="flex items-center gap-2 p-2 rounded bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: p.color }} />
                             <span className="text-sm flex-1 truncate">{p.label ? `${p.label} (${p.value})` : p.value}</span>
-                            <button onClick={() => onRemovePoint(p.id)} className="p-1 text-slate-400 hover:text-red-500">
-                                <Trash2 className="w-4 h-4" />
-                            </button>
+                            <div className="flex items-center gap-1">
+                                <button
+                                    onClick={() => onTogglePointHidden(p.id)}
+                                    className={cn(
+                                        "p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors",
+                                        p.hidden ? "text-slate-400" : "text-indigo-600 dark:text-indigo-400"
+                                    )}
+                                    title={p.hidden ? "Reveal Point" : "Hide Value"}
+                                >
+                                    {p.hidden ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                </button>
+                                <button
+                                    onClick={() => onRemovePoint(p.id)}
+                                    className="p-1 text-slate-400 hover:text-red-500 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                                    title="Remove Point"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
                         </div>
                     ))}
                     {points.length === 0 && <p className="text-xs text-slate-400 italic">No points added yet.</p>}
@@ -187,8 +256,8 @@ export function NumberLineSidebar({
                             }
                         }}
                         className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-medium transition-colors ${interactionMode === 'add-arc'
-                                ? "bg-amber-100 text-amber-900 border border-amber-200 hover:bg-amber-200"
-                                : "bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100"
+                            ? "bg-amber-100 text-amber-900 border border-amber-200 hover:bg-amber-200"
+                            : "bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100"
                             }`}
                     >
                         <ArrowRightLeft className="w-4 h-4" />
@@ -232,13 +301,20 @@ export function NumberLineSidebar({
                         </select>
                     </div>
                     <div className="flex gap-2">
-                        <input
-                            type="text"
-                            placeholder="+/- jump label"
-                            value={arcLabel}
-                            onChange={(e) => setArcLabel(e.target.value)}
-                            className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-sm text-slate-900 dark:text-slate-100 focus:outline-none"
-                        />
+                        {(() => {
+                            const fromP = points.find(p => p.id === arcFrom);
+                            const toP = points.find(p => p.id === arcTo);
+                            const placeholder = fromP && toP ? formatJumpLabel(fromP.value, toP.value) : "+/− jump label";
+                            return (
+                                <input
+                                    type="text"
+                                    placeholder={placeholder}
+                                    value={arcLabel}
+                                    onChange={(e) => setArcLabel(e.target.value)}
+                                    className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-sm text-slate-900 dark:text-slate-100 focus:outline-none"
+                                />
+                            );
+                        })()}
                         <button
                             onClick={handleAddArc}
                             disabled={!arcFrom || !arcTo}
@@ -262,6 +338,7 @@ export function NumberLineSidebar({
             <ControlSection title="Display Settings">
                 <ControlToggle label="Show Tick Labels" checked={showLabels} onChange={() => onToggleLabels(!showLabels)} />
                 <ControlToggle label="Hide Point Values" checked={hideValues} onChange={() => onToggleHide(!hideValues)} />
+                <ControlToggle label="Shade Negative Region" checked={showNegativeRegion} onChange={() => onToggleNegative(!showNegativeRegion)} />
                 <ControlToggle label="Snap to Ticks" checked={snapToTicks} onChange={() => onToggleSnap(!snapToTicks)} />
             </ControlSection>
 

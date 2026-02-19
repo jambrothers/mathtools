@@ -22,7 +22,8 @@ test.describe('Number Line Tool', () => {
 
         const svg = page.getByTestId('number-line-svg');
         await expect(svg.getByTestId(/^point-p-/).first()).toBeVisible();
-        await expect(svg.getByText('5', { exact: true })).toBeVisible();
+        // Point gets auto-labeled 'A', so text is 'A (5)'
+        await expect(svg.getByText('A (5)')).toBeVisible();
     });
 
     test('should hide and reveal values', async ({ page }) => {
@@ -36,12 +37,13 @@ test.describe('Number Line Tool', () => {
         await page.locator('label').filter({ hasText: 'Hide Point Values' }).click();
 
         const svg = page.getByTestId('number-line-svg');
+        // Value 7 should be hidden, but label 'A' should remain
         await expect(svg.getByText('7', { exact: true })).not.toBeVisible();
-        await expect(svg.getByText('?', { exact: true })).toBeVisible();
+        await expect(svg.getByText('A', { exact: true })).toBeVisible();
 
         // Toggle back
         await page.locator('label').filter({ hasText: 'Hide Point Values' }).click();
-        await expect(svg.getByText('7', { exact: true })).toBeVisible();
+        await expect(svg.getByText('A (7)', { exact: true })).toBeVisible();
     });
 
     test('should zoom and change ticks', async ({ page }) => {
@@ -86,11 +88,93 @@ test.describe('Number Line Tool', () => {
         await points.nth(1).locator('circle').last().click({ force: true });
 
         // Should create an arc
-        // Arcs don't have test-ids yet, but we can check if the instruction resets or just add an arc label
-        // Actually, let's just check if it resets to "first point" or stays in mode
         await expect(page.getByText('Click first point to start arc...')).toBeVisible();
 
         // Final check: manual addition should still show one arc
         await expect(page.locator('text=Arc 1:')).toBeVisible();
+    });
+
+    test('should auto-label jump arcs with the correct difference', async ({ page }) => {
+        // Disable snapping
+        await page.locator('label').filter({ hasText: 'Snap to Ticks' }).click();
+
+        // Add two points: 0 and -5
+        await page.getByTestId('add-point-input').fill('0');
+        await page.getByTestId('add-point-button').click();
+        await page.getByTestId('add-point-input').fill('-5');
+        await page.getByTestId('add-point-button').click();
+
+        // Create arc from 0 to -5
+        await page.getByRole('button', { name: 'Draw Jump Arc' }).click();
+        const svg = page.getByTestId('number-line-svg');
+        const points = svg.getByTestId(/^point-p-/);
+
+        // Click first point (auto-labeled A) and second (auto-labeled B)
+        await points.nth(0).locator('circle').last().click({ force: true });
+        await points.nth(1).locator('circle').last().click({ force: true });
+
+        // Check for minus sign − (not hyphen -)
+        await expect(svg.getByText('−5', { exact: true })).toBeVisible();
+    });
+
+    test('should add points by clicking on the number line in add-point mode', async ({ page }) => {
+        // Start add-point mode
+        await page.getByRole('button', { name: 'Click to Add Point' }).click();
+        await expect(page.getByText('Click on the number line to place points...')).toBeVisible();
+
+        const svg = page.getByTestId('number-line-svg');
+
+        // Click on the SVG at roughly 50% width (0 on -10 to 10 scale)
+        const box = await svg.boundingBox();
+        if (box) {
+            await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+        }
+
+        // Wait a bit for the point to be added
+        await page.waitForTimeout(500);
+
+        // Should create a point at 0
+        await expect(svg.getByTestId(/^point-p-/).first()).toBeVisible();
+        // Point gets auto-labeled 'A', so text is 'A (0)'
+        await expect(svg.getByText('A (0)')).toBeVisible();
+    });
+
+    test('should support ordering exercises with progressive reveal', async ({ page }) => {
+        // 1. Add some points
+        await page.click('button:has-text("Click to Add Point")');
+        const svg = page.getByTestId('number-line-svg');
+        const box = await svg.boundingBox();
+        if (!box) throw new Error('Could not find number line bounding box');
+
+        // Click at 25% and 75% of width (roughly -5 and 5 in default -10 to 10)
+        await page.mouse.click(box.x + box.width * 0.25, box.y + box.height / 2);
+        await page.mouse.click(box.x + box.width * 0.75, box.y + box.height / 2);
+
+        // Verify auto-labels A and B in SVG
+        await expect(svg.getByText('A', { exact: true }).first()).toBeVisible();
+        await expect(svg.getByText('B', { exact: true }).first()).toBeVisible();
+
+        // 2. Hide all points
+        await page.click('button:has-text("Hide All")');
+
+        // In hidden mode, labels should still be visible in SVG, but values are hidden
+        await expect(svg.getByText('A', { exact: true })).toBeVisible();
+        await expect(svg.getByText('(-5)')).not.toBeVisible();
+
+        // 3. Reveal first point specifically
+        // Find the eye icon for point A (first in list)
+        const pointItems = page.locator('div.flex.items-center.gap-2.p-2.rounded');
+        await pointItems.first().locator('button[title="Reveal Point"]').click();
+
+        // Now Point A should show its value again in SVG
+        await expect(svg.getByText('A (-5)')).toBeVisible();
+
+        // Point B should still be hidden in SVG
+        await expect(svg.getByText('B (5)')).not.toBeVisible();
+        await expect(svg.getByText('B', { exact: true })).toBeVisible();
+
+        // 4. Reveal all
+        await page.click('button:has-text("Reveal All")');
+        await expect(svg.getByText('B (5)')).toBeVisible();
     });
 });

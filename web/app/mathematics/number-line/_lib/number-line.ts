@@ -40,6 +40,19 @@ export function formatTickLabel(value: number): string {
 }
 
 /**
+ * Formats a jump operation label (e.g., +5, −3)
+ */
+export function formatJumpLabel(from: number, to: number): string {
+    const diff = to - from;
+    const formatted = parseFloat(diff.toFixed(10));
+
+    if (formatted === 0) return "0";
+
+    const sign = formatted > 0 ? "+" : "−"; // Using proper minus sign
+    return `${sign}${Math.abs(formatted)}`;
+}
+
+/**
  * Calculates adaptive ticks based on the current viewport
  */
 export function calculateTicks(viewport: Viewport): Tick[] {
@@ -137,7 +150,7 @@ export function zoomViewport(viewport: Viewport, factor: number, focalPoint?: nu
  */
 export function clampViewport(viewport: Viewport): Viewport {
     let { min, max } = viewport;
-    let range = max - min;
+    const range = max - min;
 
     if (range < MIN_VIEWPORT_RANGE) {
         const center = (min + max) / 2;

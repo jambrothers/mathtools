@@ -1,5 +1,5 @@
 export const NUMBER_LINE_CANVAS_WIDTH = 1000;
-export const NUMBER_LINE_CANVAS_HEIGHT = 400;
+export const NUMBER_LINE_CANVAS_HEIGHT = 500;
 
 export const DEFAULT_VIEWPORT = {
     min: -10,

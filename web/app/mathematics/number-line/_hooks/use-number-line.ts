@@ -3,7 +3,8 @@ import {
     Viewport,
     zoomViewport,
     clampViewport,
-    snapToTick
+    snapToTick,
+    formatJumpLabel
 } from '../_lib/number-line';
 import {
     PointMarker,
@@ -17,7 +18,7 @@ import {
     MAX_POINTS
 } from '../constants';
 
-export type InteractionMode = 'default' | 'add-arc';
+export type InteractionMode = 'default' | 'add-arc' | 'add-point';
 
 export function useNumberLine() {
     const [min, setMin] = useState(DEFAULT_VIEWPORT.min);
@@ -73,9 +74,19 @@ export function useNumberLine() {
 
     // Arc Actions
     const addArc = useCallback((fromId: string, toId: string, label?: string) => {
-        const newArc: JumpArc = { fromId, toId, label };
+        let arcLabel = label;
+
+        if (!arcLabel) {
+            const fromP = points.find(p => p.id === fromId);
+            const toP = points.find(p => p.id === toId);
+            if (fromP && toP) {
+                arcLabel = formatJumpLabel(fromP.value, toP.value);
+            }
+        }
+
+        const newArc: JumpArc = { fromId, toId, label: arcLabel };
         setArcs(prev => [...prev, newArc]);
-    }, []);
+    }, [points]);
 
     const removeArc = useCallback((index: number) => {
         setArcs(prev => prev.filter((_, i) => i !== index));
@@ -86,16 +97,24 @@ export function useNumberLine() {
         if (points.length >= MAX_POINTS) return;
 
         const id = `p-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+        // Auto-assign letter label if none provided
+        let finalLabel = label;
+        if (!finalLabel) {
+            const letter = String.fromCharCode(65 + (points.length % 26)); // A, B, C...
+            finalLabel = letter;
+        }
+
         const newPoint: PointMarker = {
             id,
             value: snapToTicks ? snapToTick(value, viewport) : value,
-            label,
+            label: finalLabel,
             color: POINT_COLORS[points.length % POINT_COLORS.length]
         };
 
         setPoints(prev => [...prev, newPoint]);
         return id;
-    }, [points.length, snapToTicks, viewport]);
+    }, [points, snapToTicks, viewport]);
 
     const removePoint = useCallback((id: string) => {
         setPoints(prev => prev.filter(p => p.id !== id));
@@ -111,6 +130,25 @@ export function useNumberLine() {
                 : p
         ));
     }, [snapToTicks, viewport]);
+
+    const togglePointHidden = useCallback((id: string) => {
+        setPoints(prev => prev.map(p =>
+            p.id === id ? { ...p, hidden: !p.hidden } : p
+        ));
+    }, []);
+
+    const revealAllPoints = useCallback(() => {
+        setPoints(prev => prev.map(p => ({ ...p, hidden: false })));
+    }, []);
+
+    const hideAllPoints = useCallback(() => {
+        setPoints(prev => prev.map(p => ({ ...p, hidden: true })));
+    }, []);
+
+    const handleLineClick = useCallback((value: number) => {
+        if (interactionMode !== 'add-point') return;
+        addPoint(value);
+    }, [interactionMode, addPoint]);
 
     const handlePointClick = useCallback((id: string) => {
         if (interactionMode !== 'add-arc') return;
@@ -164,6 +202,10 @@ export function useNumberLine() {
         addPoint,
         removePoint,
         movePoint,
+        togglePointHidden,
+        revealAllPoints,
+        hideAllPoints,
+        handleLineClick,
         handlePointClick,
 
         addArc,
