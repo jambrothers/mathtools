@@ -4,6 +4,7 @@ import * as React from "react"
 import { Suspense, useEffect, useState } from "react"
 import { InteractiveToolLayout } from "@/components/tool-ui/interactive-tool-layout"
 import { ResolutionGuard } from "@/components/tool-ui/resolution-guard"
+import { ExperimentalBanner } from "@/components/tool-ui/experimental-banner"
 import { SetPageTitle } from "@/components/set-page-title"
 import { NumberLineSVG } from "./_components/number-line-svg"
 import { NumberLineSidebar } from "./_components/number-line-sidebar"
@@ -172,8 +173,10 @@ export default function NumberLinePage() {
     return (
         <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
             <ResolutionGuard>
-                <SetPageTitle title="Number Line" />
-                <NumberLineContent />
+                <ExperimentalBanner pageId="number-line">
+                    <SetPageTitle title="Number Line" />
+                    <NumberLineContent />
+                </ExperimentalBanner>
             </ResolutionGuard>
         </Suspense>
     );

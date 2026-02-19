@@ -6,6 +6,7 @@ import { Toolbar, ToolbarGroup, ToolbarButton, ToolbarSeparator } from '@/compon
 import { CopyLinkButton } from '@/components/tool-ui/copy-link-button';
 import { Canvas } from '@/components/tool-ui/canvas';
 import { ResolutionGuard } from '@/components/tool-ui/resolution-guard';
+import { ExperimentalBanner } from '@/components/tool-ui/experimental-banner';
 import { useUrlState } from '@/lib/hooks/use-url-state';
 import { useSequences } from './_hooks/use-sequences';
 import { SequenceDisplay } from './_components/sequence-display';
@@ -29,7 +30,9 @@ export default function SequencesPage() {
     return (
         <React.Suspense fallback={<SequencesPageLoading />}>
             <ResolutionGuard>
-                <SequencesPageContent />
+                <ExperimentalBanner pageId="sequences">
+                    <SequencesPageContent />
+                </ExperimentalBanner>
             </ResolutionGuard>
         </React.Suspense>
     );

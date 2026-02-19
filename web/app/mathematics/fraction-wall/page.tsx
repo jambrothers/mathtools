@@ -3,6 +3,7 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { InteractiveToolLayout } from '@/components/tool-ui/interactive-tool-layout';
 import { ResolutionGuard } from '@/components/tool-ui/resolution-guard';
+import { ExperimentalBanner } from '@/components/tool-ui/experimental-banner';
 import { SetPageTitle } from '@/components/set-page-title';
 import { HelpModal } from '@/components/tool-ui/help-modal';
 import { HelpButton } from '@/components/tool-ui/help-button';
@@ -111,8 +112,10 @@ export default function FractionWallPage() {
     return (
         <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
             <ResolutionGuard>
-                <SetPageTitle title="Fraction Wall" />
-                <FractionWallContent />
+                <ExperimentalBanner pageId="fraction-wall">
+                    <SetPageTitle title="Fraction Wall" />
+                    <FractionWallContent />
+                </ExperimentalBanner>
             </ResolutionGuard>
         </Suspense>
     );
