@@ -25,3 +25,7 @@
 ## 2026-02-15 - Toggle Button State Feedback
 **Learning:** Standard `<button>` elements used for toggling features (like visibility or mode selection) often rely only on visual cues (background color), making their state invisible to screen readers.
 **Action:** Always use `aria-pressed={isActive}` for toggle buttons and mode selectors to explicitly communicate state changes. Pair this with `aria-label` when the button text (e.g., "1") lacks context.
+
+## 2026-02-16 - Input Labels in Game Configurations
+**Learning:** Game configuration sidebars often group inputs visually (e.g., "Min/Max" under a "Range" label) but fail to programmatically associate labels with inputs using `htmlFor`.
+**Action:** When visual labels are implicit or grouped, always provide explicit `aria-label` attributes on the inputs (e.g., "Minimum target value") to ensure screen readers can identify them.

@@ -128,6 +128,7 @@ export function CountdownSidebar({
                                 <button
                                     key={op.id}
                                     onClick={() => toggleOperation(op.id)}
+                                    aria-pressed={isEnabled}
                                     className={cn(
                                         "flex items-center justify-between p-3 rounded-xl border transition-all text-left",
                                         isEnabled
@@ -166,6 +167,8 @@ export function CountdownSidebar({
                                     <button
                                         key={val}
                                         onClick={() => setLargeNumbersCount(val as number | 'random')}
+                                        aria-pressed={config.largeNumbersCount === val}
+                                        aria-label={val === 'random' ? "Set random large numbers" : `Set ${val} large number${val === 1 ? '' : 's'}`}
                                         className={cn(
                                             "px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-tight transition-all",
                                             config.largeNumbersCount === val
@@ -186,6 +189,7 @@ export function CountdownSidebar({
                                     <span className="text-[10px] text-slate-400 ml-1">Min</span>
                                     <input
                                         type="number"
+                                        aria-label="Minimum target value"
                                         value={config.targetRange[0]}
                                         onChange={(e) => setTargetRange(Number(e.target.value), config.targetRange[1])}
                                         className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -195,6 +199,7 @@ export function CountdownSidebar({
                                     <span className="text-[10px] text-slate-400 ml-1">Max</span>
                                     <input
                                         type="number"
+                                        aria-label="Maximum target value"
                                         value={config.targetRange[1]}
                                         onChange={(e) => setTargetRange(config.targetRange[0], Number(e.target.value))}
                                         className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"

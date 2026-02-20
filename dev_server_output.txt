@@ -1,0 +1,12 @@
+
+> scarlet-halley@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+
+✓ Starting...
+✓ Ready in 1160ms
+○ Compiling /games/countdown ...
+ GET /games/countdown 200 in 3.8s (compile: 3.5s, render: 367ms)
