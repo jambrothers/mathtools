@@ -2,8 +2,7 @@
 
 import * as React from "react"
 import { Suspense, useEffect, useState } from "react"
-import { InteractiveToolLayout } from "@/components/tool-ui/interactive-tool-layout"
-import { ResolutionGuard } from "@/components/tool-ui/resolution-guard"
+import { ToolScaffold } from "@/components/tool-ui/tool-scaffold"
 import { ExperimentalBanner } from "@/components/tool-ui/experimental-banner"
 import { SetPageTitle } from "@/components/set-page-title"
 import { NumberLineSVG } from "./_components/number-line-svg"
@@ -14,6 +13,7 @@ import { numberLineSerializer } from "./_lib/url-state"
 import { exportSVGElement } from "@/lib/export/canvas-export"
 import { ExportModal } from "@/components/tool-ui/export-modal"
 import { NumberLineToolbar } from "./_components/number-line-toolbar"
+import helpContent from "./HELP.md"
 
 function NumberLineContent() {
     const {
@@ -106,7 +106,9 @@ function NumberLineContent() {
     };
 
     return (
-        <InteractiveToolLayout
+        <ToolScaffold
+            useInteractiveLayout={true}
+            helpContent={helpContent}
             sidebar={
                 <NumberLineSidebar
                     viewport={viewport}
@@ -137,28 +139,32 @@ function NumberLineContent() {
                     onExport={() => setIsExportOpen(true)}
                 />
             }
+            footerOverlay={
+                <NumberLineToolbar
+                    mode={interactionMode}
+                    setMode={setInteractionMode}
+                    className="relative left-auto bottom-auto translate-x-0 transform-none shadow-xl border border-slate-200 dark:border-slate-800"
+                />
+            }
         >
-            <div className="flex-1 overflow-hidden relative flex items-center justify-center p-8 bg-slate-50 dark:bg-slate-950">
-                <div className="w-full max-w-7xl aspect-[5/2] bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
-                    <NumberLineSVG
-                        viewport={viewport}
-                        points={points}
-                        arcs={arcs}
-                        showLabels={showLabels}
-                        hideValues={hideValues}
-                        showNegativeRegion={showNegativeRegion}
-                        interactionMode={interactionMode}
-                        pendingArcStart={pendingArcStart}
-                        onPointMove={movePoint}
-                        onPointClick={handlePointClick}
-                        onLineClick={handleLineClick}
-                        onZoom={(focal, factor) => {
-                            zoom(factor, focal);
-                        }}
-                        onPan={pan}
-                    />
-                </div>
-                <NumberLineToolbar mode={interactionMode} setMode={setInteractionMode} />
+            <div className="flex-1 w-full max-w-7xl aspect-[5/2] bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden relative">
+                <NumberLineSVG
+                    viewport={viewport}
+                    points={points}
+                    arcs={arcs}
+                    showLabels={showLabels}
+                    hideValues={hideValues}
+                    showNegativeRegion={showNegativeRegion}
+                    interactionMode={interactionMode}
+                    pendingArcStart={pendingArcStart}
+                    onPointMove={movePoint}
+                    onPointClick={handlePointClick}
+                    onLineClick={handleLineClick}
+                    onZoom={(focal, factor) => {
+                        zoom(factor, focal);
+                    }}
+                    onPan={pan}
+                />
             </div>
 
             <ExportModal
@@ -167,19 +173,17 @@ function NumberLineContent() {
                 onExport={handleExport}
                 title="Export Number Line"
             />
-        </InteractiveToolLayout>
+        </ToolScaffold>
     );
 }
 
 export default function NumberLinePage() {
     return (
         <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
-            <ResolutionGuard>
-                <ExperimentalBanner pageId="number-line">
-                    <SetPageTitle title="Number Line" />
-                    <NumberLineContent />
-                </ExperimentalBanner>
-            </ResolutionGuard>
+            <ExperimentalBanner pageId="number-line">
+                <SetPageTitle title="Number Line" />
+                <NumberLineContent />
+            </ExperimentalBanner>
         </Suspense>
     );
 }

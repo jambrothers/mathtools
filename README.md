@@ -100,6 +100,17 @@ A logic gate simulator for Computer Science students.
 *Status: Stable. Recently updated with multi-select and enhanced UI.*
 [Documentation](./web/app/computing/circuit-designer/HELP.md)
 
+### 9. Number Line
+An interactive tool for exploring integers, fractions, and decimals on a number line.
+- **Features**:
+    - Customizable range and zoom.
+    - Add points and jumps (arcs).
+    - Toggle labels and values.
+    - Shareable URLs and Export.
+
+*Status: Stable. Core functionality and URL sharing implemented.*
+[Documentation](./web/app/mathematics/number-line/HELP.md)
+
 ## Classroom Games
 
 ### Pointless
