@@ -25,3 +25,7 @@
 ## 2026-02-20 - Canvas Drag Optimization via Pointer Capture
 **Learning:** Using `getBoundingClientRect()` in high-frequency `pointermove` handlers causes layout thrashing (forced reflow). Instead, utilizing `setPointerCapture()` allows using `event.offsetX/Y` which are relative to the captured target, avoiding the need for expensive DOM measurements.
 **Action:** Replaced `getBoundingClientRect` calls in `Canvas` component with `setPointerCapture` and `nativeEvent.offsetX/Y`. Polyfilled these in `jest.setup.ts` for JSDOM testing.
+
+## 2026-02-24 - Optimizing Large Interactive SVGs
+**Learning:** Rendering large SVGs (like Fraction Wall with ~200 segments) with inline map functions causes all segments to re-render on any state change. By extracting the segment into a `React.memo` component and passing stable callbacks and primitive props, React can skip reconciliation for unchanged segments, significantly reducing update time.
+**Action:** Extracted `FractionWallSegment` from `FractionWallSVG` and memoized it. Ensured `onToggle` callback is stable and `isShaded`/`isComparing` logic is passed as boolean props computed in the parent loop.

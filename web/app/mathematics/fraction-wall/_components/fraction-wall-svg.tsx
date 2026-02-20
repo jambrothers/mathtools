@@ -12,6 +12,69 @@ interface FractionWallSVGProps {
     onSegmentClick: (d: number, i: number) => void;
 }
 
+interface FractionWallSegmentProps {
+    d: number;
+    i: number;
+    width: number;
+    height: number;
+    isShaded: boolean;
+    isComparing: boolean;
+    label: string;
+    onToggle: (d: number, i: number) => void;
+}
+
+// Optimization: Memoize individual segments to prevent re-rendering the entire SVG
+// when only one segment's state changes (e.g., clicking to shade).
+const FractionWallSegment = React.memo(function FractionWallSegment({
+    d,
+    i,
+    width,
+    height,
+    isShaded,
+    isComparing,
+    label,
+    onToggle
+}: FractionWallSegmentProps) {
+    return (
+        <g transform={`translate(${i * width}, 0)`}
+            onClick={() => onToggle(d, i)}
+            className="cursor-pointer group"
+        >
+            <rect
+                width={width}
+                height={height}
+                fill={isShaded ? SVG_SHADED_COLORS[d] : SVG_COLORS[d]}
+                stroke="currentColor"
+                strokeWidth="1"
+                className="text-slate-300 dark:text-slate-700 hover:opacity-80 transition-opacity"
+            />
+            {isComparing && (
+                <rect
+                    x="2"
+                    y="2"
+                    width={width - 4}
+                    height={height - 4}
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="3"
+                    strokeDasharray="5,3"
+                    className="pointer-events-none"
+                />
+            )}
+            <text
+                x={width / 2}
+                y={height / 2}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className={`text-sm font-medium pointer-events-none ${isShaded ? 'fill-white' : 'fill-slate-600 dark:fill-slate-400'
+                    }`}
+            >
+                {label}
+            </text>
+        </g>
+    );
+});
+
 export function FractionWallSVG({
     visibleDenominators,
     shadedSegments,
@@ -31,7 +94,7 @@ export function FractionWallSVG({
         shadedSegments.some(s => s.d === d && s.i === i);
 
     const isComparing = (d: number, i: number) =>
-        comparisonPair?.some(s => s.d === d && s.i === i);
+        comparisonPair?.some(s => s.d === d && s.i === i) ?? false;
 
     const getLabel = (n: number, d: number) => {
         if (labelMode === 'none') return '';
@@ -54,48 +117,19 @@ export function FractionWallSVG({
                     return (
                         <g key={d} transform={`translate(0, ${rowIndex * rowHeight})`}>
                             {/* Row Segments */}
-                            {Array.from({ length: d }).map((_, i) => {
-                                const shaded = isShaded(d, i);
-                                const comparing = isComparing(d, i);
-                                return (
-                                    <g key={i} transform={`translate(${i * segmentWidth}, 0)`}
-                                        onClick={() => onSegmentClick(d, i)}
-                                        className="cursor-pointer group"
-                                    >
-                                        <rect
-                                            width={segmentWidth}
-                                            height={rowHeight}
-                                            fill={shaded ? SVG_SHADED_COLORS[d] : SVG_COLORS[d]}
-                                            stroke="currentColor"
-                                            strokeWidth="1"
-                                            className="text-slate-300 dark:text-slate-700 hover:opacity-80 transition-opacity"
-                                        />
-                                        {comparing && (
-                                            <rect
-                                                x="2"
-                                                y="2"
-                                                width={segmentWidth - 4}
-                                                height={rowHeight - 4}
-                                                fill="none"
-                                                stroke="white"
-                                                strokeWidth="3"
-                                                strokeDasharray="5,3"
-                                                className="pointer-events-none"
-                                            />
-                                        )}
-                                        <text
-                                            x={segmentWidth / 2}
-                                            y={rowHeight / 2}
-                                            textAnchor="middle"
-                                            dominantBaseline="middle"
-                                            className={`text-sm font-medium pointer-events-none ${shaded ? 'fill-white' : 'fill-slate-600 dark:fill-slate-400'
-                                                }`}
-                                        >
-                                            {getLabel(i + 1, d)}
-                                        </text>
-                                    </g>
-                                );
-                            })}
+                            {Array.from({ length: d }).map((_, i) => (
+                                <FractionWallSegment
+                                    key={i}
+                                    d={d}
+                                    i={i}
+                                    width={segmentWidth}
+                                    height={rowHeight}
+                                    isShaded={isShaded(d, i)}
+                                    isComparing={isComparing(d, i)}
+                                    label={getLabel(i + 1, d)}
+                                    onToggle={onSegmentClick}
+                                />
+                            ))}
 
                             {/* Row Total Annotation */}
                             {shadedCount > 0 && (
