@@ -5,15 +5,20 @@ import { MousePointer2, PlusCircle, Trash2, CornerRightUp } from "lucide-react"
 import { FloatingPanel } from "@/components/tool-ui/floating-panel"
 import { ToolbarButton, ToolbarGroup } from "@/components/tool-ui/toolbar"
 import { InteractionMode } from "../_hooks/use-number-line"
+import { cn } from "@/lib/utils"
 
 interface NumberLineToolbarProps {
     mode: InteractionMode
     setMode: (mode: InteractionMode) => void
+    className?: string
 }
 
-export function NumberLineToolbar({ mode, setMode }: NumberLineToolbarProps) {
+export function NumberLineToolbar({ mode, setMode, className }: NumberLineToolbarProps) {
     return (
-        <FloatingPanel className="bottom-8 left-1/2 -translate-x-1/2 px-2 py-1.5 flex items-center shadow-2xl bg-white/95 dark:bg-slate-900/95 border-slate-200/50 dark:border-slate-800/50">
+        <FloatingPanel className={cn(
+            "bottom-8 left-1/2 -translate-x-1/2 px-2 py-1.5 flex items-center shadow-2xl bg-white/95 dark:bg-slate-900/95 border-slate-200/50 dark:border-slate-800/50",
+            className
+        )}>
             <ToolbarGroup className="gap-1">
                 <ToolbarButton
                     icon={<MousePointer2 size={20} />}
