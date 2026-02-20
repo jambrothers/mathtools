@@ -38,6 +38,7 @@ export function PointlessSidebar({
     params,
     setParams
 }: PointlessSidebarProps) {
+    const id = React.useId();
 
     const handleParamChange = (key: string, value: string) => {
         const num = Number(value);
@@ -119,9 +120,12 @@ export function PointlessSidebar({
                     <div className="space-y-4">
                         {category === "factors" && (
                             <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-slate-500 dark:text-slate-400">Target Number</label>
+                                <label htmlFor={`${id}-n`} className="text-xs font-bold text-slate-500 dark:text-slate-400">Target Number</label>
                                 <input
+                                    id={`${id}-n`}
                                     type="number"
+                                    min={1}
+                                    max={10000}
                                     value={params.n || ""}
                                     onChange={(e) => handleParamChange("n", e.target.value)}
                                     className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
@@ -132,9 +136,12 @@ export function PointlessSidebar({
                         {category === "multiples-in-range" && (
                             <>
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400">Multiplier</label>
+                                    <label htmlFor={`${id}-multiplier`} className="text-xs font-bold text-slate-500 dark:text-slate-400">Multiplier</label>
                                     <input
+                                        id={`${id}-multiplier`}
                                         type="number"
+                                        min={1}
+                                        max={100}
                                         value={params.multiplier || ""}
                                         onChange={(e) => handleParamChange("multiplier", e.target.value)}
                                         className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -142,18 +149,24 @@ export function PointlessSidebar({
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400">Min</label>
+                                        <label htmlFor={`${id}-min`} className="text-xs font-bold text-slate-500 dark:text-slate-400">Min</label>
                                         <input
+                                            id={`${id}-min`}
                                             type="number"
+                                            min={0}
+                                            max={10000}
                                             value={params.min || ""}
                                             onChange={(e) => handleParamChange("min", e.target.value)}
                                             className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                                         />
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400">Max</label>
+                                        <label htmlFor={`${id}-max`} className="text-xs font-bold text-slate-500 dark:text-slate-400">Max</label>
                                         <input
+                                            id={`${id}-max`}
                                             type="number"
+                                            min={0}
+                                            max={10000}
                                             value={params.max || ""}
                                             onChange={(e) => handleParamChange("max", e.target.value)}
                                             className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -169,9 +182,12 @@ export function PointlessSidebar({
                             category === "powers-of-2" ||
                             category === "triangular-numbers") && (
                                 <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400">Max Value</label>
+                                    <label htmlFor={`${id}-max-val`} className="text-xs font-bold text-slate-500 dark:text-slate-400">Max Value</label>
                                     <input
+                                        id={`${id}-max-val`}
                                         type="number"
+                                        min={1}
+                                        max={category === "powers-of-2" ? 1000000 : 100000}
                                         value={params.max || ""}
                                         onChange={(e) => handleParamChange("max", e.target.value)}
                                         className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"

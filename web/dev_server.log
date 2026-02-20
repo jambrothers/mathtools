@@ -12,8 +12,6 @@ This information is used to shape Next.js' roadmap and prioritize features.
 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
 https://nextjs.org/telemetry
 
-✓ Ready in 1175ms
-○ Compiling /mathematics/fraction-wall ...
- GET /mathematics/fraction-wall 200 in 6.3s (compile: 5.8s, render: 510ms)
- GET /mathematics/fraction-wall 200 in 526ms (compile: 288ms, render: 238ms)
- GET /mathematics/fraction-wall 200 in 407ms (compile: 165ms, render: 243ms)
+✓ Ready in 1265ms
+○ Compiling /games/pointless ...
+ GET /games/pointless 200 in 5.6s (compile: 4.8s, render: 737ms)
