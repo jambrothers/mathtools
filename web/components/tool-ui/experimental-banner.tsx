@@ -6,10 +6,30 @@ import { Banner } from "./banner"
 import { ExperimentalBannerProvider, useExperimentalBanner } from "./experimental-banner-context"
 
 interface ExperimentalBannerProps {
+    /**
+     * Unique identifier for the page.
+     * Used to store the dismissal state in sessionStorage (e.g., `mathtools-experimental-dismissed-[pageId]`).
+     */
     pageId: string
+    /** The content to be rendered below the banner. */
     children: React.ReactNode
 }
 
+/**
+ * A wrapper component that displays a dismissible "Experimental Feature" banner at the top of the page.
+ *
+ * Features:
+ * - **Context Provider**: Wraps children in `ExperimentalBannerProvider` to expose `bannerHeight`.
+ * - **Persistence**: Remembers dismissal state via sessionStorage using `pageId`.
+ * - **Layout Adjustment**: Automatically pushes content down based on banner height.
+ *
+ * @example
+ * ```tsx
+ * <ExperimentalBanner pageId="my-new-tool">
+ *   <MyToolContent />
+ * </ExperimentalBanner>
+ * ```
+ */
 export function ExperimentalBanner({ pageId, children }: ExperimentalBannerProps) {
     return (
         <ExperimentalBannerProvider>
