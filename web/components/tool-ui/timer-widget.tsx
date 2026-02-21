@@ -95,24 +95,23 @@ export function TimerWidget({ className }: { className?: string }) {
             )}
 
             <div className="flex items-center justify-center gap-3 mt-2">
-                {!isRunning ? (
-                    <button
-                        onClick={startTimer}
-                        disabled={seconds === 0}
-                        className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-primary)] hover:opacity-90 disabled:opacity-30 disabled:grayscale text-white shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
-                        aria-label="Start timer"
-                    >
-                        <Play size={18} fill="currentColor" className="ml-0.5" aria-hidden="true" />
-                    </button>
-                ) : (
-                    <button
-                        onClick={pauseTimer}
-                        className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
-                        aria-label="Pause timer"
-                    >
+                <button
+                    onClick={isRunning ? pauseTimer : startTimer}
+                    disabled={!isRunning && seconds === 0}
+                    className={cn(
+                        "flex items-center justify-center w-10 h-10 rounded-full shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2",
+                        !isRunning
+                            ? "bg-[var(--color-primary)] hover:opacity-90 disabled:opacity-30 disabled:grayscale text-white"
+                            : "bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white"
+                    )}
+                    aria-label={isRunning ? "Pause timer" : "Start timer"}
+                >
+                    {isRunning ? (
                         <Pause size={18} fill="currentColor" aria-hidden="true" />
-                    </button>
-                )}
+                    ) : (
+                        <Play size={18} fill="currentColor" className="ml-0.5" aria-hidden="true" />
+                    )}
+                </button>
                 <button
                     onClick={resetTimer}
                     className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
