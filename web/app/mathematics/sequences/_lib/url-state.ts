@@ -6,7 +6,7 @@ import {
     deserializeString,
     deserializeNumber,
 } from '@/lib/url-state';
-import { SequenceType } from './sequences';
+import { SequenceType, MAX_SEQUENCE_LENGTH } from './sequences';
 
 export interface SequencesURLState {
     sequenceType: SequenceType;
@@ -77,7 +77,8 @@ export const sequencesURLSerializer: URLStateSerializer<SequencesURLState> = {
             d: deserializeNumber(params.get(PARAM_D), 3),
             r: deserializeNumber(params.get(PARAM_R), 2),
             d2: deserializeNumber(params.get(PARAM_D2), 2),
-            termCount: deserializeNumber(params.get(PARAM_TERM_COUNT), 0),
+            // Security: clamp termCount to prevent DoS
+            termCount: Math.min(deserializeNumber(params.get(PARAM_TERM_COUNT), 0), MAX_SEQUENCE_LENGTH),
             revealedCount: deserializeNumber(params.get(PARAM_REVEALED_COUNT), 0),
             showCounters: deserializeBool(params.get(PARAM_COUNTERS), true),
             showRule: deserializeBool(params.get(PARAM_RULE), false),

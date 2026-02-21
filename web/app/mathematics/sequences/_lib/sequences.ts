@@ -1,5 +1,8 @@
 export type SequenceType = 'arithmetic' | 'geometric' | 'quadratic';
 
+// Security: Limit sequence length to prevent DoS
+export const MAX_SEQUENCE_LENGTH = 100;
+
 /**
  * Computes the terms of a sequence.
  * @param type - The type of sequence
@@ -18,14 +21,16 @@ export function computeSequence(
     length: number
 ): number[] {
     const terms: number[] = [];
-    if (length <= 0) return terms;
+    // Security: Enforce hard limit on length to prevent DoS
+    const safeLength = Math.min(length, MAX_SEQUENCE_LENGTH);
+    if (safeLength <= 0) return terms;
 
     if (type === 'arithmetic') {
-        for (let n = 0; n < length; n++) {
+        for (let n = 0; n < safeLength; n++) {
             terms.push(a + n * d);
         }
     } else if (type === 'geometric') {
-        for (let n = 0; n < length; n++) {
+        for (let n = 0; n < safeLength; n++) {
             // Handle floating point precision issues (e.g. 2 * 0.1^n)
             // We round to 10 decimal places to strip out floating point artifacts
             const term = a * Math.pow(r, n);
@@ -39,7 +44,7 @@ export function computeSequence(
         const B = d - (3 * A);
         const C = a - A - B;
 
-        for (let n = 1; n <= length; n++) {
+        for (let n = 1; n <= safeLength; n++) {
             terms.push(A * n * n + B * n + C);
         }
     }
