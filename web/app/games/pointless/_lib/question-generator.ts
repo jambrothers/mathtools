@@ -46,9 +46,19 @@ function generateFactorsQuestion(params?: Record<string, number | string>): Ques
     n = clamp(n, 1, 10000);
 
     const answers: number[] = [];
-    for (let i = 1; i <= n; i++) {
-        if (n % i === 0) answers.push(i);
+    // Optimization: Loop up to sqrt(n) instead of n
+    // This reduces complexity from O(n) to O(sqrt(n))
+    for (let i = 1; i * i <= n; i++) {
+        if (n % i === 0) {
+            answers.push(i);
+            if (i * i !== n) {
+                answers.push(n / i);
+            }
+        }
     }
+    // Sort answers numerically to maintain consistent order
+    answers.sort((a, b) => a - b);
+
     return {
         category: "factors",
         text: `Factors of ${n}`,

@@ -25,3 +25,7 @@
 ## 2026-02-20 - Canvas Drag Optimization via Pointer Capture
 **Learning:** Using `getBoundingClientRect()` in high-frequency `pointermove` handlers causes layout thrashing (forced reflow). Instead, utilizing `setPointerCapture()` allows using `event.offsetX/Y` which are relative to the captured target, avoiding the need for expensive DOM measurements.
 **Action:** Replaced `getBoundingClientRect` calls in `Canvas` component with `setPointerCapture` and `nativeEvent.offsetX/Y`. Polyfilled these in `jest.setup.ts` for JSDOM testing.
+
+## 2026-02-23 - Algorithmic Optimization Side Effects
+**Learning:** Replacing an O(n) loop with O(sqrt(n)) for finding factors changes the natural output order (from sorted to unsorted pairs). Functional parity requires an explicit sort, which is cheap for small datasets but easy to forget.
+**Action:** When optimizing algorithms that build lists, always verify if the output order is preserved and add sorting if necessary to match the original contract.
