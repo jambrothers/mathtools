@@ -38,6 +38,8 @@ export default function MyToolPage() {
 }
 ```
 
+> **Note**: When `useInteractiveLayout={true}` is used, `ToolScaffold` wraps the content in `InteractiveToolLayout`. However, it does not currently expose all configuration options (such as `sidebarWidth`). For highly custom layouts (like **Sequences**), consider using `InteractiveToolLayout` or manual composition directly.
+
 ### InteractiveToolLayout
 `interactive-tool-layout.tsx`
 
@@ -180,6 +182,22 @@ A notification component that renders via React Portal to ensure visibility.
 - **Positioning**: Fixed to the bottom-center of the screen.
 - **Variants**: `default`, `success`, `error`.
 - **Accessibility**: Uses `role="status"` and `aria-live` regions.
+
+## Experimental Features
+
+### ExperimentalBanner
+`experimental-banner.tsx`
+
+A wrapper component that displays a dismissible banner at the top of the page to warn users about beta/experimental status.
+- **Usage**: Wrap the tool's page content.
+- **Persistence**: Dismissal is remembered per-page using `pageId` in `sessionStorage`.
+- **Layout**: Uses `ExperimentalBannerProvider` to calculate height and adjust the layout of children (e.g., `InteractiveToolLayout` or custom page layouts) so content isn't obscured.
+
+```tsx
+<ExperimentalBanner pageId="my-beta-tool">
+    <MyToolContent />
+</ExperimentalBanner>
+```
 
 ## Creating a New Tool
 
