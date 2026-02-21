@@ -25,3 +25,7 @@
 ## 2026-02-15 - Toggle Button State Feedback
 **Learning:** Standard `<button>` elements used for toggling features (like visibility or mode selection) often rely only on visual cues (background color), making their state invisible to screen readers.
 **Action:** Always use `aria-pressed={isActive}` for toggle buttons and mode selectors to explicitly communicate state changes. Pair this with `aria-label` when the button text (e.g., "1") lacks context.
+
+## 2026-02-24 - Focus Preservation on Conditional Buttons
+**Learning:** Conditionally rendering two different button elements (e.g., Start vs. Pause) causes focus loss when the state toggles, forcing keyboard users to re-navigate.
+**Action:** Use a single `<button>` element and dynamically update its attributes (`aria-label`, `onClick`, icon) based on state to preserve focus.
