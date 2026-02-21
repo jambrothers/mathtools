@@ -1,4 +1,4 @@
-import { Linkedin, Mail } from "lucide-react"
+import { Mail } from "lucide-react"
 import { BlueskyIcon } from "./icons/bluesky-icon"
 
 /**
@@ -21,10 +21,10 @@ export function Footer() {
                     © {new Date().getFullYear()} TeachMaths.net. All rights reserved.
                 </p>
                 <div className="flex items-center gap-6">
-                    <a href="#" aria-label="LinkedIn" className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
+                    {/* <a href="#" aria-label="LinkedIn" className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
                         <Linkedin size={20} />
-                    </a>
-                    <a href="https://bsky.app" aria-label="Bluesky" className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
+                    </a> */}
+                    <a href="https://bsky.app/profile/teachmaths.bsky.social" aria-label="Bluesky" className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
                         <BlueskyIcon size={20} />
                     </a>
                     <a href="mailto:help@teachmaths.net" aria-label="Email" className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
