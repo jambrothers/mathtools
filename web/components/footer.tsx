@@ -1,4 +1,4 @@
-import { Mail } from "lucide-react"
+import { Mail, Twitter } from "lucide-react"
 import { BlueskyIcon } from "./icons/bluesky-icon"
 
 /**
@@ -26,6 +26,9 @@ export function Footer() {
                     </a> */}
                     <a href="https://bsky.app/profile/teachmaths.bsky.social" aria-label="Bluesky" className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
                         <BlueskyIcon size={20} />
+                    </a>
+                    <a href="https://x.com/JoTeachMaths" aria-label="X (Twitter)" className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
+                        <Twitter size={20} />
                     </a>
                     <a href="mailto:help@teachmaths.net" aria-label="Email" className="text-[var(--theme-muted)] hover:text-[var(--theme-main)] transition-colors">
                         <Mail size={20} />
