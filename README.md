@@ -180,7 +180,7 @@ mathtools/
     - **`[tool-name]/`**: Each tool has its own subdirectory containing its page, `HELP.md`, and tool-specific local components.
 - **`web/components/`**: Shared reusable components. [Documentation](./web/components/README.md)
   - **`tool-ui/`**: Components shared across multiple tools (e.g., `Canvas`, `TileBase`, `Toolbar`, `HelpModal`).
-- **`lib/`**: Utility functions and custom hooks.
+- **`lib/`**: Utility functions and custom hooks. [Documentation](./web/lib/README.md)
   - **`url-state.ts`**: Generic URL state serialization utilities for shareable tool configurations.
 
 ### Key Architectural Concepts
