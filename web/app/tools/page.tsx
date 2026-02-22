@@ -74,6 +74,13 @@ export default function ToolsPage() {
                                 gradient="from-emerald-500 to-teal-500"
                                 icon={<Rows2 className="w-8 h-8 text-emerald-500" />}
                             />
+                            <ToolCard
+                                title="Area Model"
+                                description="Visualise multiplication and algebraic expansion. Auto-partition factors, toggle partial products, and explore with discrete arrays."
+                                href="/mathematics/area-model"
+                                gradient="from-teal-500 to-cyan-500"
+                                icon={<Grid2x2 className="w-8 h-8 text-teal-500" />}
+                            />
                         </div>
                     </div>
 
