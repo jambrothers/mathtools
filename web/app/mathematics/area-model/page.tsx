@@ -11,6 +11,7 @@ import { generateShareableURL, copyURLToClipboard } from '@/lib/url-state';
 import { Toast } from '@/components/tool-ui/toast';
 import { ExportModal } from '@/components/tool-ui/export-modal';
 import { exportSVGElement } from '@/lib/export/canvas-export';
+import { SetPageTitle } from '@/components/set-page-title';
 import helpContent from './HELP.md';
 
 function AreaModelPageContent() {
@@ -51,7 +52,9 @@ function AreaModelPageContent() {
         decrementFactorA,
         incrementFactorB,
         decrementFactorB,
-        isAlgebraic
+        isAlgebraic,
+        undo,
+        canUndo
     } = useAreaModel();
 
     // Sync URL state when state change
@@ -128,71 +131,76 @@ function AreaModelPageContent() {
     };
 
     return (
-        <ToolScaffold
-            useInteractiveLayout={true}
-            helpContent={helpContent}
-            toolbarOverlay={
-                <AreaModelToolbar
-                    factorA={factorA}
-                    factorB={factorB}
-                    onFactorAChange={setFactorA}
-                    onFactorBChange={setFactorB}
-                    onIncrementA={incrementFactorA}
-                    onDecrementA={decrementFactorA}
-                    onIncrementB={incrementFactorB}
-                    onDecrementB={decrementFactorB}
-                    onVisualise={() => {
-                        visualise();
-                        updateURL();
-                    }}
-                    onClear={clear}
-                    showFactorLabels={showFactorLabels}
-                    showPartialProducts={showPartialProducts}
-                    showTotal={showTotal}
-                    showGridLines={showGridLines}
-                    showArray={showArray}
-                    onToggleFactorLabels={toggleFactorLabels}
-                    onTogglePartialProducts={togglePartialProducts}
-                    onToggleTotal={toggleTotal}
-                    onToggleGridLines={toggleGridLines}
-                    onToggleArray={toggleArray}
-                    isAlgebraic={isAlgebraic}
-                    onRevealAll={revealAll}
-                    onHideAll={hideAll}
-                    autoPartition={autoPartition}
-                    onToggleAutoPartition={() => setAutoPartition(prev => !prev)}
-                    onGenerateLink={handleGenerateLink}
-                    onExport={() => setIsExportModalOpen(true)}
-                />
-            }
-        >
-            <AreaModelCanvas
-                ref={svgRef}
-                model={model}
-                products={products}
-                total={total}
+        <div className="flex flex-col flex-1 min-h-0 w-full">
+            <SetPageTitle title="Area Model" />
+
+            <AreaModelToolbar
+                factorA={factorA}
+                factorB={factorB}
+                onFactorAChange={setFactorA}
+                onFactorBChange={setFactorB}
+                onIncrementA={incrementFactorA}
+                onDecrementA={decrementFactorA}
+                onIncrementB={incrementFactorB}
+                onDecrementB={decrementFactorB}
+                onVisualise={() => {
+                    visualise();
+                    updateURL();
+                }}
+                onClear={clear}
+                onUndo={undo}
+                canUndo={canUndo}
                 showFactorLabels={showFactorLabels}
                 showPartialProducts={showPartialProducts}
                 showTotal={showTotal}
                 showGridLines={showGridLines}
                 showArray={showArray}
-                revealedCells={revealedCells}
-                onCellClick={revealCell}
+                onToggleFactorLabels={toggleFactorLabels}
+                onTogglePartialProducts={togglePartialProducts}
+                onToggleTotal={toggleTotal}
+                onToggleGridLines={toggleGridLines}
+                onToggleArray={toggleArray}
+                isAlgebraic={isAlgebraic}
+                onRevealAll={revealAll}
+                onHideAll={hideAll}
+                autoPartition={autoPartition}
+                onToggleAutoPartition={() => setAutoPartition(prev => !prev)}
+                onGenerateLink={handleGenerateLink}
+                onExport={() => setIsExportModalOpen(true)}
             />
 
-            <ExportModal
-                isOpen={isExportModalOpen}
-                onClose={() => setIsExportModalOpen(false)}
-                onExport={handleExport}
-                title="Export Area Model"
-            />
+            <ToolScaffold
+                useInteractiveLayout={false}
+                helpContent={helpContent}
+            >
+                <AreaModelCanvas
+                    ref={svgRef}
+                    model={model}
+                    products={products}
+                    total={total}
+                    showFactorLabels={showFactorLabels}
+                    showPartialProducts={showPartialProducts}
+                    showTotal={showTotal}
+                    showGridLines={showGridLines}
+                    showArray={showArray}
+                    revealedCells={revealedCells}
+                    onCellClick={revealCell}
+                />
 
-            <Toast
-                message="Link copied to clipboard"
-                isVisible={showToast}
-                onClose={() => setShowToast(false)}
-            />
-        </ToolScaffold>
+                <ExportModal
+                    isOpen={isExportModalOpen}
+                    onClose={() => setIsExportModalOpen(false)}
+                    onExport={handleExport}
+                    title="Export Area Model"
+                />
+
+                <Toast
+                    message="Link copied to clipboard"
+                    isVisible={showToast}
+                    onClose={() => setShowToast(false)}
+                />
+            </ToolScaffold>
+        </div>
     );
 }
 

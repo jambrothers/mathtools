@@ -77,8 +77,8 @@ test.describe('Area Model Tool', () => {
         await expect(page.getByTestId('product-label-0-0')).toHaveText('x²');
         await expect(page.getByTestId('total-label')).toHaveText('Total: x² + 3x + 2');
 
-        // Discrete array should be disabled
-        const arrayToggle = page.getByLabel('Toggle Discrete Array');
+        // Discrete array should be disabled in algebraic mode
+        const arrayToggle = page.getByLabel('Array');
         await expect(arrayToggle).toBeDisabled();
     });
 });

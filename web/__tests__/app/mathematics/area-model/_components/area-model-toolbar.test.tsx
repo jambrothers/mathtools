@@ -67,13 +67,13 @@ describe('AreaModelToolbar', () => {
         const onToggleFactorLabels = jest.fn();
         render(<AreaModelToolbar {...defaultProps} onToggleFactorLabels={onToggleFactorLabels} />);
 
-        fireEvent.click(screen.getByLabelText(/toggle labels/i));
+        fireEvent.click(screen.getByLabelText(/labels/i));
         expect(onToggleFactorLabels).toHaveBeenCalled();
     });
 
     it('disables array toggle when algebraic', () => {
         render(<AreaModelToolbar {...defaultProps} isAlgebraic={true} />);
-        const arrayToggle = screen.getByLabelText(/toggle discrete array/i);
+        const arrayToggle = screen.getByLabelText(/array/i);
         expect(arrayToggle).toBeDisabled();
     });
 
@@ -83,5 +83,21 @@ describe('AreaModelToolbar', () => {
 
         fireEvent.click(screen.getByLabelText(/auto-partition/i));
         expect(onToggleAutoPartition).toHaveBeenCalled();
+    });
+
+    it('handles undo click', () => {
+        const onUndo = jest.fn();
+        render(<AreaModelToolbar {...defaultProps} onUndo={onUndo} canUndo={true} />);
+
+        fireEvent.click(screen.getByLabelText(/undo/i));
+        expect(onUndo).toHaveBeenCalled();
+    });
+
+    it('handles clear click', () => {
+        const onClear = jest.fn();
+        render(<AreaModelToolbar {...defaultProps} onClear={onClear} />);
+
+        fireEvent.click(screen.getByLabelText(/clear/i));
+        expect(onClear).toHaveBeenCalled();
     });
 });

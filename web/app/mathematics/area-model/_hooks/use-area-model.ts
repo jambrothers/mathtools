@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useMemo } from 'react';
+import { useHistory } from '@/lib/hooks/use-history';
 import {
     AreaModel,
     PartialProduct,
@@ -11,20 +12,33 @@ import {
     adjustLastConstant
 } from '../_lib/area-model-logic';
 
+interface AreaModelInputState {
+    factorA: string;
+    factorB: string;
+    autoPartition: boolean;
+}
+
 export function useAreaModel() {
-    // Model state
+    // History manages the input state
+    const {
+        state: inputState,
+        pushState: setInputState,
+        undo,
+        canUndo,
+    } = useHistory<AreaModelInputState>({
+        factorA: '',
+        factorB: '',
+        autoPartition: false
+    });
+
+    const { factorA, factorB, autoPartition } = inputState;
+
+    // Model state (derived from input state on visualise)
     const [model, setModel] = useState<AreaModel | null>(null);
     const [products, setProducts] = useState<PartialProduct[][] | null>(null);
     const [total, setTotal] = useState<string>('');
 
-    // Input state
-    const [factorA, setFactorA] = useState<string>('');
-    const [factorB, setFactorB] = useState<string>('');
-
-    // Settings
-    const [autoPartition, setAutoPartition] = useState<boolean>(false);
-
-    // Visibility toggles
+    // Visibility toggles (not in history to avoid polluting)
     const [showFactorLabels, setShowFactorLabels] = useState(true);
     const [showPartialProducts, setShowPartialProducts] = useState(true);
     const [showTotal, setShowTotal] = useState(true);
@@ -36,6 +50,21 @@ export function useAreaModel() {
 
     const isAlgebraicModel = useMemo(() => model ? isAlgebraic(model) : false, [model]);
 
+    const setFactorA = useCallback((v: string) => {
+        setInputState(prev => ({ ...prev, factorA: v }));
+    }, [setInputState]);
+
+    const setFactorB = useCallback((v: string) => {
+        setInputState(prev => ({ ...prev, factorB: v }));
+    }, [setInputState]);
+
+    const setAutoPartition = useCallback((v: boolean | ((p: boolean) => boolean)) => {
+        setInputState(prev => ({
+            ...prev,
+            autoPartition: typeof v === 'function' ? v(prev.autoPartition) : v
+        }));
+    }, [setInputState]);
+
     const visualise = useCallback(() => {
         const newModel = buildModel(factorA, factorB, autoPartition);
         const newProducts = computePartialProducts(newModel);
@@ -45,11 +74,6 @@ export function useAreaModel() {
         setProducts(newProducts);
         setTotal(newTotal);
 
-        // Auto-reveal if it's a small model, or hide all?
-        // User requested progressive revealing, so let's default to reveal all for now
-        // unless they specifically want to hide.
-        // Actually, following the "predict-observe-explain" pedagogy, maybe default to revealed
-        // but give buttons to hide/show all.
         const allCells = new Set<string>();
         newProducts.forEach((row, i) => {
             row.forEach((_, j) => {
@@ -60,14 +84,17 @@ export function useAreaModel() {
     }, [factorA, factorB, autoPartition]);
 
     const clear = useCallback(() => {
+        setInputState({
+            factorA: '',
+            factorB: '',
+            autoPartition: false
+        });
         setModel(null);
         setProducts(null);
         setTotal('');
-        setFactorA('');
-        setFactorB('');
         setRevealedCells(new Set());
         setShowArray(false);
-    }, []);
+    }, [setInputState]);
 
     const toggleFactorLabels = useCallback(() => setShowFactorLabels(prev => !prev), []);
     const togglePartialProducts = useCallback(() => setShowPartialProducts(prev => !prev), []);
@@ -103,20 +130,20 @@ export function useAreaModel() {
     }, []);
 
     const incrementFactorA = useCallback(() => {
-        setFactorA(prev => adjustLastConstant(prev, 1));
-    }, []);
+        setFactorA(adjustLastConstant(factorA, 1));
+    }, [factorA, setFactorA]);
 
     const decrementFactorA = useCallback(() => {
-        setFactorA(prev => adjustLastConstant(prev, -1));
-    }, []);
+        setFactorA(adjustLastConstant(factorA, -1));
+    }, [factorA, setFactorA]);
 
     const incrementFactorB = useCallback(() => {
-        setFactorB(prev => adjustLastConstant(prev, 1));
-    }, []);
+        setFactorB(adjustLastConstant(factorB, 1));
+    }, [factorB, setFactorB]);
 
     const decrementFactorB = useCallback(() => {
-        setFactorB(prev => adjustLastConstant(prev, -1));
-    }, []);
+        setFactorB(adjustLastConstant(factorB, -1));
+    }, [factorB, setFactorB]);
 
     return {
         model,
@@ -148,6 +175,8 @@ export function useAreaModel() {
         decrementFactorA,
         incrementFactorB,
         decrementFactorB,
-        isAlgebraic: isAlgebraicModel
+        isAlgebraic: isAlgebraicModel,
+        undo,
+        canUndo
     };
 }

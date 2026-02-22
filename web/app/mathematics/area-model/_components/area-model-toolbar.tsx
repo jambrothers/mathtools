@@ -7,14 +7,15 @@ import {
     Grid2x2,
     Hash,
     Table,
-    Share2,
     Download,
     ChevronUp,
     ChevronDown,
     Trash2,
-    Play
+    Play,
+    Undo2
 } from "lucide-react";
 import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator, ToolbarInput } from "@/components/tool-ui/toolbar";
+import { CopyLinkButton } from "@/components/tool-ui/copy-link-button";
 
 interface FactorInputProps {
     label: string;
@@ -69,6 +70,8 @@ interface AreaModelToolbarProps {
     onDecrementB: () => void;
     onVisualise: () => void;
     onClear: () => void;
+    onUndo?: () => void;
+    canUndo?: boolean;
 
     // Visibility toggles
     showFactorLabels: boolean;
@@ -107,6 +110,8 @@ export function AreaModelToolbar({
     onDecrementB,
     onVisualise,
     onClear,
+    onUndo,
+    canUndo = false,
     showFactorLabels,
     showPartialProducts,
     showTotal,
@@ -126,7 +131,7 @@ export function AreaModelToolbar({
     onExport
 }: AreaModelToolbarProps) {
     return (
-        <Toolbar>
+        <Toolbar className="gap-x-4 gap-y-2">
             <ToolbarGroup>
                 <FactorInput
                     id="a"
@@ -152,12 +157,6 @@ export function AreaModelToolbar({
                     className="ml-2"
                     label="Visualise"
                 />
-                <ToolbarButton
-                    icon={<Trash2 className="h-4 w-4 text-rose-500" />}
-                    onClick={onClear}
-                    title="Clear everything"
-                    aria-label="Clear everything"
-                />
             </ToolbarGroup>
 
             <ToolbarSeparator />
@@ -167,37 +166,32 @@ export function AreaModelToolbar({
                     icon={showFactorLabels ? <Type className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     onClick={onToggleFactorLabels}
                     active={showFactorLabels}
-                    title="Toggle Labels"
-                    aria-label="Toggle Labels"
+                    label="Labels"
                 />
                 <ToolbarButton
                     icon={showPartialProducts ? <Calculator className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     onClick={onTogglePartialProducts}
                     active={showPartialProducts}
-                    title="Toggle Partial Products"
-                    aria-label="Toggle Partial Products"
+                    label="Partials"
                 />
                 <ToolbarButton
                     icon={showTotal ? <Table className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     onClick={onToggleTotal}
                     active={showTotal}
-                    title="Toggle Total"
-                    aria-label="Toggle Total"
+                    label="Total"
                 />
                 <ToolbarButton
                     icon={<Grid2x2 className="h-4 w-4" />}
                     onClick={onToggleGridLines}
                     active={showGridLines}
-                    title="Toggle Partition Lines"
-                    aria-label="Toggle Partition Lines"
+                    label="Grid"
                 />
                 <ToolbarButton
                     icon={<Hash className="h-4 w-4" />}
                     onClick={onToggleArray}
                     active={showArray}
                     disabled={isAlgebraic}
-                    title="Toggle Discrete Array"
-                    aria-label="Toggle Discrete Array"
+                    label="Array"
                 />
             </ToolbarGroup>
 
@@ -227,18 +221,33 @@ export function AreaModelToolbar({
                 />
             </ToolbarGroup>
 
+            <ToolbarSeparator />
+
+            <ToolbarGroup>
+                <ToolbarButton
+                    icon={<Undo2 size={16} />}
+                    label="Undo"
+                    onClick={onUndo}
+                    disabled={!canUndo || !onUndo}
+                />
+            </ToolbarGroup>
+
             <div className="flex-1" />
 
             <ToolbarGroup>
                 <ToolbarButton
-                    icon={<Share2 className="h-4 w-4" />}
-                    onClick={onGenerateLink}
-                    title="Share Link"
+                    icon={<Trash2 className="h-4 w-4" />}
+                    onClick={onClear}
+                    label="Clear"
+                    variant="danger"
                 />
+                <ToolbarSeparator />
+                <CopyLinkButton onCopyLink={onGenerateLink} />
+                <ToolbarSeparator />
                 <ToolbarButton
                     icon={<Download className="h-4 w-4" />}
                     onClick={onExport}
-                    title="Export Image"
+                    label="Export"
                 />
             </ToolbarGroup>
         </Toolbar>
